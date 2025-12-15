@@ -65,7 +65,9 @@
         @apply opacity-0 pointer-events-none
     }
 
-
+    #toc-inner-wrapper {
+        mask-image: linear-gradient(to bottom, transparent 0%, black 2rem, black calc(100% - 2rem), transparent 100%);
+    }
 
     .hide-scrollbar {
         scrollbar-width: none;
@@ -108,12 +110,6 @@
     .btn-regular-dark.success {
         @apply bg-[oklch(0.75_0.14_var(--hue))] dark:bg-[oklch(0.75_0.14_var(--hue))]
     }
-}
-
-a.visible {
-    color: var(--primary); /* 기본 색상으로 변경 */
-    background-color: var(--toc-btn-hover); /* 호버 색상으로 배경 설정 */
-    font-weight: 600; /* 굵게 */
 }
 
 .custom-md img, #post-cover img {

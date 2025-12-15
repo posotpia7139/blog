@@ -1,5 +1,5 @@
 # 🍥 Fuwari
-md
+
 Template blog statis yang dibangun dengan [Astro](https://astro.build).
 
 [**🖥️ Demo Langsung (Vercel)**](https://fuwari.vercel.app)
