@@ -1,9 +1,16 @@
 # About
-This is the demo site for [Fuwari](https://github.com/saicaca/fuwari).
+`혼자 만들고, 기록하고, 남깁니다.`
 
-::github{repo="saicaca/fuwari"}
+1인 인디 개발자의 창작과 학습, 
+시행착오를 기록하는 공간입니다.
+## Why this blog exists
 
-> ### Sources of images used in this site
-> - [Unsplash](https://unsplash.com/)
-> - [星と少女](https://www.pixiv.net/artworks/108916539) by [Stella](https://www.pixiv.net/users/93273965)
-> - [Rabbit - v1.4 Showcase](https://civitai.com/posts/586908) by [Rabbit_YourMajesty](https://civitai.com/user/Rabbit_YourMajesty)
+- 혼자 만드는 과정에서 배운 것을 정리하기 위해
+- 휘발되지 않는 기록을 남기기 위해
+- 의미 있는 창작으로 이어질 가능성을 탐색하기 위해
+## What I write about
+
+- Web / App 개발 기록
+- 인디 게임 & 개인 프로젝트
+- 기술을 도구로 한 경제적 독립 실험
+- 창작, 미니멀리즘, 사유에 대한 메모
