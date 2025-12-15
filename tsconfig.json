@@ -2,6 +2,8 @@
   "extends": "astro/tsconfigs/strict",
   "compilerOptions": {
     "baseUrl": ".",
+      // 경고만 숨기기
+      "ignoreDeprecations": "6.0",
     "strictNullChecks": true,
     "allowJs": false,
     "declaration": true,
