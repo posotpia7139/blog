@@ -8,7 +8,7 @@ import type {
 import { LinkPreset } from "./types/config";
 
 export const siteConfig: SiteConfig = {
-	title: "Jamesolo",
+	title: "Jamesolo.work",
 	subtitle: "A Solo Creation Log",
 	lang: "ko", // Language code, e.g. 'en', 'zh_CN', 'ja', etc.
 	themeColor: {

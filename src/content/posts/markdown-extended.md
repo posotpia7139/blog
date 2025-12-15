@@ -25,11 +25,11 @@ Create a GitHub repository card with the code `::github{repo="<owner>/<repo>"}`.
 Following types of admonitions are supported: `note` `tip` `important` `warning` `caution`
 
 :::note
-Highlights information that users should take into account, even when skimming.
+대충 훑어보더라도 사용자가 반드시 알아야 할 정보를 강조합니다.
 :::
 
 :::tip
-Optional information to help a user be more successful.
+사용자가 더 잘 활용할 수 있도록 돕는 선택적 정보입니다.
 :::
 
 :::important
