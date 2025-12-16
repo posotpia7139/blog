@@ -29,8 +29,8 @@
         &:hover, &:active {
             @apply decoration-transparent;
             background: var(--btn-plain-bg-hover);
-            border-bottom: 1px dashed var(--link-hover);
-            text-decoration: none;
+            /* border-bottom: 1px dashed var(--link-hover); */
+            /* text-decoration: none; */
         }
     }
 
