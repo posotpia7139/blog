@@ -6,18 +6,9 @@ import MainGridLayout from "@layouts/MainGridLayout.astro";
 import { getSortedPostsList } from "../utils/content-utils";
 
 const sortedPostsList = await getSortedPostsList();
-
-const tags = Astro.url.searchParams.getAll("tag");
-const categories = Astro.url.searchParams.getAll("category");
-const uncategorized = Astro.url.searchParams.has("uncategorized");
 ---
 
 <MainGridLayout title={i18n(I18nKey.archive)}>
-    <ArchivePanel
-            sortedPosts={sortedPostsList}
-            tags={tags}
-            categories={categories}
-            uncategorized={uncategorized}
-            client:load
-    ></ArchivePanel>
+    <ArchivePanel sortedPosts={sortedPostsList} client:only="svelte"></ArchivePanel>
 </MainGridLayout>
+
