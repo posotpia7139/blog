@@ -14,9 +14,14 @@ const className = Astro.props.class;
 <div id="sidebar" class:list={[className, "w-full"]}>
     <div class="flex flex-col w-full gap-4 mb-4">
         <Profile></Profile>
-    </div>
-    <div id="sidebar-sticky" class="transition-all duration-700 flex flex-col w-full gap-4 top-4">
         <Categories class="onload-animation" style="animation-delay: 150ms"></Categories>
+    </div>
+    <div id="sidebar-sticky" class="sticky transition-all duration-700 flex flex-col w-full gap-4 top-4">
+        <!-- Ad Space -->
+        <div class="w-[300px] h-[600px] bg-gray-200 dark:bg-gray-800 flex items-center justify-center text-sm text-gray-500 rounded-lg">
+            Adsense (300x600)
+        </div>
+
         <!-- <Tag class="onload-animation" style="animation-delay: 200ms"></Tag> -->
     </div>
 </div>
