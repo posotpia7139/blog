@@ -10,15 +10,5 @@ module.exports = {
       },
     },
   },
-  plugins: [
-    require("@tailwindcss/typography"),
-    function ({ addComponents }) {
-      addComponents({
-        ".link": {
-          "@apply font-medium text-[var(--primary)] underline decoration-[var(--link-underline)] decoration-1 decoration-dashed underline-offset-4":
-            {},
-        },
-      })
-    },
-  ],
+  plugins: [require("@tailwindcss/typography")],
 }
