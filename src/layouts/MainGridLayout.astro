@@ -22,7 +22,6 @@ interface Props {
 	lang?: string;
 	setOGTypeArticle?: boolean;
 	headings?: MarkdownHeading[];
-	isArchivePage?: boolean;
 }
 
 const {
@@ -32,7 +31,6 @@ const {
 	lang,
 	setOGTypeArticle,
 	headings = [],
-	isArchivePage = false,
 } = Astro.props;
 const hasBannerCredit =
 	siteConfig.banner.enable && siteConfig.banner.credit.enable;
@@ -81,11 +79,8 @@ const mainPanelTop = siteConfig.banner.enable
                 </Icon>
             </a>}
 
-            {
-                !isArchivePage && (
-                    <SideBar class="mb-4 row-start-2 row-end-3 col-span-2 lg:col-start-2 lg:row-start-1 lg:row-end-2 lg:col-span-1 lg:w-[18.75rem] onload-animation" headings={headings}></SideBar>
-                )
-            }
+
+                        <SideBar class="mb-4 row-start-2 row-end-3 col-span-2 lg:col-start-2 lg:row-start-1 lg:row-end-2 lg:col-span-1 lg:w-[18.75rem] onload-animation" headings={headings}></SideBar>
 
 
             
@@ -124,19 +119,19 @@ const mainPanelTop = siteConfig.banner.enable
             
 
 
-                                                <div class:list={["footer col-span-2 onload-animation block lg:hidden", {"hidden": isArchivePage}]}>
+                                                                        <div class="footer col-span-2 onload-animation block lg:hidden">
 
 
             
 
 
-                                                    <Footer></Footer>
+                                                                            <Footer></Footer>
 
 
             
 
 
-                                                </div>
+                                                                        </div>
 
 
                     </div>

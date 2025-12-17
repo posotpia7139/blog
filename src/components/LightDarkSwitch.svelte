@@ -11,7 +11,6 @@ import {
 import { onMount } from "svelte";
 import type { LIGHT_DARK_MODE } from "@/types/config.ts";
 
-const seq: LIGHT_DARK_MODE[] = [LIGHT_MODE, DARK_MODE, AUTO_MODE];
 let mode: LIGHT_DARK_MODE = $state(AUTO_MODE);
 
 onMount(() => {
@@ -37,29 +36,29 @@ function switchScheme(newMode: LIGHT_DARK_MODE) {
 }
 
 function toggleScheme() {
-	let i = 0;
-	for (; i < seq.length; i++) {
-		if (seq[i] === mode) {
-			break;
+	if (mode === AUTO_MODE) {
+		// AUTO_MODE일 때, 시스템 테마에 따라 반대 테마로 전환.
+		// 시스템이 다크 모드이면 라이트 모드로, 아니면 다크 모드로 전환.
+		if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+			switchScheme(LIGHT_MODE); // 시스템이 다크면 라이트로
+		} else {
+			switchScheme(DARK_MODE); // 시스템이 라이트면 다크로
 		}
+	} else if (mode === LIGHT_MODE) {
+		// 현재 라이트 모드이면 다크 모드로 전환.
+		switchScheme(DARK_MODE);
+	} else { // mode === DARK_MODE
+		// 현재 다크 모드이면 라이트 모드로 전환.
+		switchScheme(LIGHT_MODE);
 	}
-	switchScheme(seq[(i + 1) % seq.length]);
 }
 
-function showPanel() {
-	const panel = document.querySelector("#light-dark-panel");
-	panel.classList.remove("float-panel-closed");
-}
 
-function hidePanel() {
-	const panel = document.querySelector("#light-dark-panel");
-	panel.classList.add("float-panel-closed");
-}
 </script>
 
 <!-- z-50 make the panel higher than other float panels -->
-<div class="relative z-50" role="menu" tabindex="-1" onmouseleave={hidePanel}>
-    <button aria-label="Light/Dark Mode" role="menuitem" class="relative btn-plain scale-animation rounded-lg h-11 w-11 active:scale-90" id="scheme-switch" onclick={toggleScheme} onmouseenter={showPanel}>
+<div class="relative z-50" role="menu" tabindex="-1">
+    <button aria-label="Light/Dark Mode" role="menuitem" class="relative btn-plain scale-animation rounded-lg h-11 w-11 active:scale-90" id="scheme-switch" onclick={toggleScheme}>
         <div class="absolute" class:opacity-0={mode !== LIGHT_MODE}>
             <Icon icon="material-symbols:wb-sunny-outline-rounded" class="text-[1.25rem]"></Icon>
         </div>
@@ -70,30 +69,4 @@ function hidePanel() {
             <Icon icon="material-symbols:radio-button-partial-outline" class="text-[1.25rem]"></Icon>
         </div>
     </button>
-
-    <div id="light-dark-panel" class="hidden lg:block absolute transition float-panel-closed top-11 -right-2 pt-5" >
-        <div class="card-base float-panel p-2">
-            <button class="flex transition whitespace-nowrap items-center !justify-start w-full btn-plain scale-animation rounded-lg h-9 px-3 font-medium active:scale-95 mb-0.5"
-                    class:current-theme-btn={mode === LIGHT_MODE}
-                    onclick={() => switchScheme(LIGHT_MODE)}
-            >
-                <Icon icon="material-symbols:wb-sunny-outline-rounded" class="text-[1.25rem] mr-3"></Icon>
-                {i18n(I18nKey.lightMode)}
-            </button>
-            <button class="flex transition whitespace-nowrap items-center !justify-start w-full btn-plain scale-animation rounded-lg h-9 px-3 font-medium active:scale-95 mb-0.5"
-                    class:current-theme-btn={mode === DARK_MODE}
-                    onclick={() => switchScheme(DARK_MODE)}
-            >
-                <Icon icon="material-symbols:dark-mode-outline-rounded" class="text-[1.25rem] mr-3"></Icon>
-                {i18n(I18nKey.darkMode)}
-            </button>
-            <button class="flex transition whitespace-nowrap items-center !justify-start w-full btn-plain scale-animation rounded-lg h-9 px-3 font-medium active:scale-95"
-                    class:current-theme-btn={mode === AUTO_MODE}
-                    onclick={() => switchScheme(AUTO_MODE)}
-            >
-                <Icon icon="material-symbols:radio-button-partial-outline" class="text-[1.25rem] mr-3"></Icon>
-                {i18n(I18nKey.systemMode)}
-            </button>
-        </div>
-    </div>
 </div>
