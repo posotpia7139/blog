@@ -13,7 +13,7 @@ const config = profileConfig;
             <ImageWrapper src={config.avatar || ""} alt="Profile Image of the Author" class="w-full h-full object-cover"></ImageWrapper>
         </div>
         <div class="flex-grow"> <!-- Container for name and bio, allowing it to grow -->
-            <div class="font-bold text-xl text-left dark:text-neutral-50 transition group-hover:text-[var(--primary)]">{config.name}</div>
+            <div class="font-bold text-xl text-left dark:text-neutral-50 transition">{config.name}</div>
             <!-- Blue line removed -->
             <div class="text-left text-neutral-400 transition">{config.bio}</div>
         </div>

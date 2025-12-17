@@ -80,7 +80,8 @@ const mainPanelTop = siteConfig.banner.enable
             </a>}
 
 
-                        <SideBar class="mb-4 row-start-2 row-end-3 col-span-2 lg:col-start-2 lg:row-start-1 lg:row-end-2 lg:col-span-1 lg:w-[18.75rem] onload-animation" headings={headings}></SideBar>
+                        <SideBar class="mb-4 row-start-2 row-end-3 col-span-2 lg:col-start-2 lg:row-start-1 lg:row-end-2 lg:col-span-1 lg:w-[18.75rem] onload-animation" headings={headings}
+                     showProfileAndCategories={!Astro.url.pathname.includes("/archive")}></SideBar>
 
 
             
