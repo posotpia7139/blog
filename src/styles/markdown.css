@@ -123,6 +123,11 @@
         }
     }
 
+    hr {
+        @apply border-dashed border-[var(--line-divider)];
+        border-top-width: 2.5px;
+    }
+
     blockquote {
         @apply not-italic border-transparent relative;
         font-weight: inherit;
