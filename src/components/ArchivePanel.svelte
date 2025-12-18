@@ -5,14 +5,9 @@ import I18nKey from "../i18n/i18nKey";
 import { i18n } from "../i18n/translation";
 import { getPostUrlBySlug } from "../utils/url-utils";
 
-export let tags: string[];
-export let categories: string[];
+export let tags: string[] = [];
+export let categories: string[] = [];
 export let sortedPosts: Post[] = [];
-
-const params = new URLSearchParams(window.location.search);
-tags = params.has("tag") ? params.getAll("tag") : [];
-categories = params.has("category") ? params.getAll("category") : [];
-const uncategorized = params.get("uncategorized");
 
 interface Post {
 	slug: string;
@@ -31,38 +26,8 @@ interface Group {
 
 let groups: Group[] = [];
 
-function formatDate(date: Date) {
-	const month = (date.getMonth() + 1).toString().padStart(2, "0");
-	const day = date.getDate().toString().padStart(2, "0");
-	return `${month}-${day}`;
-}
-
-function formatTag(tagList: string[]) {
-	return tagList.map((t) => `#${t}`).join(" ");
-}
-
-onMount(async () => {
-	let filteredPosts: Post[] = sortedPosts;
-
-	if (tags.length > 0) {
-		filteredPosts = filteredPosts.filter(
-			(post) =>
-				Array.isArray(post.data.tags) &&
-				post.data.tags.some((tag) => tags.includes(tag)),
-		);
-	}
-
-	if (categories.length > 0) {
-		filteredPosts = filteredPosts.filter(
-			(post) => post.data.category && categories.includes(post.data.category),
-		);
-	}
-
-	if (uncategorized) {
-		filteredPosts = filteredPosts.filter((post) => !post.data.category);
-	}
-
-	const grouped = filteredPosts.reduce(
+function setGroups(posts: Post[]) {
+	const grouped = posts.reduce(
 		(acc, post) => {
 			const year = post.data.published.getFullYear();
 			if (!acc[year]) {
@@ -80,8 +45,52 @@ onMount(async () => {
 	}));
 
 	groupedPostsArray.sort((a, b) => b.year - a.year);
-
 	groups = groupedPostsArray;
+}
+
+// Initial render with all posts
+setGroups(sortedPosts);
+
+function formatDate(date: Date) {
+	const month = (date.getMonth() + 1).toString().padStart(2, "0");
+	const day = date.getDate().toString().padStart(2, "0");
+	return `${month}-${day}`;
+}
+
+function formatTag(tagList: string[]) {
+	return tagList.map((t) => `#${t}`).join(" ");
+}
+
+onMount(async () => {
+	const params = new URLSearchParams(window.location.search);
+	const tagParams = params.has("tag") ? params.getAll("tag") : [];
+	const categoryParams = params.has("category") ? params.getAll("category") : [];
+	const uncategorizedParam = params.get("uncategorized");
+
+	if (tagParams.length > 0 || categoryParams.length > 0 || uncategorizedParam) {
+		tags = tagParams;
+		categories = categoryParams;
+		let filteredPosts: Post[] = sortedPosts;
+
+		if (tags.length > 0) {
+			filteredPosts = filteredPosts.filter(
+				(post) =>
+					Array.isArray(post.data.tags) &&
+					post.data.tags.some((tag) => tags.includes(tag)),
+			);
+		}
+
+		if (categories.length > 0) {
+			filteredPosts = filteredPosts.filter(
+				(post) => post.data.category && categories.includes(post.data.category),
+			);
+		}
+
+		if (uncategorizedParam) {
+			filteredPosts = filteredPosts.filter((post) => !post.data.category);
+		}
+		setGroups(filteredPosts);
+	}
 });
 </script>
 
