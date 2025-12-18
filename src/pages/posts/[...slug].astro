@@ -13,6 +13,7 @@ import ImageWrapper from "../../components/misc/ImageWrapper.astro";
 import PostMetadata from "../../components/PostMeta.astro";
 import { profileConfig, siteConfig } from "../../config";
 import { formatDateToYYYYMMDD } from "../../utils/date-utils";
+import Comment from "../../components/widget/Comment.astro";
 
 export async function getStaticPaths() {
 	const blogEntries = await getSortedPosts();
@@ -129,6 +130,10 @@ const jsonLd = {
                 <Icon name="material-symbols:chevron-right-rounded" class="text-[2rem] text-[var(--primary)]" />
             </div>}
         </a>
+    </div>
+
+    <div class="card-base p-6 mb-4">
+        <Comment />
     </div>
 
 </MainGridLayout>
