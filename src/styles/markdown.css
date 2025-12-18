@@ -11,6 +11,14 @@
   .btn-regular-dark {
     @apply bg-[var(--btn-regular-bg)] text-[var(--btn-regular-text)];
   }
+  
+  /* ✅ prose 테이블 정렬 수정 */
+  /* prose가 align 속성까지 덮는 문제 해결 */
+  .prose table th[align],
+  .prose table td[align] {
+    text-align: center;
+  }
+  
 }
 
 
