@@ -30,3 +30,18 @@ const links = Astro.props.links;
         </a>
     ))}
 </div>
+
+<script>
+    const panel = document.getElementById("nav-menu-panel");
+    const links = panel?.querySelectorAll("a");
+
+    if (panel && links) {
+        links.forEach((link) => {
+            link.addEventListener("click", () => {
+                if (!link.getAttribute("href")?.startsWith("#")) {
+                   panel.classList.add("float-panel-closed");
+                }
+            });
+        });
+    }
+</script>

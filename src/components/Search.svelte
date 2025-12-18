@@ -12,6 +12,7 @@ let result: SearchResult[] = [];
 let isSearching = false;
 let pagefindLoaded = false;
 let initialized = false;
+let closing = false;
 
 const fakeResult: SearchResult[] = [
 	{
@@ -40,7 +41,7 @@ const setPanelVisibility = (show: boolean, isDesktop: boolean): void => {
 	const panel = document.getElementById("search-panel");
 	if (!panel || !isDesktop) return;
 
-	if (show) {
+	if (show && !closing) {
 		panel.classList.remove("float-panel-closed");
 	} else {
 		panel.classList.add("float-panel-closed");
@@ -81,14 +82,26 @@ const search = async (keyword: string, isDesktop: boolean): Promise<void> => {
 		console.error("Search error:", error);
 		result = [];
 		setPanelVisibility(false, isDesktop);
-	} finally {
-		isSearching = false;
-	}
-};
+			} finally {
+			isSearching = false;
+		}
+	};
+	
+const resetSearch = () => {
+    closing = true;
+    const panel = document.getElementById("search-panel");
+    if (panel) {
+        panel.classList.add("float-panel-closed");
+    }
 
-onMount(() => {
-	const initializeSearch = () => {
-		initialized = true;
+    setTimeout(() => {
+        keywordDesktop = "";
+        keywordMobile = "";
+        result = [];
+        closing = false;
+    }, 500);
+};	onMount(() => {
+		const initializeSearch = () => {		initialized = true;
 		pagefindLoaded =
 			typeof window !== "undefined" &&
 			!!window.pagefind &&
@@ -174,7 +187,7 @@ top-20 left-4 md:left-[unset] right-4 shadow-2xl rounded-2xl p-2">
 
     <!-- search results -->
     {#each result as item}
-        <a href={item.url}
+        <a href={item.url} on:click={resetSearch}
            class="transition first-of-type:mt-2 lg:first-of-type:mt-0 group block
        rounded-xl text-lg px-3 py-2 hover:bg-[var(--btn-plain-bg-hover)] active:bg-[var(--btn-plain-bg-active)]">
             <div class="transition text-90 inline-flex font-bold group-hover:text-[var(--primary)]">
