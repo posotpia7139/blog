@@ -1,3 +1,19 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  .link {
+    @apply underline decoration-[var(--link-underline)]
+    decoration-1 decoration-dashed underline-offset-4;
+  }
+
+  .btn-regular-dark {
+    @apply bg-[var(--btn-regular-bg)] text-[var(--btn-regular-text)];
+  }
+}
+
+
 .custom-md {
     h1 {
         @apply text-3xl;
