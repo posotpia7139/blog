@@ -32,9 +32,9 @@ let heading1Count = 1;
 const maxLevel = siteConfig.toc.depth;
 ---
 {isPostsRoute &&
-<table-of-contents class:list={[className, "group"]}>
+<table-of-contents class:list={[className, "group block relative pb-32"]}>
     {headings.filter((heading) => heading.depth < minDepth + maxLevel).map((heading) =>
-            <a href={`#${heading.slug}`} class="px-2 flex gap-2 relative transition w-full min-h-9 rounded-xl
+            <a href={`#${heading.slug}`} class="px-2 flex gap-2 relative transition w-full min-h-7 rounded-xl
         hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-1
     ">
                 <div class:list={["transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold",
@@ -55,8 +55,8 @@ const maxLevel = siteConfig.toc.depth;
                 }]}>{removeTailingHash(heading.text)}</div>
             </a>
     )}
-    <div id="active-indicator" style="opacity: 0" class:list={[{'hidden': headings.length == 0}, "-z-10 absolute bg-[var(--toc-btn-hover)] left-0 right-0 rounded-xl transition-all " +
-        "group-hover:bg-transparent border-4 border-[var(--toc-btn-hover)] group-hover:border-[var(--toc-btn-active)] border-dashed"]}></div>
+    <div id="active-indicator" style="opacity: 0" class:list={[{'hidden': headings.length == 0}, "-z-10 absolute bg-[var(--toc-btn-hover)] rounded-xl transition-all pointer-events-none " +
+        "border-2 border-[var(--toc-btn-hover)] group-hover:border-[var(--toc-btn-active)] border-dashed box-border shadow-sm"]}></div>
 </table-of-contents>}
 
 <script>
@@ -90,8 +90,7 @@ class TableOfContents extends HTMLElement {
                 this.anchorNavTarget = null;
         });
 
-        if (!this.active.includes(true))
-            this.fallback();
+        this.fallback();
         this.update();
     };
 
@@ -115,11 +114,14 @@ class TableOfContents extends HTMLElement {
         if (min > max) {
             this.activeIndicator?.setAttribute("style", `opacity: 0`);
         } else {
-            let parentOffset = this.tocEl?.getBoundingClientRect().top || 0;
-            let scrollOffset = this.tocEl?.scrollTop || 0;
-            let top = this.tocEntries[min].getBoundingClientRect().top - parentOffset + scrollOffset;
-            let bottom = this.tocEntries[max].getBoundingClientRect().bottom - parentOffset + scrollOffset;
-            this.activeIndicator?.setAttribute("style", `top: ${top}px; height: ${bottom - top}px`);
+            const entry = this.tocEntries[min];
+            const top = entry.offsetTop;
+            const left = entry.offsetLeft;
+            const width = entry.offsetWidth;
+            const height = (this.tocEntries[max].offsetTop + this.tocEntries[max].offsetHeight) - top;
+            
+            // Apply coordinates with pixel precision
+            this.activeIndicator?.setAttribute("style", `top: ${top}px; left: ${left}px; width: ${width}px; height: ${height}px; opacity: 1`);
         }
     };
 
@@ -130,7 +132,7 @@ class TableOfContents extends HTMLElement {
 
         if (this.anchorNavTarget || !this.tocEl) return;
         const activeHeading =
-            document.querySelectorAll<HTMLDivElement>(`#toc .${this.visibleClass}`);
+            this.querySelectorAll<HTMLDivElement>(`.${this.visibleClass}`);
         if (!activeHeading.length) return;
 
         const topmost = activeHeading[0];
@@ -154,15 +156,14 @@ class TableOfContents extends HTMLElement {
     update = () => {
         requestAnimationFrame(() => {
             this.toggleActiveHeading();
-            // requestAnimationFrame(() => {
             this.scrollToActiveHeading();
-            // });
         });
     };
 
     fallback = () => {
         if (!this.sections.length) return;
 
+        let anyActive = false;
         for (let i = 0; i < this.sections.length; i++) {
             let offsetTop = this.sections[i].getBoundingClientRect().top;
             let offsetBottom = this.sections[i].getBoundingClientRect().bottom;
@@ -171,8 +172,15 @@ class TableOfContents extends HTMLElement {
                 || this.isInRange(offsetBottom, 0, window.innerHeight)
                 || (offsetTop < 0 && offsetBottom > window.innerHeight)) {                    
                 this.markActiveHeading(i);
+                anyActive = true;
             }
             else if (offsetTop > window.innerHeight) break;
+        }
+
+        if (!anyActive && this.sections.length > 0) {
+            if (this.sections[this.sections.length - 1].getBoundingClientRect().bottom < 0) {
+                this.markActiveHeading(this.sections.length - 1);
+            }
         }
     };
 
