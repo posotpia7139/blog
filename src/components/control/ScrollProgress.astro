@@ -1,0 +1,50 @@
+---
+---
+<div id="scroll-progress-container" class="fixed top-0 left-0 w-full h-[3px] z-[100] pointer-events-none">
+    <div id="scroll-progress-bar" class="h-full bg-[var(--primary)] w-0 transition-all duration-150 ease-out shadow-[0_0_10px_var(--primary)]"></div>
+</div>
+
+<script>
+    const progressBar = document.getElementById('scroll-progress-bar');
+    
+    function updateProgress() {
+        if (!progressBar) return;
+
+        const postContainer = document.getElementById('post-container');
+        let scrolled = 0;
+
+        if (postContainer) {
+            const winScroll = window.scrollY || document.documentElement.scrollTop;
+            const containerTop = postContainer.offsetTop;
+            const containerHeight = postContainer.offsetHeight;
+            const viewHeight = window.innerHeight;
+
+            if (winScroll < containerTop) {
+                // 본문 도달 전 (배너 영역 등)
+                scrolled = 0;
+            } else {
+                // 본문 읽기 중: 본문 상단이 화면 상단에 닿은 시점부터 계산
+                // 본문의 마지막 부분이 화면 하단에 보일 때 100%에 도달하도록 계산
+                const totalScrollable = containerHeight - viewHeight;
+                if (totalScrollable > 0) {
+                    scrolled = ((winScroll - containerTop) / totalScrollable) * 100;
+                } else {
+                    scrolled = 100;
+                }
+            }
+        } else {
+            // 일반 페이지: 전체 문서 기준 계산
+            const winScroll = document.documentElement.scrollTop || document.body.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            scrolled = (winScroll / height) * 100;
+        }
+        
+        progressBar.style.width = scrolled + "%";
+    }
+
+    window.addEventListener('scroll', updateProgress, { passive: true });
+    window.addEventListener('resize', updateProgress);
+    updateProgress();
+
+    document.addEventListener('astro:after-swap', updateProgress);
+</script>
