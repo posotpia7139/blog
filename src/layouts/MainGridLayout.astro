@@ -160,8 +160,8 @@ const mainPanelTop = siteConfig.banner.enable
                     <!-- TOC component -->
                     {siteConfig.toc.enable && <div id="toc-wrapper" class:list={["hidden lg:block transition duration-300 ease-in-out absolute top-0 toc-hide"]}
                     >
-                        <div id="toc-inner-wrapper" class="fixed top-4 h-[calc(100vh_-_20rem)] overflow-y-scroll overflow-x-hidden hide-scrollbar flex flex-col items-end"
-                             style="right: calc(50vw + var(--page-width) / 2); width: fit-content; max-width: calc(50vw - var(--page-width) / 2 - 8rem);">
+                        <div id="toc-inner-wrapper" class="fixed top-4 h-[calc(100vh_-_18.5rem)] overflow-y-scroll overflow-x-hidden hide-scrollbar flex flex-col items-end"
+                             style="right: calc(50vw + var(--page-width) / 2); width: 17rem; max-width: calc(50vw - var(--page-width) / 2 - 2rem); mask-image: linear-gradient(to bottom, black 85%, transparent 100%); -webkit-mask-image: linear-gradient(to bottom, black 85%, transparent 100%);">
                             <div id="toc" class="w-full h-full transition-swup-fade">
                                 <TOC headings={headings}></TOC>
                             </div>
