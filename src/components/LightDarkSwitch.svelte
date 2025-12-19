@@ -11,6 +11,7 @@ import {
 import { onMount } from "svelte";
 import type { LIGHT_DARK_MODE } from "@/types/config.ts";
 
+let { ...props } = $props();
 let mode: LIGHT_DARK_MODE = $state(AUTO_MODE);
 
 onMount(() => {

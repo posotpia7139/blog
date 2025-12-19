@@ -19,7 +19,8 @@
       "@i18n/*": ["src/i18n/*"],
       "@layouts/*": ["src/layouts/*"],
       "@/*": ["src/*"]
-    }
+    },
+    "types": ["astro/client"]
   },
   "include": ["src/**/*"]
 }
