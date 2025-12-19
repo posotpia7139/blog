@@ -28,6 +28,7 @@
     }
 
     h1, h2, h3, h4, h5, h6 {
+        @apply font-semibold;
         margin-top: calc(1.6em - 25px); /* 기존 margin-top에서 25px 감소 */
         padding-top: 25px; /* padding-top 25px 추가 */
         .anchor {

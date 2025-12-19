@@ -37,7 +37,7 @@ const maxLevel = siteConfig.toc.depth;
             <a href={`#${heading.slug}`} class="px-3 flex items-start gap-2 relative transition w-full min-h-7 rounded-xl
         hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-1
     ">
-                <div class:list={["transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold mt-0.5",
+                <div class:list={["transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-semibold mt-0.5",
                     {
                         "bg-[var(--toc-badge-bg)] text-[var(--btn-content)]": heading.depth == minDepth,
                         "ml-4": heading.depth == minDepth + 1,
