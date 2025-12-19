@@ -1,8 +1,13 @@
-<div class="w-full mt-8" id="giscus-container">
-    <script is:inline>
-        function getGiscusTheme() {
-            return document.documentElement.classList.contains('dark') ? 'dark' : 'light';
-        }
+<div class="w-full mt-8" id="giscus-container"></div>
+
+<script is:inline>
+    function loadGiscus() {
+        const container = document.getElementById('giscus-container');
+        if (!container) return;
+
+        container.innerHTML = '';
+
+        const theme = document.documentElement.classList.contains('dark') ? 'dark' : 'light';
 
         const giscusAttributes = {
             "src": "https://giscus.app/client.js",
@@ -15,7 +20,7 @@
             "data-reactions-enabled": "1",
             "data-emit-metadata": "0",
             "data-input-position": "top",
-            "data-theme": getGiscusTheme(),
+            "data-theme": theme,
             "data-lang": "ko",
             "data-loading": "lazy",
             "crossorigin": "anonymous",
@@ -24,11 +29,9 @@
 
         const giscusScript = document.createElement("script");
         Object.entries(giscusAttributes).forEach(([key, value]) => giscusScript.setAttribute(key, value));
-        document.getElementById('giscus-container').appendChild(giscusScript);
-    </script>
-</div>
+        container.appendChild(giscusScript);
+    }
 
-<script is:inline>
     function updateGiscusTheme() {
         const theme = document.documentElement.classList.contains('dark') ? 'dark' : 'light';
         const iframe = document.querySelector('iframe.giscus-frame');
@@ -40,16 +43,18 @@
         }
     }
 
-    const observer = new MutationObserver((mutations) => {
-        mutations.forEach((mutation) => {
-            if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
-                updateGiscusTheme();
-            }
+    loadGiscus();
+
+    if (!window.giscusObserver) {
+        window.giscusObserver = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+                    updateGiscusTheme();
+                }
+            });
         });
-    });
+        window.giscusObserver.observe(document.documentElement, { attributes: true });
+    }
 
-    observer.observe(document.documentElement, { attributes: true });
-
-    document.addEventListener('swup:content:replace', updateGiscusTheme);
-    window.addEventListener('load', updateGiscusTheme);
+    document.addEventListener('swup:content:replace', loadGiscus);
 </script>
