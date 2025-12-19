@@ -2,6 +2,7 @@
 import "@fontsource/roboto/400.css";
 import "@fontsource/roboto/500.css";
 import "@fontsource/roboto/700.css";
+import "pretendard/dist/web/variable/pretendardvariable.css";
 
 import ConfigCarrier from "@components/ConfigCarrier.astro";
 import { profileConfig, siteConfig } from "@/config";
@@ -108,8 +109,6 @@ const bannerOffset =
 				  media={favicon.theme && `(prefers-color-scheme: ${favicon.theme})`}
 			/>
 		))}
-
-		<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css" />
 
 		<!-- Set the theme before the page is rendered to avoid a flash -->
 		<script is:inline define:vars={{DEFAULT_THEME, LIGHT_MODE, DARK_MODE, AUTO_MODE, BANNER_HEIGHT_EXTEND, PAGE_WIDTH, configHue}}>
