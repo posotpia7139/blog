@@ -33,15 +33,15 @@ Following types of admonitions are supported: `note` `tip` `important` `warning`
 :::
 
 :::important
-Crucial information necessary for users to succeed.
+사용자의 성공에 필수적인 핵심 정보입니다.
 :::
 
 :::warning
-Critical content demanding immediate user attention due to potential risks.
+잠재적 위험으로 인해 사용자의 즉각적인 주의가 필요한 중요 콘텐츠입니다.
 :::
 
 :::caution
-Negative potential consequences of an action.
+어떤 행동이 가져올 수 있는 부정적인 잠재적 결과.
 :::
 
 ### Basic Syntax
