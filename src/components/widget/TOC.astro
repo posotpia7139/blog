@@ -49,7 +49,7 @@ const maxLevel = siteConfig.toc.depth;
                     {heading.depth == minDepth + 1 && <div class="transition w-2 h-2 rounded-[0.1875rem] bg-[var(--toc-badge-bg)]"></div>}
                     {heading.depth == minDepth + 2 && <div class="transition w-1.5 h-1.5 rounded-sm bg-black/5 dark:bg-white/10"></div>}
                 </div>
-                <div class:list={["transition text-sm text-left break-words leading-snug py-0.5 text-black/60 dark:text-white/60 [.visible_&]:text-black/90 [.visible_&]:dark:text-white/90 group-hover:text-[var(--primary)] dark:group-hover:text-[var(--primary)]"]}>{removeTailingHash(heading.text)}</div>
+                <div class:list={["transition text-sm text-left break-words leading-snug py-0.5 text-black/80 dark:text-white/60 [.visible_&]:text-black/100 [.visible_&]:dark:text-white/90 group-hover:text-[oklch(0.20_0.14_var(--hue))] dark:group-hover:text-[var(--primary)]"]}>{removeTailingHash(heading.text)}</div>
             </a>
     )}
     <div id="active-indicator" style="opacity: 0" class:list={[{'hidden': headings.length == 0}, "-z-10 absolute bg-[var(--toc-btn-hover)] rounded-xl transition-all pointer-events-none " +

@@ -5,7 +5,7 @@
 @layer components {
   .link {
     @apply underline decoration-[var(--link-underline)]
-    decoration-1 decoration-dashed underline-offset-4;
+    decoration-1 decoration-dashed underline-offset-4 rounded-md;
   }
 
   .btn-regular-dark {
