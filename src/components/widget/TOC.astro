@@ -34,8 +34,8 @@ const maxLevel = siteConfig.toc.depth;
 {isPostsRoute &&
 <table-of-contents class:list={[className, "group block relative pb-32 w-fit ml-auto text-left"]}>
     {headings.filter((heading) => heading.depth < minDepth + maxLevel).map((heading) =>
-            <a href={`#${heading.slug}`} class="pl-2 pr-4 flex items-start gap-2 relative transition w-full min-h-7 rounded-xl
-        hover:bg-[var(--toc-btn-hover)] active:bg-[var(--toc-btn-active)] py-1
+            <a href={`#${heading.slug}`} class="pl-2 pr-4 flex items-start gap-2 relative transition-all w-full min-h-7 rounded-xl
+        hover:bg-[var(--toc-btn-active)] hover:translate-x-1 active:bg-[var(--toc-btn-active)] py-1
     ">
                 <div class:list={["transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-semibold mt-0.5",
                     {
