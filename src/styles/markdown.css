@@ -125,8 +125,8 @@
     }
 
     hr {
-        @apply border-dashed border-[var(--line-divider)];
-        border-top-width: 2.5px;
+        @apply border-dashed border-[var(--line-color)];
+        border-top-width: 3px;
     }
 
     blockquote {
