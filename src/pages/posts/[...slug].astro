@@ -116,21 +116,25 @@ const jsonLd = {
     <div class="flex flex-row justify-between mb-4 gap-2 md:gap-4 overflow-hidden w-full">
         <a href={entry.data.prevSlug ? getPostUrlBySlug(entry.data.prevSlug) : "#"}
            class:list={["w-full font-semibold overflow-hidden active:scale-95", {"pointer-events-none": !entry.data.prevSlug}]}>
-            {entry.data.prevSlug && <div class="btn-card group rounded-2xl w-full h-[3.75rem] max-w-full px-5 flex items-center !justify-start gap-2" >
+            {entry.data.prevSlug ? <div class="btn-card group rounded-2xl w-full h-[3.75rem] max-w-full px-5 flex items-center !justify-start gap-2" >
                 <Icon name="material-symbols:chevron-left-rounded" class="text-[2rem] text-[var(--primary)] transition-all duration-300 ease-out group-hover:-translate-x-1.5" />
                 <div class="overflow-hidden transition overflow-ellipsis whitespace-nowrap max-w-[calc(100%_-_3rem)] text-black/75 dark:text-white/75 group-hover:text-[var(--primary)]">
                     {entry.data.prevTitle}
                 </div>
+            </div> : <div class="btn-card rounded-2xl w-full h-[3.75rem] px-10 flex items-center justify-start text-black/50 dark:text-white/50 italic cursor-not-allowed font-normal">
+                <div class="overflow-hidden overflow-ellipsis whitespace-nowrap pr-2">첫 번째 글입니다.</div>
             </div>}
         </a>
 
         <a href={entry.data.nextSlug ? getPostUrlBySlug(entry.data.nextSlug) : "#"}
            class:list={["w-full font-semibold overflow-hidden active:scale-95", {"pointer-events-none": !entry.data.nextSlug}]}>
-            {entry.data.nextSlug && <div class="btn-card group rounded-2xl w-full h-[3.75rem] max-w-full px-5 flex items-center !justify-end gap-2">
+            {entry.data.nextSlug ? <div class="btn-card group rounded-2xl w-full h-[3.75rem] max-w-full px-5 flex items-center !justify-end gap-2">
                 <div class="overflow-hidden transition overflow-ellipsis whitespace-nowrap max-w-[calc(100%_-_3rem)] text-black/75 dark:text-white/75 group-hover:text-[var(--primary)]">
                     {entry.data.nextTitle}
                 </div>
                 <Icon name="material-symbols:chevron-right-rounded" class="text-[2rem] text-[var(--primary)] transition-all duration-300 ease-out group-hover:translate-x-1.5" />
+            </div> : <div class="btn-card rounded-2xl w-full h-[3.75rem] px-10 flex items-center justify-end gap-2 text-black/50 dark:text-white/50 italic cursor-not-allowed font-normal">
+                <div class="overflow-hidden overflow-ellipsis whitespace-nowrap pr-2">마지막 글입니다.</div>
             </div>}
         </a>
     </div>
