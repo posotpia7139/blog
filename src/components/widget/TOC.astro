@@ -34,7 +34,7 @@ const maxLevel = siteConfig.toc.depth;
 {isPostsRoute &&
 <table-of-contents class:list={[className, "block relative pb-32 w-fit ml-auto text-left"]}>
     {headings.filter((heading) => heading.depth < minDepth + maxLevel).map((heading) =>
-            <a href={`#${heading.slug}`} class="group pl-2 pr-4 flex items-start gap-2 relative transition-all w-full min-h-7 rounded-xl
+            <a href={`#${heading.slug}`} class="group pl-2 pr-4 flex items-start gap-2 relative transition-all duration-100 ease-out w-full min-h-7 rounded-xl
         hover:bg-[var(--toc-btn-active)] active:bg-[var(--toc-btn-active)] py-1
     ">
                 <div class:list={["transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-semibold mt-0.5",
@@ -52,7 +52,7 @@ const maxLevel = siteConfig.toc.depth;
                 <div class:list={["transition text-sm text-left break-words leading-snug py-0.5 text-black/80 dark:text-white/60 [.visible_&]:text-black/100 [.visible_&]:dark:text-white/90 group-hover:text-[oklch(0.20_0.14_var(--hue))] dark:group-hover:text-[var(--primary)]"]}>{removeTailingHash(heading.text)}</div>
             </a>
     )}
-    <div id="active-indicator" style="opacity: 0" class:list={[{'hidden': headings.length == 0}, "-z-10 absolute bg-[var(--toc-btn-hover)] rounded-xl transition-all pointer-events-none " +
+    <div id="active-indicator" style="opacity: 0" class:list={[{'hidden': headings.length == 0}, "-z-10 absolute bg-[var(--toc-btn-hover)] rounded-xl transition-all duration-100 ease-out pointer-events-none " +
         "border-2 border-[var(--toc-btn-hover)] group-hover:border-[var(--toc-btn-active)] border-dashed box-border shadow-sm"]}></div>
 </table-of-contents>}
 
