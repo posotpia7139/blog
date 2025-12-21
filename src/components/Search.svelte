@@ -159,7 +159,7 @@ $: if (initialized && keywordMobile) {
     <Icon icon="material-symbols:search" class="absolute text-[1.25rem] pointer-events-none ml-3 transition my-auto text-black/90 dark:text-white/90"></Icon>
     <input placeholder="{i18n(I18nKey.search)}" bind:value={keywordDesktop} on:focus={() => search(keywordDesktop, true)}
            class="transition-all pl-10 text-sm bg-transparent outline-0 font-medium
-         h-full w-40 active:w-60 focus:w-60 text-black/90 dark:text-white/90 placeholder:text-black/60 dark:placeholder:text-white/60"
+         h-full w-40 active:w-[14.5rem] focus:w-[14.5rem] text-black/90 dark:text-white/90 placeholder:text-black/60 dark:placeholder:text-white/60"
     >
 </div>
 
