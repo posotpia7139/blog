@@ -4,10 +4,10 @@ import path from "node:path";
 import { Icon } from "astro-icon/components";
 import I18nKey from "../i18n/i18nKey";
 import { i18n } from "../i18n/translation";
+import { formatDateToYYYYMMDD } from "../utils/date-utils";
 import { getDir } from "../utils/url-utils";
 import ImageWrapper from "./misc/ImageWrapper.astro";
 import PostMetadata from "./PostMeta.astro";
-import { formatDateToYYYYMMDD } from "../utils/date-utils";
 
 interface Props {
 	class?: string;
@@ -45,7 +45,7 @@ const { remarkPluginFrontmatter } = await entry.render();
 ---
 <div class:list={["card-base flex flex-col-reverse md:flex-col w-full rounded-[var(--radius-large)] overflow-hidden relative group", className]} style={style}>
     <div class:list={["pl-6 md:pl-9 pr-6 md:pr-9 pt-6 md:pt-7 pb-6 relative", {"w-full": !hasCover, "w-full md:w-[calc(100%_-_var(--coverWidth)_-_12px)]": hasCover}]}>
-        <div class="transition w-full block font-semibold mb-3 text-3xl text-90
+        <div class="transition w-full block font-semibold mb-3 text-2xl md:text-3xl text-90
         group-hover:text-[var(--primary)]
         active:text-[var(--title-active)]
         relative z-10 pointer-events-none">
@@ -71,12 +71,10 @@ const { remarkPluginFrontmatter } = await entry.render();
                 {formatDateToYYYYMMDD(published)}
             </div>
             <div class="flex items-center">
-                <Icon name="material-symbols:notes-rounded" class="mr-1.5 text-lg"></Icon>
-                {remarkPluginFrontmatter.words} {" " + i18n(remarkPluginFrontmatter.words === 1 ? I18nKey.wordCount : I18nKey.wordsCount)}
-            </div>
-            <div class="flex items-center">
                 <Icon name="material-symbols:schedule-outline-rounded" class="mr-1.5 text-lg"></Icon>
                 {remarkPluginFrontmatter.minutes} {" " + i18n(remarkPluginFrontmatter.minutes === 1 ? I18nKey.minuteCount : I18nKey.minutesCount)}
+                <span class="mx-1.5 opacity-50">/</span>
+                {remarkPluginFrontmatter.words} {" " + i18n(remarkPluginFrontmatter.words === 1 ? I18nKey.wordCount : I18nKey.wordsCount)}
             </div>
         </div>
 

@@ -126,10 +126,10 @@ export async function getCategoryList(): Promise<Category[]> {
 	// 카테고리별 정렬 가중치 설정
 	const SORT_WEIGHT: { [key: string]: number } = {
 		// 1차 카테고리
-		"dev": 100,
-		"philosophy": 200,
-		"life": 300,
-		"guide": 400,
+		dev: 100,
+		philosophy: 200,
+		life: 300,
+		guide: 400,
 		// 2차 카테고리 (dev)
 		"dev/study": 110,
 		"dev/projects": 120,

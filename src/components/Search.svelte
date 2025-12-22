@@ -82,26 +82,28 @@ const search = async (keyword: string, isDesktop: boolean): Promise<void> => {
 		console.error("Search error:", error);
 		result = [];
 		setPanelVisibility(false, isDesktop);
-			} finally {
-			isSearching = false;
-		}
-	};
-	
-const resetSearch = () => {
-    closing = true;
-    const panel = document.getElementById("search-panel");
-    if (panel) {
-        panel.classList.add("float-panel-closed");
-    }
+	} finally {
+		isSearching = false;
+	}
+};
 
-    setTimeout(() => {
-        keywordDesktop = "";
-        keywordMobile = "";
-        result = [];
-        closing = false;
-    }, 500);
-};	onMount(() => {
-		const initializeSearch = () => {		initialized = true;
+const resetSearch = () => {
+	closing = true;
+	const panel = document.getElementById("search-panel");
+	if (panel) {
+		panel.classList.add("float-panel-closed");
+	}
+
+	setTimeout(() => {
+		keywordDesktop = "";
+		keywordMobile = "";
+		result = [];
+		closing = false;
+	}, 500);
+};
+onMount(() => {
+	const initializeSearch = () => {
+		initialized = true;
 		pagefindLoaded =
 			typeof window !== "undefined" &&
 			!!window.pagefind &&

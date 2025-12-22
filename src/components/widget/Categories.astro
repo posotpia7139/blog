@@ -1,22 +1,22 @@
 ---
+import { Icon } from "astro-icon/components";
 import { getCategoryList, getSortedPosts } from "../../utils/content-utils";
 import ButtonLink from "../control/ButtonLink.astro";
 import WidgetLayout from "./WidgetLayout.astro";
-import { Icon } from "astro-icon/components";
 
 const categories = await getCategoryList();
 const allPosts = await getSortedPosts();
 
 // [서버 사이드] 초기 로드 감지
 const url = new URL(Astro.request.url);
-let activeCategory = url.searchParams.get('category');
+let activeCategory = url.searchParams.get("category");
 const isPostPage = !!Astro.params.slug; // 포스트 본문 여부 확인
 
 if (!activeCategory && Astro.params.slug) {
-    const currentPost = allPosts.find(p => p.slug === Astro.params.slug);
-    if (currentPost && currentPost.data.category) {
-        activeCategory = currentPost.data.category;
-    }
+	const currentPost = allPosts.find((p) => p.slug === Astro.params.slug);
+	if (currentPost && currentPost.data.category) {
+		activeCategory = currentPost.data.category;
+	}
 }
 
 interface CategoryNode {
@@ -57,7 +57,7 @@ function buildTree(flatCategories: any[]): CategoryNode[] {
 			if (!aHasChildren && bHasChildren) return 1;
 			return 0;
 		});
-		nodes.forEach(node => {
+		nodes.forEach((node) => {
 			if (node.children.length > 0) sortNodes(node.children);
 		});
 	};
@@ -69,8 +69,8 @@ function buildTree(flatCategories: any[]): CategoryNode[] {
 const categoryTree = buildTree(categories);
 
 function isPathActive(nodePath: string, active: string | null) {
-    if (!active) return false;
-    return active === nodePath || active.startsWith(nodePath + '/');
+	if (!active) return false;
+	return active === nodePath || active.startsWith(nodePath + "/");
 }
 
 interface Props {

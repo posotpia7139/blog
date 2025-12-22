@@ -64,7 +64,9 @@ function formatTag(tagList: string[]) {
 onMount(async () => {
 	const params = new URLSearchParams(window.location.search);
 	const tagParams = params.has("tag") ? params.getAll("tag") : [];
-	const categoryParams = params.has("category") ? params.getAll("category") : [];
+	const categoryParams = params.has("category")
+		? params.getAll("category")
+		: [];
 	const uncategorizedParam = params.get("uncategorized");
 
 	if (tagParams.length > 0 || categoryParams.length > 0 || uncategorizedParam) {
@@ -105,42 +107,42 @@ onMount(async () => {
     <div class="mb-6 pb-6 border-b border-black/5 dark:border-white/5">
         <div class="transition text-left text-50 flex items-center flex-wrap">
             {#if categories.length > 0}
-                {@const parts = categories[0].split('/')}
-                {@const leaf = parts.pop()}
+                {@const allParts = categories[0].split('/')}
                 {@const totalCount = groups.reduce((acc, g) => acc + g.posts.length, 0)}
                 
-                <!-- 모바일 전용 계층형 리스트 뷰 (3차만 15px 들여쓰기) -->
+                <!-- 모바일 전용 계층형 리스트 뷰 (3차부터 15px씩 추가 들여쓰기) -->
                 <div class="flex flex-col w-full md:hidden space-y-0.5 pl-5 pt-5">
-                    {#each parts as part, i}
-                        <div class="flex items-center h-6" style="padding-left: {i === 2 ? 15 : 0}px">
+                    {#each allParts as part, i}
+                        {@const isLast = i === allParts.length - 1}
+                        <div class="flex items-center h-6" style="padding-left: {Math.max(0, i - 1) * 15}px">
                             {#if i > 0}
                                 <span class="text-[0.7rem] opacity-30 mr-1.5">└</span>
                             {/if}
-                            <span class:list={["text-sm", {"font-medium": i === 0, "text-75": i > 0}]}>{part}</span>
+                            <span class="{isLast ? 'text-[var(--primary)] font-bold text-base' : 'text-base ' + (i === 0 ? 'font-medium' : 'text-75')}">
+                                {part}
+                            </span>
+                            {#if isLast}
+                                <span class="ml-2 flex items-center shrink-0">
+                                    <span class="text-base font-semibold opacity-60">게시물&nbsp;</span>
+                                    <span class="text-[var(--primary)] font-bold text-base">{totalCount}</span>
+                                    <span class="text-base font-semibold opacity-60">개</span>
+                                </span>
+                            {/if}
                         </div>
                     {/each}
-                    <div class="flex items-center h-6" style="padding-left: {parts.length === 2 ? 15 : 0}px">
-                        {#if parts.length > 0}
-                            <span class="text-[0.7rem] opacity-30 mr-1.5">└</span>
-                        {/if}
-                        <span class="text-[var(--primary)] font-bold text-base">{leaf}</span>
-                        <span class="ml-2 flex items-center shrink-0">
-                            <span class="text-base font-semibold opacity-60">전체 게시물&nbsp;</span>
-                            <span class="text-[var(--primary)] font-bold text-base">{totalCount}</span>
-                            <span class="text-base font-semibold opacity-60">개</span>
-                        </span>
-                    </div>
                 </div>
 
                 <!-- 데스크탑 전용 가로형 브레드크럼 -->
                 <div class="hidden md:flex md:flex-row md:items-center w-full flex-wrap">
-                    {#each parts as part}
-                        <span class="text-base">{part}</span>
-                        <span class="mx-1.5 text-black/30 dark:text-white/30 font-normal">/</span>
+                    {#each allParts as part, i}
+                        {@const isLast = i === allParts.length - 1}
+                        <span class="{isLast ? 'text-[var(--primary)] font-bold text-base' : 'text-base'}">{part}</span>
+                        {#if !isLast}
+                            <span class="mx-1.5 text-black/30 dark:text-white/30 font-normal">/</span>
+                        {/if}
                     {/each}
-                    <span class="text-[var(--primary)] font-bold text-base">{leaf}</span>
                     <div class="ml-2 flex items-center shrink-0">
-                        <span class="text-xs opacity-60">전체 게시물&nbsp;</span>
+                        <span class="text-xs opacity-60">게시물&nbsp;</span>
                         <span class="text-[var(--primary)] font-bold text-xs">{totalCount}</span>
                         <span class="text-xs opacity-60">개</span>
                     </div>
@@ -171,7 +173,7 @@ onMount(async () => {
                   -outline-offset-[2px] z-50 outline-3"
                     ></div>
                 </div>
-                <div class="w-[70%] md:w-[80%] transition text-left text-50 text-sm flex items-center">
+                <div class="w-[70%] md:w-[80%] transition text-left text-50 text-base md:text-base flex items-center">
                     <span class="text-[var(--primary)] font-bold mr-1">{group.posts.length}</span>
                     <span class="opacity-60">{i18n(group.posts.length === 1 ? I18nKey.postCount : I18nKey.postsCount)}</span>
                 </div>

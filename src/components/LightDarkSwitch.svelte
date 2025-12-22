@@ -48,13 +48,12 @@ function toggleScheme() {
 	} else if (mode === LIGHT_MODE) {
 		// 현재 라이트 모드이면 다크 모드로 전환.
 		switchScheme(DARK_MODE);
-	} else { // mode === DARK_MODE
+	} else {
+		// mode === DARK_MODE
 		// 현재 다크 모드이면 라이트 모드로 전환.
 		switchScheme(LIGHT_MODE);
 	}
 }
-
-
 </script>
 
 <!-- z-50 make the panel higher than other float panels -->

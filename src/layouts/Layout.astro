@@ -496,7 +496,7 @@ async function createPhotoSwipe() {
 		doubleTapAction: 'zoom',
 	})
 
-	lightbox.addFilter("domItemData", (itemData, element) => {
+	lightbox.addFilter("domItemData", (itemData: any, element: HTMLElement) => {
 		if (element instanceof HTMLImageElement) {
 			itemData.src = element.src
 
