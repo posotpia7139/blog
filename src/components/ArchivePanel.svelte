@@ -113,8 +113,26 @@ onMount(async () => {
                   -outline-offset-[2px] z-50 outline-3"
                     ></div>
                 </div>
-                <div class="w-[70%] md:w-[80%] transition text-left text-50">
-                    {group.posts.length} {i18n(group.posts.length === 1 ? I18nKey.postCount : I18nKey.postsCount)}
+                <div class="w-[70%] md:w-[80%] transition text-left text-50 flex items-center flex-wrap">
+                    {#if categories.length > 0}
+                        {@const parts = categories[0].split('/')}
+                        {@const leaf = parts.pop()}
+                        {#each parts as part}
+                            <span>{part}</span><span class="mx-1.5 text-black/30 dark:text-white/30 font-normal">/</span>
+                        {/each}
+                        <span class="text-[var(--primary)]">{leaf}</span>
+                        <span>&nbsp;게시물&nbsp;</span>
+                        <span class="text-[var(--primary)]">{group.posts.length}</span>
+                        <span>개</span>
+                    {:else if tags.length > 0}
+                        <span class="text-[var(--primary)]">#{tags[0]}</span>
+                        <span>&nbsp;태그의 게시물&nbsp;</span>
+                        <span class="text-[var(--primary)]">{group.posts.length}</span>
+                        <span>개</span>
+                    {:else}
+                        <span class="text-[var(--primary)]">{group.posts.length}</span>
+                        <span>&nbsp;{i18n(group.posts.length === 1 ? I18nKey.postCount : I18nKey.postsCount)}</span>
+                    {/if}
                 </div>
             </div>
 

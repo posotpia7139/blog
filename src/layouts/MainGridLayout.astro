@@ -79,97 +79,40 @@ const mainPanelTop = siteConfig.banner.enable
                 </Icon>
             </a>}
 
+            <SideBar class="mb-4 row-start-2 row-end-3 col-span-2 lg:col-start-2 lg:row-start-1 lg:row-end-2 lg:col-span-1 lg:w-[18.75rem] onload-animation" headings={headings}></SideBar>
 
-                        <SideBar class="mb-4 row-start-2 row-end-3 col-span-2 lg:col-start-2 lg:row-start-1 lg:row-end-2 lg:col-span-1 lg:w-[18.75rem] onload-animation" headings={headings}></SideBar>
-
-
-            
-
-
-                        <main id="swup-container" class="transition-swup-fade col-span-2 lg:col-start-1 lg:col-span-1 overflow-hidden">
-
-
-                            <div id="content-wrapper" class="onload-animation">
-
-
-                                <!-- the overflow-hidden here prevent long text break the layout-->
-
-
-                                <!-- make id different from windows.swup global property -->
-
-
-                                <slot></slot>
-
-
-                                <div class="footer col-span-2 onload-animation hidden lg:block">
-
-
-                                    <Footer></Footer>
-
-
-                                </div>
-
-
-                            </div>
-
-
-                        </main>
-
-
-            
-
-
-                                                                        <div class="footer col-span-2 onload-animation block lg:hidden">
-
-
-            
-
-
-                                                                            <Footer></Footer>
-
-
-            
-
-
-                                                                        </div>
-
-
+            <main id="swup-container" class="transition-swup-fade col-span-2 lg:col-start-1 lg:col-span-1 overflow-hidden">
+                <div id="content-wrapper" class="onload-animation">
+                    <slot></slot>
+                    <div class="footer col-span-2 onload-animation hidden lg:block">
+                        <Footer></Footer>
                     </div>
-
-
-            
-
-
-                    <!-- <BackToTop></BackToTop> -->
-
-
                 </div>
+            </main>
 
-
+            <div class="footer col-span-2 onload-animation block lg:hidden">
+                <Footer></Footer>
             </div>
+        </div>
+    </div>
+</div>
 
-
-            
-
-
-
-
-            <!-- The things that should be under the banner, only the TOC for now -->
-            <div class="absolute w-full z-0 hidden 2xl:block">
-                <div class="relative max-w-[var(--page-width)] mx-auto">
-                    <!-- TOC component -->
-                    {siteConfig.toc.enable && <div id="toc-wrapper" class:list={["hidden lg:block transition duration-700 ease-in-out absolute top-0 toc-hide"]}
-                    >
-                        <div id="toc-inner-wrapper" class="fixed top-4 h-[calc(100vh_-_18.5rem)] overflow-y-scroll overflow-x-hidden hide-scrollbar flex flex-col items-end"
-                             style="right: calc(50vw + var(--page-width) / 2); width: 17rem; max-width: calc(50vw - var(--page-width) / 2 - 2rem); mask-image: linear-gradient(to bottom, black 85%, transparent 100%); -webkit-mask-image: linear-gradient(to bottom, black 85%, transparent 100%);">
-                            <div id="toc" class="w-full h-full transition-swup-fade">
-                                <TOC headings={headings}></TOC>
-                            </div>
-                        </div>
-                    </div>}
-            
-                    <!-- #toc needs to exist for Swup to work normally -->
-                    {!siteConfig.toc.enable && <div id="toc"></div>}
+<!-- The things that should be under the banner, only the TOC for now -->
+<div class="absolute w-full z-0 hidden 2xl:block">
+    <div class="relative max-w-[var(--page-width)] mx-auto">
+        <!-- TOC component -->
+        {siteConfig.toc.enable && <div id="toc-wrapper" class:list={["hidden lg:block transition duration-700 ease-in-out absolute top-0 toc-hide"]}
+        >
+            <div id="toc-inner-wrapper" class="fixed top-4 h-[calc(100vh_-_18.5rem)] overflow-y-scroll overflow-x-hidden hide-scrollbar flex flex-col items-end"
+                 style="right: calc(50vw + var(--page-width) / 2); width: 17rem; max-width: calc(50vw - var(--page-width) / 2 - 2rem); mask-image: linear-gradient(to bottom, black 85%, transparent 100%); -webkit-mask-image: linear-gradient(to bottom, black 85%, transparent 100%);">
+                <div id="toc" class="w-full h-full transition-swup-fade">
+                    <TOC headings={headings}></TOC>
                 </div>
             </div>
+        </div>}
+
+        <!-- #toc needs to exist for Swup to work normally -->
+        {!siteConfig.toc.enable && <div id="toc"></div>}
+    </div>
+</div>
 </Layout>

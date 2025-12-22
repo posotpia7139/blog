@@ -6,18 +6,17 @@ import ImageWrapper from "../misc/ImageWrapper.astro";
 
 const config = profileConfig;
 ---
-<div class="card-base p-3">
-    <a href={url('/about/')} class="flex items-center gap-4 mb-3 group"> <!-- This is now the link -->
+<div class="card-base p-3 flex flex-col items-center text-center">
+    <div class="flex flex-col items-center gap-4 mb-3 w-full"> <!-- Link removed, now a plain div -->
         <div
-           class="block shrink-0 w-[4.5rem] h-[4.5rem] overflow-hidden rounded-xl active:scale-95"> <!-- This is now a div -->
-            <ImageWrapper src={config.avatar || ""} alt="Profile Image of the Author" class="w-full h-full object-cover" widths={[120, 240]} sizes="120px" loading="eager" fetchPriority="high"></ImageWrapper>
+           class="block shrink-0 w-[8rem] h-[8rem] overflow-hidden rounded-xl"> <!-- Size increased to 8rem -->
+            <ImageWrapper src={config.avatar || ""} alt="Profile Image of the Author" class="w-full h-full object-cover" widths={[120, 240]} sizes="128px" loading="eager" fetchPriority="high"></ImageWrapper>
         </div>
-        <div class="flex-grow"> <!-- Container for name and bio, allowing it to grow -->
-            <div class="font-semibold text-xl text-left dark:text-neutral-50 transition group-hover:text-[var(--primary)]">{config.name}</div>
-            <!-- Blue line removed -->
-            <div class="text-left text-neutral-400 transition">{config.bio}</div>
+        <div class="w-full"> <!-- Full width container for text -->
+            <div class="font-semibold text-xl dark:text-neutral-50 transition">{config.name}</div>
+            <div class="text-neutral-400 transition mt-1">{config.bio}</div>
         </div>
-    </a>
+    </div>
     <div class="px-2"> <!-- Links section, now outside the flex container -->
         <div class="flex flex-wrap gap-2 justify-center mb-1">
             {config.links.length > 1 && config.links.map(item =>
@@ -33,4 +32,3 @@ const config = profileConfig;
         </div>
     </div>
 </div>
-

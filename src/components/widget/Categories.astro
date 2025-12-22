@@ -1,10 +1,23 @@
 ---
-import { getCategoryList } from "../../utils/content-utils";
+import { getCategoryList, getSortedPosts } from "../../utils/content-utils";
 import ButtonLink from "../control/ButtonLink.astro";
 import WidgetLayout from "./WidgetLayout.astro";
 import { Icon } from "astro-icon/components";
 
 const categories = await getCategoryList();
+const allPosts = await getSortedPosts();
+
+// [서버 사이드] 초기 로드 감지
+const url = new URL(Astro.request.url);
+let activeCategory = url.searchParams.get('category');
+const isPostPage = !!Astro.params.slug; // 포스트 본문 여부 확인
+
+if (!activeCategory && Astro.params.slug) {
+    const currentPost = allPosts.find(p => p.slug === Astro.params.slug);
+    if (currentPost && currentPost.data.category) {
+        activeCategory = currentPost.data.category;
+    }
+}
 
 interface CategoryNode {
 	name: string;
@@ -55,6 +68,11 @@ function buildTree(flatCategories: any[]): CategoryNode[] {
 
 const categoryTree = buildTree(categories);
 
+function isPathActive(nodePath: string, active: string | null) {
+    if (!active) return false;
+    return active === nodePath || active.startsWith(nodePath + '/');
+}
+
 interface Props {
 	class?: string;
 	style?: string;
@@ -67,58 +85,76 @@ const { class: className, style } = Astro.props;
 >
     <div class="category-tree">
         <ul class="root-list">
-            {categoryTree.map((node) => (
-                <li class="category-item">
-                    <ButtonLink
-                        url={node.url}
-                        label={`View all posts in the ${node.fullPath} category`}
-                        class={node.children.length === 0 ? "leaf-node" : ""}
-                    >
-                        {node.name}
-                    </ButtonLink>
-                    
-                    {node.children.length > 0 && (
-                        <ul class="sub-list">
-                            {node.children.map((child) => (
-                                <li class="category-item accordion-item" data-path={child.fullPath.replace(/\//g, '-')}>
-                                    <div class="flex items-center group relative cursor-pointer">
-                                        <ButtonLink
-                                            url={child.url}
-                                            label={`View all posts in the ${child.fullPath} category`}
-                                            class={`flex-grow ${child.children.length === 0 ? "leaf-node" : ""}`}
-                                        >
-                                            {child.name}
-                                        </ButtonLink>
-                                        {child.children.length > 0 && (
-                                            <div class="toggle-icon-wrapper absolute right-2 top-1/2 -translate-y-1/2 flex items-center justify-center w-8 h-8 pointer-events-none">
-                                                <Icon name="material-symbols:chevron-right-rounded" class="toggle-chevron text-2xl text-black/20 dark:text-white/20 transition-all duration-500" />
+            {categoryTree.map((node) => {
+                const isActive = activeCategory === node.fullPath;
+                const isPath = isPathActive(node.fullPath, activeCategory);
+                
+                return (
+                    <li class="category-item root-item" data-path={node.fullPath}>
+                        <ButtonLink
+                            url={node.url}
+                            label={`View all posts in the ${node.fullPath} category`}
+                            class:list={["category-link", { "active-category-link": isActive, "reading-active-dot": isActive && isPostPage }]}
+                        >
+                            <span class="category-text-label">{node.name}</span>
+                        </ButtonLink>
+                        
+                        {node.children.length > 0 && (
+                            <ul class="sub-list">
+                                {node.children.map((child) => {
+                                    const isChildActive = activeCategory === child.fullPath;
+                                    const isChildPath = isPathActive(child.fullPath, activeCategory);
+                                    
+                                    return (
+                                        <li class="category-item accordion-item" data-path={child.fullPath}>
+                                            <div class="flex items-center group relative cursor-pointer rounded-lg overflow-hidden">
+                                                <ButtonLink
+                                                    url={child.url}
+                                                    label={`View all posts in the ${child.fullPath} category`}
+                                                    class:list={["flex-grow category-link", { "active-category-link": isChildActive, "reading-active-dot": isChildActive && isPostPage }]}
+                                                >
+                                                    <span class="category-text-label">{child.name}</span>
+                                                </ButtonLink>
+                                                {child.children.length > 0 && (
+                                                    <div class="toggle-icon-wrapper absolute right-2 top-1/2 -translate-y-1/2 flex items-center justify-center w-8 h-8 pointer-events-none">
+                                                        <Icon name="material-symbols:chevron-right-rounded" 
+                                                              class:list={["toggle-chevron text-2xl transition-all duration-500", { "active": isChildPath }]} 
+                                                              style={isChildPath ? "transform: rotate(90deg)" : ""}
+                                                        />
+                                                    </div>
+                                                )}
                                             </div>
-                                        )}
-                                    </div>
 
-                                    {child.children.length > 0 && (
-                                        <div class="accordion-content overflow-hidden max-h-0">
-                                            <ul class="grandchild-list">
-                                                {child.children.map((grandChild) => (
-                                                    <li class="category-item">
-                                                        <ButtonLink
-                                                            url={grandChild.url}
-                                                            label={`View all posts in the ${grandChild.fullPath} category`}
-                                                            class="leaf-node"
-                                                        >
-                                                            {grandChild.name}
-                                                        </ButtonLink>
-                                                    </li>
-                                                ))}
-                                            </ul>
-                                        </div>
-                                    )}
-                                </li>
-                            ))}
-                        </ul>
-                    )}
-                </li>
-            ))}
+                                            {child.children.length > 0 && (
+                                                <div class:list={["accordion-content overflow-hidden", { "open": isChildPath }]}
+                                                     style={isChildPath ? "max-height: none" : "max-height: 0px"}
+                                                >
+                                                    <ul class="grandchild-list">
+                                                        {child.children.map((grandChild) => {
+                                                            const isGrandActive = activeCategory === grandChild.fullPath;
+                                                            return (
+                                                                <li class="category-item" data-path={grandChild.fullPath}>
+                                                                    <ButtonLink
+                                                                        url={grandChild.url}
+                                                                        label={`View all posts in the ${grandChild.fullPath} category`}
+                                                                        class:list={["category-link", { "active-category-link": isGrandActive, "reading-active-dot": isGrandActive && isPostPage }]}
+                                                                    >
+                                                                        <span class="category-text-label">{grandChild.name}</span>
+                                                                    </ButtonLink>
+                                                                </li>
+                                                            );
+                                                        })}
+                                                    </ul>
+                                                </div>
+                                            )}
+                                        </li>
+                                    );
+                                })}
+                            </ul>
+                        )}
+                    </li>
+                );
+            })}
         </ul>
     </div>
 </WidgetLayout>
@@ -126,162 +162,144 @@ const { class: className, style } = Astro.props;
 <script>
     function setupAccordion() {
         const accordionItems = document.querySelectorAll('.accordion-item');
-        
+        const urlParams = new URLSearchParams(window.location.search);
+        const pathname = window.location.pathname;
+        let activeCategory = urlParams.get('category');
+        const isPostPage = pathname.includes('/posts/'); // 클라이언트 사이드 포스트 여부 확인
+
+        // [포스트 본문 감지 고도화]
+        if (!activeCategory && isPostPage) {
+            const postMetaLink = document.querySelector('#post-container a[href*="category="]');
+            if (postMetaLink) {
+                const search = new URL((postMetaLink as HTMLAnchorElement).href, window.location.origin).search;
+                activeCategory = new URLSearchParams(search).get('category');
+            }
+        }
+
+        // 1. 하이라이트 실시간 업데이트
+        document.querySelectorAll('.active-category-link, .reading-active-dot').forEach(el => el.classList.remove('active-category-link', 'reading-active-dot'));
+
+        if (activeCategory) {
+            const targetItems = document.querySelectorAll(`[data-path="${activeCategory}"]`);
+            targetItems.forEach(item => {
+                const btn = item.querySelector('button');
+                if (btn) {
+                    btn.classList.add('active-category-link');
+                    if (isPostPage) btn.classList.add('reading-active-dot'); // 독서 중일 때만 점(별) 클래스 추가
+                }
+            });
+        }
+
+        // 2. 아코디언 상태 동기화
         accordionItems.forEach(item => {
             const header = item.querySelector('.group');
             const content = item.querySelector('.accordion-content') as HTMLElement;
             const icon = item.querySelector('.toggle-chevron') as HTMLElement;
 
             if (!content || !icon || !header) return;
-            if (item.getAttribute('data-accordion-initialized') === 'true') return;
 
-            header.addEventListener('click', (e) => {
-                const isLinkClick = (e.target as HTMLElement).closest('a');
-                
-                if (!isLinkClick) {
-                    e.preventDefault();
-                    e.stopPropagation();
-
-                    const isOpen = content.classList.contains('open');
-                    if (isOpen) {
-                        content.style.maxHeight = '0px';
-                        content.classList.remove('open');
-                        icon.style.transform = 'rotate(0deg)';
-                        icon.classList.remove('active');
-                    } else {
-                        content.style.maxHeight = content.scrollHeight + 'px';
-                        content.classList.add('open');
-                        icon.style.transform = 'rotate(90deg)';
-                        icon.classList.add('active');
-                    }
+            const toggle = (forceOpen: boolean | null = null) => {
+                const isNowOpen = forceOpen !== null ? forceOpen : !content.classList.contains('open');
+                if (!isNowOpen) {
+                    content.style.maxHeight = '0px';
+                    content.classList.remove('open');
+                    icon.style.transform = 'rotate(0deg)';
+                    icon.classList.remove('active');
+                } else {
+                    content.style.maxHeight = content.scrollHeight + 'px';
+                    content.classList.add('open');
+                    icon.style.transform = 'rotate(90deg)';
+                    icon.classList.add('active');
                 }
-            });
+            };
 
-            item.setAttribute('data-accordion-initialized', 'true');
+            if (item.getAttribute('data-accordion-initialized') !== 'true') {
+                header.addEventListener('click', (e) => {
+                    const link = item.querySelector('a.category-link') as HTMLAnchorElement;
+                    const isLinkTextClick = (e.target as HTMLElement).closest('.category-text-label');
+                    const isOpen = content.classList.contains('open');
+                    
+                    // [지능형 판단] 닫혀 있을 때만 펼침 애니메이션 실행
+                    if (!isOpen) {
+                        toggle(true);
+                    }
+
+                    // 텍스트 라벨이 아닌 영역(여백/아이콘) 클릭 시 수동 이동 유발
+                    if (!isLinkTextClick && link) {
+                        link.click();
+                    }
+                });
+                item.setAttribute('data-accordion-initialized', 'true');
+            }
+
+            if (activeCategory) {
+                const itemPath = item.getAttribute('data-path');
+                const isPartOfPath = itemPath && (activeCategory === itemPath || activeCategory.startsWith(itemPath + '/'));
+                if (isPartOfPath) {
+                    if (!content.classList.contains('open')) toggle(true);
+                } else {
+                    if (content.classList.contains('open')) toggle(false);
+                }
+            } else {
+                if (content.classList.contains('open')) toggle(false);
+            }
         });
     }
 
     setupAccordion();
     document.addEventListener('astro:page-load', setupAccordion);
-    document.addEventListener('astro:after-swap', setupAccordion);
 </script>
 
 <style>
-    .category-tree ul {
-        list-style: none;
-        padding: 0;
-        margin: 0;
-    }
-    .category-item {
-        margin-bottom: 0.25rem;
-        position: relative;
-    }
-    /* 1차 목록 사이 간격 확대 */
-    .root-list > .category-item {
-        margin-bottom: 0.75rem;
-    }
-    .root-list > .category-item:last-child {
-        margin-bottom: 0;
-    }
+    .category-tree ul { list-style: none; padding: 0; margin: 0; }
+    .category-item { margin-bottom: 0.25rem; position: relative; }
+    .root-list > .category-item { margin-bottom: 1.5rem; }
+    .root-list > .category-item:last-child { margin-bottom: 0; }
+    .sub-list, .grandchild-list { margin-left: 1.5rem; padding-left: 0 !important; }
+    .root-list > .category-item { padding-left: 0; }
+    .sub-list > .category-item { padding-left: 1.5rem; }
+    .grandchild-list .category-item { padding-left: 1.5rem; }
 
-    .sub-list, .grandchild-list {
-        margin-left: 1.5rem;
-        padding-left: 0 !important;
-        position: relative;
-    }
-
-    /* 1단계: 들여쓰기 없음 */
-    .root-list > .category-item {
-        padding-left: 0;
-    }
-
-    /* 2단계: 1.5rem 파고들기 */
-    .sub-list > .category-item {
-        padding-left: 1.5rem;
-    }
-
-    /* 3단계: 가지형 디자인 적용 */
-    .grandchild-list .category-item {
-        padding-left: 1.5rem;
-        position: relative;
-    }
-
-    /* 3단계 공통 수직선 (│) */
-    .grandchild-list .category-item::before {
-        content: "";
-        position: absolute;
-        left: 0.5rem;
-        top: -0.5rem;
-        bottom: 0;
-        border-left: 1.5px dashed oklch(0.6 0 var(--hue));
-        opacity: 0.6;
-    }
-
-    /* 3단계 공통 수평선 (─) */
-    .grandchild-list .category-item::after {
-        content: "";
-        position: absolute;
-        left: 0.5rem;
-        top: 1.125rem;
-        width: 0.8rem;
-        border-top: 1.5px dashed oklch(0.6 0 var(--hue));
-        opacity: 0.6;
-    }
-
-    /* 마지막 항목의 수직선 꺾임 (└─) */
-    .grandchild-list .category-item:last-child::before {
-        bottom: auto;
-        height: 1.625rem;
-    }
-
-    /* 위계별 굵기 (600 - 400 - 300) */
     .root-list > .category-item > :global(a) { font-weight: 600; }
     .sub-list > .category-item > div > :global(a), 
     .sub-list > .category-item > :global(a) { font-weight: 400; }
     .grandchild-list > .category-item > :global(a) { font-weight: 300; }
 
-    /* 리프 노드 호버 효과 */
-    :global(.leaf-node button) {
-        @apply hover:bg-[oklch(var(--primary)/0.1)] dark:hover:bg-[oklch(var(--primary)/0.2)];
-    }
-
-    /* 아코디언 컨텐츠 애니메이션 */
-    .accordion-content {
-        transition: max-height 0.5s cubic-bezier(0.22, 1, 0.36, 1);
-    }
-
-    /* 아이콘 스타일 정제 */
-    .toggle-icon-wrapper {
-        pointer-events: auto; /* 호버 감지를 위해 활성화 */
-        cursor: pointer;
-    }
-
-    .toggle-chevron {
-        color: currentColor;
-        opacity: 0.2;
-    }
-
-    .toggle-chevron.active {
+    /* 활성화 카테고리 (글자색 강조) */
+    :global(button.active-category-link) {
         color: var(--primary) !important;
-        opacity: 1 !important;
+        font-weight: 600 !important;
+        background-color: oklch(var(--primary) / 0.1) !important;
     }
 
-    /* 1. 라인 전체 호버 시 화살표 존재감 살짝 노출 */
-    .group:hover .toggle-chevron {
+    /* 독서 모드 전용 '불꽃 별표(*)' 포인트 (애니메이션 추가) */
+    :global(button.reading-active-dot .category-text-label::after) {
+        content: "*";
+        display: inline-block;
         color: var(--primary);
-        opacity: 0.5;
+        font-weight: 700;
+        font-size: 1.25rem;
+        margin-left: 3px; /* 4px에서 3px로 미세 하향 */
+        vertical-align: middle;
+        transform: translateY(-3px);
+        line-height: 0;
+        /* 숨 쉬는 애니메이션 적용 */
+        animation: fire-pulse 2s ease-in-out infinite;
     }
 
-    /* 2. 화살표 영역에 직접 호버 시 강력한 하이라이트 */
-    .toggle-icon-wrapper:hover .toggle-chevron {
-        color: var(--primary) !important;
-        opacity: 1 !important;
-        filter: drop-shadow(0 0 4px oklch(var(--primary) / 0.3)); /* 은은한 광채 효과 추가 */
+    @keyframes fire-pulse {
+        0%, 100% {
+            opacity: 0.1; /* 아주 희미한 상태 */
+        }
+        50% {
+            opacity: 1; /* 가장 선명한 상태 */
+        }
     }
 
-    /* 3. 텍스트 링크 호버 시 화살표 강조 억제 */
-    .group:has(a:hover) .toggle-chevron {
-        opacity: 0.1 !important;
-        color: currentColor !important;
-    }
+    .accordion-content { transition: max-height 0.5s cubic-bezier(0.22, 1, 0.36, 1); }
+    .toggle-chevron { color: black; opacity: 0.3; }
+    :global(.dark) .toggle-chevron { color: white; opacity: 0.45; }
+    .toggle-chevron.active { color: var(--primary) !important; opacity: 1 !important; }
+    .group:hover .toggle-chevron { color: var(--primary); opacity: 0.6; }
+    .category-tree :global(button) { height: 2.25rem !important; }
 </style>
