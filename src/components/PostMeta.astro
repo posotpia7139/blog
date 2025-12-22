@@ -30,7 +30,7 @@ const className = Astro.props.class;
 <div class:list={["flex flex-col gap-2", className]}>
     <!-- First row: Dates (Non-clickable) -->
     {published && !hideDate && (
-        <div class:list={["flex flex-wrap items-center gap-4 text-black/50 dark:text-white/50", className]}>
+        <div class="flex flex-wrap items-center gap-4 text-black/50 dark:text-white/50">
             <div class="flex items-center">
                 <div class="meta-icon">
                     <Icon name="material-symbols:calendar-today-outline-rounded"></Icon>
@@ -50,7 +50,7 @@ const className = Astro.props.class;
 
     <!-- Second row: Category & Tags (Clickable) -->
     {(category || (tags && tags.length > 0)) && (
-        <div class:list={["flex flex-wrap items-center gap-x-4 gap-y-2", className]}>
+        <div class="flex flex-wrap items-center gap-x-4 gap-y-2">
             <!-- category -->
             {category && (
                 <div class="flex items-center">

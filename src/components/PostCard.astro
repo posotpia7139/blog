@@ -50,7 +50,6 @@ const { remarkPluginFrontmatter } = await entry.render();
         active:text-[var(--title-active)]
         relative z-10 pointer-events-none">
             {title}
-            <Icon class="inline text-[2.25rem] text-[var(--primary)] md:hidden translate-y-0.5 absolute" name="material-symbols:chevron-right-rounded" ></Icon>
             <Icon class="text-[var(--primary)] text-[2.25rem] transition hidden md:inline absolute translate-y-0.5 opacity-0 group-hover:opacity-100 -translate-x-1 group-hover:translate-x-0" name="material-symbols:chevron-right-rounded"></Icon>
         </div>
 
@@ -63,7 +62,7 @@ const { remarkPluginFrontmatter } = await entry.render();
 
                     
         <!-- metadata -->
-        <PostMetadata tags={tags} category={category} hideTagsForMobile={true} hideUpdateDate={true} class="mb-4 relative z-20"></PostMetadata>
+        <PostMetadata tags={tags} category={category} hideTagsForMobile={false} hideUpdateDate={true} class="mb-4 relative z-20"></PostMetadata>
 
         <!-- word count, read time, and date -->
         <div class="text-sm text-black/50 dark:text-white/50 flex flex-wrap gap-4 transition relative z-10 pointer-events-none">
