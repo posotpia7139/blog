@@ -102,7 +102,7 @@ const bannerOffset =
 
 		<meta name="viewport" content="width=device-width" />
 		<meta name="generator" content={Astro.generator} />
-		<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css" />
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css" />
 		{favicons.map(favicon => (
 			<link rel="icon"
 				  href={favicon.src.startsWith('/') ? url(favicon.src) : favicon.src}
@@ -474,12 +474,14 @@ window.onresize = () => {
 </script>
 
 <script>
-import PhotoSwipeLightbox from "photoswipe/lightbox"
-
-let lightbox: PhotoSwipeLightbox
+let PhotoSwipeLightbox: any
+let lightbox: any
 let pswp = import("photoswipe")
 
-function createPhotoSwipe() {
+async function createPhotoSwipe() {
+	if (!PhotoSwipeLightbox) {
+		PhotoSwipeLightbox = (await import("photoswipe/lightbox")).default
+	}
 	lightbox = new PhotoSwipeLightbox({
 		gallery: ".custom-md img, #post-cover img",
 		pswpModule: () => pswp,
