@@ -14,9 +14,9 @@ import PostMetadata from "../../components/PostMeta.astro";
 import { profileConfig, siteConfig } from "../../config";
 import { formatDateToYYYYMMDD } from "../../utils/date-utils";
 import Comment from "../../components/widget/Comment.astro";
+import Categories from "../../components/widget/Categories.astro";
 
 import "katex/dist/katex.css";
-import "photoswipe/style.css";
 
 export async function getStaticPaths() {
 	const blogEntries = await getSortedPosts();
@@ -27,6 +27,7 @@ export async function getStaticPaths() {
 }
 
 const { entry } = Astro.props;
+
 const { Content, headings } = await entry.render();
 
 const { remarkPluginFrontmatter } = await entry.render();
@@ -49,42 +50,28 @@ const jsonLd = {
 	// TODO include cover image here
 };
 ---
-<MainGridLayout banner={entry.data.image} title={entry.data.title} description={entry.data.description} lang={entry.data.lang} setOGTypeArticle={true} headings={headings}>
+<MainGridLayout banner={entry.data.image} title={entry.data.title} description={entry.data.description} lang={entry.data.lang} setOGTypeArticle={true} headings={headings} showSidebarOnMobile={false}>
     <script is:inline slot="head" type="application/ld+json" set:html={JSON.stringify(jsonLd)}></script>
     <div class="flex w-full rounded-[var(--radius-large)] overflow-hidden relative mb-4">
         <div id="post-container" class:list={["card-base z-10 px-6 md:px-9 pt-6 pb-4 relative w-full ",
             {}
         ]}>
-            <!-- date, word count and reading time -->
-            <div class="flex flex-row flex-wrap text-black/50 dark:text-white/50 gap-x-6 gap-y-2 mb-3 transition onload-animation justify-center">
+            <!-- metadata: dates (top) -->
+            <div class="flex flex-row flex-wrap text-75 gap-x-6 gap-y-2 mb-3 transition onload-animation justify-center">
                 <div class="flex flex-row items-center">
-                    <div class="transition h-6 w-6 rounded-md bg-black/5 dark:bg-white/10 text-black/50 dark:text-white/50 flex items-center justify-center mr-2">
+                    <div class="transition h-6 w-6 rounded-md bg-black/10 dark:bg-white/15 text-75 flex items-center justify-center mr-2">
                         <Icon name="material-symbols:calendar-today-outline-rounded"></Icon>
                     </div>
-                    <div class="text-sm">{formatDateToYYYYMMDD(entry.data.published)}</div>
+                    <div class="text-sm font-medium">{formatDateToYYYYMMDD(entry.data.published)}</div>
                 </div>
                 {entry.data.updated && entry.data.updated !== entry.data.published && (
                     <div class="flex flex-row items-center">
-                        <div class="transition h-6 w-6 rounded-md bg-black/5 dark:bg-white/10 text-black/50 dark:text-white/50 flex items-center justify-center mr-2">
+                        <div class="transition h-6 w-6 rounded-md bg-black/10 dark:bg-white/15 text-75 flex items-center justify-center mr-2">
                             <Icon name="material-symbols:edit-calendar-outline-rounded"></Icon>
                         </div>
-                        <div class="text-sm">{formatDateToYYYYMMDD(entry.data.updated)}</div>
+                        <div class="text-sm font-medium">{formatDateToYYYYMMDD(entry.data.updated)}</div>
                     </div>
                 )}
-                <div class="flex flex-row items-center">
-                    <div class="transition h-6 w-6 rounded-md bg-black/5 dark:bg-white/10 text-black/50 dark:text-white/50 flex items-center justify-center mr-2">
-                        <Icon name="material-symbols:notes-rounded"></Icon>
-                    </div>
-                    <div class="text-sm">{remarkPluginFrontmatter.words} {" " + i18n(I18nKey.wordsCount)}</div>
-                </div>
-                <div class="flex flex-row items-center">
-                    <div class="transition h-6 w-6 rounded-md bg-black/5 dark:bg-white/10 text-black/50 dark:text-white/50 flex items-center justify-center mr-2">
-                        <Icon name="material-symbols:schedule-outline-rounded"></Icon>
-                    </div>
-                    <div class="text-sm">
-                        {remarkPluginFrontmatter.minutes} {" " + i18n(remarkPluginFrontmatter.minutes === 1 ? I18nKey.minuteCount : I18nKey.minutesCount)}
-                    </div>
-                </div>
             </div>
 
             <!-- title -->
@@ -102,10 +89,28 @@ const jsonLd = {
             <!-- metadata -->
             <div class="onload-animation">
                 <PostMetadata
-                        class="mb-5 justify-center items-center"
+                        class="mb-3 justify-center items-center"
                         tags={entry.data.tags}
                         category={entry.data.category}
+                        published={entry.data.published}
                 ></PostMetadata>
+                <!-- Word count and Reading time (Moved below tags) -->
+                <div class="flex flex-row flex-wrap justify-center gap-x-6 gap-y-2 text-black/50 dark:text-white/50 mb-6">
+                    <div class="flex flex-row items-center">
+                        <div class="transition h-6 w-6 rounded-md bg-black/5 dark:bg-white/10 text-black/50 dark:text-white/50 flex items-center justify-center mr-2">
+                            <Icon name="material-symbols:notes-rounded"></Icon>
+                        </div>
+                        <div class="text-sm">{remarkPluginFrontmatter.words} {" " + i18n(I18nKey.wordsCount)}</div>
+                    </div>
+                    <div class="flex flex-row items-center">
+                        <div class="transition h-6 w-6 rounded-md bg-black/5 dark:bg-white/10 text-black/50 dark:text-white/50 flex items-center justify-center mr-2">
+                            <Icon name="material-symbols:schedule-outline-rounded"></Icon>
+                        </div>
+                        <div class="text-sm">
+                            {remarkPluginFrontmatter.minutes} {" " + i18n(remarkPluginFrontmatter.minutes === 1 ? I18nKey.minuteCount : I18nKey.minutesCount)}
+                        </div>
+                    </div>
+                </div>
                 {!entry.data.image && <div class="border-[var(--line-divider)] border-dashed border-b-[1px] mb-5"></div>}
             </div>
 
@@ -153,6 +158,10 @@ const jsonLd = {
 
     <div class="card-base p-6 mb-4 min-h-[400px]">
         <Comment />
+    </div>
+
+    <div class="lg:hidden mb-4 card-base p-6">
+        <Categories />
     </div>
 
 </MainGridLayout>
