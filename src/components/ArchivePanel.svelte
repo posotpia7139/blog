@@ -104,47 +104,27 @@ onMount(async () => {
 
 <div class="card-base px-8 py-6">
     <!-- 글로벌 필터 헤더: 선택된 카테고리나 태그 정보를 맨 위에 한 번만 표시 -->
-    <div class="mb-6 pb-6 border-b border-black/5 dark:border-white/5">
+    <div class="">
         <div class="transition text-left text-50 flex items-center flex-wrap">
             {#if categories.length > 0}
                 {@const allParts = categories[0].split('/')}
                 {@const totalCount = groups.reduce((acc, g) => acc + g.posts.length, 0)}
                 
-                <!-- 모바일 전용 계층형 리스트 뷰 (3차부터 15px씩 추가 들여쓰기) -->
-                <div class="flex flex-col w-full md:hidden space-y-0.5 pl-5 pt-5">
-                    {#each allParts as part, i}
-                        {@const isLast = i === allParts.length - 1}
-                        <div class="flex items-center h-6" style="padding-left: {Math.max(0, i - 1) * 15}px">
-                            {#if i > 0}
-                                <span class="text-[0.7rem] opacity-30 mr-1.5">└</span>
+                <!-- 카테고리 정보 헤더 (모바일/데스크탑 통합 2단 좌측 정렬 배치) -->
+                <div class="flex flex-col items-start w-full py-4 pl-2">
+                    <div class="flex flex-row items-center flex-wrap justify-start">
+                        {#each allParts as part, i}
+                            {@const isLast = i === allParts.length - 1}
+                            <span class="{isLast ? 'text-[var(--primary)] font-bold text-[13px]' : 'text-[13px]'}">{part}</span>
+                            {#if !isLast}
+                                <span class="mx-1.5 text-black/30 dark:text-white/30 font-normal">/</span>
                             {/if}
-                            <span class="{isLast ? 'text-[var(--primary)] font-bold text-base' : 'text-base ' + (i === 0 ? 'font-medium' : 'text-75')}">
-                                {part}
-                            </span>
-                            {#if isLast}
-                                <span class="ml-2 flex items-center shrink-0">
-                                    <span class="text-base font-semibold opacity-60">게시물&nbsp;</span>
-                                    <span class="text-[var(--primary)] font-bold text-base">{totalCount}</span>
-                                    <span class="text-base font-semibold opacity-60">개</span>
-                                </span>
-                            {/if}
-                        </div>
-                    {/each}
-                </div>
-
-                <!-- 데스크탑 전용 가로형 브레드크럼 -->
-                <div class="hidden md:flex md:flex-row md:items-center w-full flex-wrap">
-                    {#each allParts as part, i}
-                        {@const isLast = i === allParts.length - 1}
-                        <span class="{isLast ? 'text-[var(--primary)] font-bold text-base' : 'text-base'}">{part}</span>
-                        {#if !isLast}
-                            <span class="mx-1.5 text-black/30 dark:text-white/30 font-normal">/</span>
-                        {/if}
-                    {/each}
-                    <div class="ml-2 flex items-center shrink-0">
-                        <span class="text-xs opacity-60">게시물&nbsp;</span>
-                        <span class="text-[var(--primary)] font-bold text-xs">{totalCount}</span>
-                        <span class="text-xs opacity-60">개</span>
+                        {/each}
+                    </div>
+                    <div class="mt-1 flex items-center shrink-0">
+                        <span class="text-[13px] opacity-60">게시물&nbsp;</span>
+                        <span class="text-[var(--primary)] font-bold text-[13px]">{totalCount}</span>
+                        <span class="text-[13px] opacity-60">개</span>
                     </div>
                 </div>
             {:else if tags.length > 0}

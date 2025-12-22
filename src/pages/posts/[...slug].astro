@@ -56,22 +56,31 @@ const jsonLd = {
         <div id="post-container" class:list={["card-base z-10 px-6 md:px-9 pt-6 pb-4 relative w-full ",
             {}
         ]}>
-            <!-- metadata: dates (top) -->
-            <div class="flex flex-row flex-wrap text-75 gap-x-6 gap-y-2 mb-3 transition onload-animation justify-center">
+            <!-- metadata: consolidated (top-center) -->
+            <div class="flex flex-row flex-wrap items-center justify-center gap-x-6 gap-y-2 mb-3 transition onload-animation text-black/50 dark:text-white/50">
                 <div class="flex flex-row items-center">
-                    <div class="transition h-6 w-6 rounded-md bg-black/10 dark:bg-white/15 text-75 flex items-center justify-center mr-2">
+                    <div class="transition h-6 w-6 rounded-md bg-black/5 dark:bg-white/10 text-black/50 dark:text-white/50 flex items-center justify-center mr-2">
                         <Icon name="material-symbols:calendar-today-outline-rounded"></Icon>
                     </div>
                     <div class="text-sm font-medium">{formatDateToYYYYMMDD(entry.data.published)}</div>
-                </div>
-                {entry.data.updated && entry.data.updated !== entry.data.published && (
-                    <div class="flex flex-row items-center">
-                        <div class="transition h-6 w-6 rounded-md bg-black/10 dark:bg-white/15 text-75 flex items-center justify-center mr-2">
-                            <Icon name="material-symbols:edit-calendar-outline-rounded"></Icon>
+                    {entry.data.updated && entry.data.updated !== entry.data.published && (
+                        <div class="flex flex-row items-center">
+                            <span class="mx-1.5 opacity-50">/</span>
+                            <div class="text-sm font-medium">{formatDateToYYYYMMDD(entry.data.updated)}</div>
                         </div>
-                        <div class="text-sm font-medium">{formatDateToYYYYMMDD(entry.data.updated)}</div>
+                    )}
+                </div>
+                
+                <div class="flex flex-row items-center">
+                    <div class="transition h-6 w-6 rounded-md bg-black/5 dark:bg-white/10 text-black/50 dark:text-white/50 flex items-center justify-center mr-2">
+                        <Icon name="material-symbols:schedule-outline-rounded"></Icon>
                     </div>
-                )}
+                    <div class="text-sm">
+                        {remarkPluginFrontmatter.minutes} {" " + i18n(remarkPluginFrontmatter.minutes === 1 ? I18nKey.minuteCount : I18nKey.minutesCount)}
+                        <span class="mx-1.5 opacity-50">/</span>
+                        {remarkPluginFrontmatter.words} {" " + i18n(remarkPluginFrontmatter.words === 1 ? I18nKey.wordCount : I18nKey.wordsCount)}
+                    </div>
+                </div>
             </div>
 
             <!-- title -->
@@ -95,19 +104,6 @@ const jsonLd = {
                         published={entry.data.published}
                         hideDate={true}
                 ></PostMetadata>
-                <!-- Word count and Reading time (Consolidated) -->
-                <div class="flex flex-row flex-wrap justify-center gap-x-6 gap-y-2 text-black/50 dark:text-white/50 mb-6">
-                    <div class="flex flex-row items-center">
-                        <div class="transition h-6 w-6 rounded-md bg-black/5 dark:bg-white/10 text-black/50 dark:text-white/50 flex items-center justify-center mr-2">
-                            <Icon name="material-symbols:schedule-outline-rounded"></Icon>
-                        </div>
-                        <div class="text-sm">
-                            {remarkPluginFrontmatter.minutes} {" " + i18n(remarkPluginFrontmatter.minutes === 1 ? I18nKey.minuteCount : I18nKey.minutesCount)}
-                            <span class="mx-1.5 opacity-50">/</span>
-                            {remarkPluginFrontmatter.words} {" " + i18n(remarkPluginFrontmatter.words === 1 ? I18nKey.wordCount : I18nKey.wordsCount)}
-                        </div>
-                    </div>
-                </div>
                 {!entry.data.image && <div class="border-[var(--line-divider)] border-dashed border-b-[1px] mb-5"></div>}
             </div>
 
