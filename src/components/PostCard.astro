@@ -62,7 +62,7 @@ const { remarkPluginFrontmatter } = await entry.render();
 
                     
         <!-- metadata -->
-        <PostMetadata tags={tags} category={category} hideTagsForMobile={false} hideUpdateDate={true} class="mb-4 relative z-20"></PostMetadata>
+        <PostMetadata published={published} tags={tags} category={category} hideTagsForMobile={false} hideUpdateDate={true} hideDate={true} class="mb-4 relative z-20"></PostMetadata>
 
         <!-- word count, read time, and date -->
         <div class="text-sm text-black/50 dark:text-white/50 flex flex-wrap gap-4 transition relative z-10 pointer-events-none">
