@@ -38,15 +38,19 @@
 
             &::after {
                 content: '#';
-                @apply text-[var(--primary)] opacity-0 transition-all duration-300 ease-in-out -translate-x-1;
+                @apply text-[var(--primary)] opacity-0 transition-all duration-300 ease-in-out;
                 margin-left: 0.5rem;
                 display: inline-block;
+                /* 초기 위치: -45도 대각선 상태로 최대의 임팩트 부여 */
+                transform: translateX(-0.5rem) rotate(-45deg);
             }
         }
 
         &:hover {
             .anchor-link::after {
-                @apply opacity-100 translate-x-0;
+                /* 최종 위치: 제자리(0) 및 회전 복구(0) */
+                @apply opacity-100;
+                transform: translateX(0) rotate(0deg);
             }
         }
     }

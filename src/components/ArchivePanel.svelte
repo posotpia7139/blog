@@ -1,6 +1,9 @@
 <script lang="ts">
 import { onMount } from "svelte";
+import { tweened } from "svelte/motion";
+import { expoOut } from "svelte/easing";
 
+import { siteConfig } from "../config";
 import I18nKey from "../i18n/i18nKey";
 import { i18n } from "../i18n/translation";
 import { getPostUrlBySlug } from "../utils/url-utils";
@@ -8,6 +11,12 @@ import { getPostUrlBySlug } from "../utils/url-utils";
 export let tags: string[] = [];
 export let categories: string[] = [];
 export let sortedPosts: Post[] = [];
+
+// [애니메이션] 숫자가 차오르는 효과를 위한 tweened 변수
+const animatedCount = tweened(0, {
+	duration: 2400,
+	easing: expoOut,
+});
 
 interface Post {
 	slug: string;
@@ -25,6 +34,7 @@ interface Group {
 }
 
 let groups: Group[] = [];
+let totalCount = 0;
 
 function setGroups(posts: Post[]) {
 	const grouped = posts.reduce(
@@ -46,6 +56,14 @@ function setGroups(posts: Post[]) {
 
 	groupedPostsArray.sort((a, b) => b.year - a.year);
 	groups = groupedPostsArray;
+
+	totalCount = posts.length;
+	
+	// 모든 텍스트와 연도 애니메이션이 끝난 후(약 1.5초 뒤) 카운트업 시작
+	const isInitialLoad = $animatedCount === 0;
+	setTimeout(() => {
+		animatedCount.set(totalCount);
+	}, isInitialLoad ? 1500 : 0);
 }
 
 // Initial render with all posts
@@ -103,14 +121,11 @@ onMount(async () => {
 </script>
 
 <div class="card-base px-8 py-6">
-    <!-- 글로벌 필터 헤더: 선택된 카테고리나 태그 정보를 맨 위에 한 번만 표시 -->
     <div class="">
         <div class="transition text-left text-50 flex items-center flex-wrap">
             {#if categories.length > 0}
                 {@const allParts = categories[0].split('/')}
                 {@const totalCount = groups.reduce((acc, g) => acc + g.posts.length, 0)}
-                
-                <!-- 카테고리 정보 헤더 (모바일/데스크탑 통합 2단 좌측 정렬 배치) -->
                 <div class="flex flex-col items-start w-full py-4 pl-2">
                     <div class="flex flex-row items-center flex-wrap justify-start">
                         {#each allParts as part, i}
@@ -134,8 +149,38 @@ onMount(async () => {
                     <span class="ml-3 text-75">{groups.reduce((acc, g) => acc + g.posts.length, 0)} {i18n(I18nKey.postsCount)}</span>
                 </div>
             {:else}
-                <div class="flex items-center text-xl font-bold text-75">
-                    {groups.reduce((acc, g) => acc + g.posts.length, 0)} {i18n(I18nKey.postsCount)}
+                {@const newestYear = sortedPosts.length > 0 ? sortedPosts[0].data.published.getFullYear() : new Date().getFullYear()}
+                {@const oldestYear = sortedPosts.length > 0 ? sortedPosts[sortedPosts.length - 1].data.published.getFullYear() : newestYear}
+                
+                <div class="flex flex-col items-center w-full py-12 mb-6 border-b border-dashed border-[var(--line-divider)] overflow-hidden">
+                    <div class="relative">
+                        <span class="inline-block text-[18px] text-[var(--primary)] font-bold tracking-tight leading-none anim-fade-in delay-200">
+                            {siteConfig.title}
+                        </span>
+                        <span class="absolute left-full top-[-4px] ml-1 text-[8px] text-[var(--primary)] font-black uppercase tracking-[0.12em] leading-none whitespace-nowrap anim-fade-in delay-400">
+                            Archive
+                        </span>
+                    </div>
+                    
+                    <div class="mt-5 flex flex-col items-center gap-3">
+                        <!-- 2단: 연도 연대기 애니메이션 -->
+                        <div class="flex items-center text-[13px] font-semibold text-black/70 dark:text-white/70 h-5">
+                            <span class="text-[var(--primary)] font-bold anim-fade-in delay-600">{oldestYear}</span>
+                            <div class="year-connector anim-grow-line"></div>
+                            <span class="text-[var(--primary)] font-bold anim-fade-in delay-1100">{newestYear}</span>
+                        </div>
+                        
+                        <!-- 3단: 게시물 개수 (정밀 2px 간격 최적화) -->
+                        <div class="text-[12px] font-medium text-center text-black/60 dark:text-white/60 anim-fade-in delay-1300">
+                            <span class="surround-text left-text" class:show-surround={$animatedCount >= totalCount - 0.1}>
+                                기록된
+                            </span>
+                            
+                            <span class="inline-block text-right text-[var(--primary)] font-bold text-[14px] transition-all duration-700 mr-[2px]" 
+                                  class:count-finished={$animatedCount >= totalCount - 0.1}
+                                  style="width: {totalCount.toString().length}ch; font-variant-numeric: tabular-nums;">{Math.round($animatedCount)}</span><span class="surround-text right-text" class:show-surround={$animatedCount >= totalCount - 0.1}>개의 불꽃들</span>
+                        </div>
+                    </div>
                 </div>
             {/if}
         </div>
@@ -148,10 +193,7 @@ onMount(async () => {
                     {group.year}
                 </div>
                 <div class="w-[15%] md:w-[10%]">
-                    <div
-                            class="h-3 w-3 bg-none rounded-full outline outline-[var(--primary)] mx-auto
-                  -outline-offset-[2px] z-50 outline-3"
-                    ></div>
+                    <div class="h-3 w-3 bg-none rounded-full outline outline-[var(--primary)] mx-auto -outline-offset-[2px] z-50 outline-3"></div>
                 </div>
                 <div class="w-[70%] md:w-[80%] transition text-left text-50 text-base md:text-base flex items-center">
                     <span class="text-[var(--primary)] font-bold mr-1">{group.posts.length}</span>
@@ -161,43 +203,18 @@ onMount(async () => {
 
             <div class="mt-2 space-y-1">
                 {#each group.posts as post}
-                    <a
-                            href={getPostUrlBySlug(post.slug)}
-                            aria-label={post.data.title}
-                            class="group btn-plain !block h-10 w-full rounded-lg hover:text-[initial]"
-                    >
+                    <a href={getPostUrlBySlug(post.slug)} aria-label={post.data.title} class="group btn-plain !block h-10 w-full rounded-lg hover:text-[initial]">
                         <div class="flex flex-row justify-start items-center h-full">
-                            <!-- date -->
                             <div class="w-[15%] md:w-[10%] transition text-sm text-right text-50">
                                 {formatDate(post.data.published)}
                             </div>
-
-                            <!-- dot and line -->
                             <div class="w-[15%] md:w-[10%] relative dash-line h-full flex items-center">
-                                <div
-                                        class="transition-all mx-auto w-1 h-1 rounded group-hover:h-5
-                           bg-[oklch(0.5_0.05_var(--hue))] group-hover:bg-[var(--primary)]
-                           outline outline-4 z-50
-                           outline-[var(--card-bg)]
-                           group-hover:outline-[var(--btn-plain-bg-hover)]
-                           group-active:outline-[var(--btn-plain-bg-active)]"
-                                ></div>
+                                <div class="transition-all mx-auto w-1 h-1 rounded group-hover:h-5 bg-[oklch(0.5_0.05_var(--hue))] group-hover:bg-[var(--primary)] outline outline-4 z-50 outline-[var(--card-bg)] group-hover:outline-[var(--btn-plain-bg-hover)] group-active:outline-[var(--btn-plain-bg-active)]"></div>
                             </div>
-
-                            <!-- post title -->
-                            <div
-                                    class="w-[70%] md:max-w-[65%] md:w-[65%] text-left font-medium
-                         group-hover:translate-x-1 transition-all group-hover:text-[var(--primary)]
-                         text-75 pr-8 whitespace-nowrap overflow-ellipsis overflow-hidden"
-                            >
+                            <div class="w-[70%] md:max-w-[65%] md:w-[65%] text-left font-medium group-hover:translate-x-1 transition-all group-hover:text-[var(--primary)] text-75 pr-8 whitespace-nowrap overflow-ellipsis overflow-hidden">
                                 {post.data.title}
                             </div>
-
-                            <!-- tag list -->
-                            <div
-                                    class="hidden md:block md:w-[15%] text-left text-sm transition
-                         whitespace-nowrap overflow-ellipsis overflow-hidden text-30"
-                            >
+                            <div class="hidden md:block md:w-[15%] text-left text-sm transition whitespace-nowrap overflow-ellipsis overflow-hidden text-30">
                                 {formatTag(post.data.tags)}
                             </div>
                         </div>
@@ -207,3 +224,70 @@ onMount(async () => {
         </div>
     {/each}
 </div>
+
+<style>
+    @keyframes slide-up-fade {
+        from { opacity: 0; transform: translateY(12px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .anim-fade-in {
+        opacity: 0;
+        animation: slide-up-fade 1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+
+    .delay-200 { animation-delay: 200ms; }
+    .delay-400 { animation-delay: 400ms; }
+    .delay-600 { animation-delay: 600ms; }
+    .delay-1100 { animation-delay: 1100ms; }
+    .delay-1300 { animation-delay: 1300ms; }
+
+    /* [베지어 곡선] 주변 텍스트: 강렬한 Burst-Out 연출 */
+    .surround-text {
+        opacity: 0;
+        filter: blur(8px);
+        transition: all 1.1s cubic-bezier(0.16, 1, 0.3, 1);
+        white-space: nowrap;
+        display: inline-block;
+    }
+
+    .left-text {
+        transform: translateX(60px) scale(0.2);
+    }
+    
+    .right-text {
+        transform: translateX(-60px) scale(0.2);
+    }
+
+    .show-surround {
+        opacity: 1;
+        filter: blur(0);
+        transform: translateX(0) scale(1);
+    }
+
+    /* 카운팅 완료 시 번쩍이는 불꽃 효과 */
+
+    .count-finished {
+        text-shadow: 0 0 20px oklch(0.7 0.2 250 / 0.5);
+        transform: scale(1.1);
+        color: var(--primary) !important;
+    }
+
+    .year-connector {
+        width: 0;
+        height: 1px;
+        background: var(--primary);
+        opacity: 0.3;
+        margin: 0 12px;
+    }
+
+    @keyframes grow-line {
+        from { width: 0; }
+        to { width: 24px; }
+    }
+
+    .anim-grow-line {
+        animation: grow-line 0.6s cubic-bezier(0.76, 0, 0.24, 1) forwards;
+        animation-delay: 800ms;
+    }
+</style>

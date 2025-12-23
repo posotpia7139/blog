@@ -10,12 +10,18 @@ interface Props {
 }
 
 const className = Astro.props.class;
+const pathname = Astro.url.pathname;
+const isPostPage = pathname.includes('/posts/');
 ---
 <div id="sidebar" class:list={[className, "w-full"]}>
-    <div class="flex flex-col w-full gap-4 mb-4">
-        <Categories class="onload-animation" style="animation-delay: 150ms"></Categories>
-    </div>
+    {isPostPage && (
+        <div class="flex flex-col w-full gap-4 mb-4">
+            <Categories class="onload-animation" style="animation-delay: 100ms"></Categories>
+        </div>
+    )}
     <div id="sidebar-sticky" class="sticky transition-all duration-700 flex flex-col w-full gap-4 top-4">
+        {!isPostPage && <Categories class="onload-animation" style="animation-delay: 100ms"></Categories>}
+        
         <!-- Ad Space: 기본적으로 숨김, 스크립트로 포스트 본문에서만 노출 -->
         <div id="sidebar-ad" class="hidden w-[300px] h-[600px] bg-gray-200 dark:bg-gray-800 items-center justify-center text-sm text-gray-500 rounded-lg overflow-hidden">
             Adsense (300x600)
