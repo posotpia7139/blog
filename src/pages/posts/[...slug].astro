@@ -50,7 +50,7 @@ const jsonLd = {
 	// TODO include cover image here
 };
 ---
-<MainGridLayout banner={entry.data.image} title={entry.data.title} description={entry.data.description} lang={entry.data.lang} setOGTypeArticle={true} headings={headings} showSidebarOnMobile={false}>
+<MainGridLayout banner={entry.data.image} title={entry.data.title} description={entry.data.description} lang={entry.data.lang} setOGTypeArticle={true} headings={headings} showSidebarOnMobile={true}>
     <script is:inline slot="head" type="application/ld+json" set:html={JSON.stringify(jsonLd)}></script>
     <div class="flex w-full rounded-[var(--radius-large)] overflow-hidden relative mb-4">
         <div id="post-container" class:list={["card-base z-10 px-6 md:px-9 pt-6 pb-4 relative w-full ",
@@ -98,7 +98,7 @@ const jsonLd = {
             <!-- metadata -->
             <div class="onload-animation">
                 <PostMetadata
-                        class="mb-4 justify-center items-center"
+                        class="mb-7 justify-center items-center"
                         tags={entry.data.tags}
                         category={entry.data.category}
                         published={entry.data.published}
@@ -151,11 +151,6 @@ const jsonLd = {
 
     <div class="card-base p-6 mb-4 min-h-[413px] md:min-h-[452px]">
         <Comment />
-    </div>
-
-    {/* 모바일 전용 카테고리: 댓글창 하단에 위치 */}
-    <div class="block md:hidden">
-        <Categories class="onload-animation" style="animation-delay: 150ms"></Categories>
     </div>
 
 </MainGridLayout>

@@ -152,7 +152,7 @@ onMount(async () => {
                 {@const newestYear = sortedPosts.length > 0 ? sortedPosts[0].data.published.getFullYear() : new Date().getFullYear()}
                 {@const oldestYear = sortedPosts.length > 0 ? sortedPosts[sortedPosts.length - 1].data.published.getFullYear() : newestYear}
                 
-                <div class="flex flex-col items-center w-full py-16 mb-8 border-b border-dashed border-[var(--line-divider)] overflow-hidden gap-4">
+                <div class="flex flex-col items-center w-full py-16 mt-6 mb-8 overflow-hidden gap-4">
                     <!-- 1단: 제목 (ARCHIVE 및 타이틀 모두 한 글자씩 등장) -->
                     <div class="flex flex-col items-center">
                         <div class="flex flex-row mb-2">

@@ -1,11 +1,14 @@
 ---
 ---
-<div id="scroll-progress-container" class="fixed top-0 left-0 w-full h-1 z-[100] pointer-events-none opacity-0 transition-opacity duration-300">
+<div id="scroll-progress-container" class="fixed top-0 left-0 w-full h-[2px] dark:h-[2px] z-[100] pointer-events-none opacity-0 transition-opacity duration-300">
     <div id="scroll-progress-bar" class="h-full bg-[var(--primary)] w-0 transition-all duration-150 ease-out shadow-[0_0_10px_var(--primary)] dark:shadow-none"></div>
 </div>
 
 <style>
-    /* 라이트 모드에서 진행바를 더 선명하게 보이도록 조정 */
+    /* 밝음 모드에서 진행바 굵기를 3px로 조정 및 색상 최적화 */
+    :root:not(.dark) #scroll-progress-container {
+        height: 3px;
+    }
     :root:not(.dark) #scroll-progress-bar {
         background-color: oklch(0.65 0.14 var(--hue));
         box-shadow: 0 0 15px oklch(0.65 0.14 var(--hue));

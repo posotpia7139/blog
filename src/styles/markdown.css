@@ -4,8 +4,7 @@
 
 @layer components {
   .link {
-    @apply underline decoration-[var(--link-underline)]
-    decoration-1 decoration-dashed underline-offset-4 rounded-md;
+    @apply no-underline rounded-md;
   }
 
   .btn-regular-dark {
@@ -13,9 +12,20 @@
   }
   
   /* ✅ prose 테이블 정렬 수정 */
-  /* prose가 align 속성까지 덮는 문제 해결 */
-  .prose table th[align],
-  .prose table td[align] {
+  /* 기본적으로 모든 셀을 중앙 정렬함 */
+  .prose table th,
+  .prose table td {
+    text-align: center;
+  }
+
+  /* 마크다운 문법(:---, ---:)으로 명시적 정렬을 지정한 경우 해당 설정을 따름 */
+  .prose table th[align="left"], .prose table td[align="left"] {
+    text-align: left;
+  }
+  .prose table th[align="right"], .prose table td[align="right"] {
+    text-align: right;
+  }
+  .prose table th[align="center"], .prose table td[align="center"] {
     text-align: center;
   }
   
@@ -41,23 +51,20 @@
                 @apply text-[var(--primary)] opacity-0 transition-all duration-300 ease-in-out;
                 margin-left: 0.5rem;
                 display: inline-block;
-                /* 초기 위치: -45도 대각선 상태로 최대의 임팩트 부여 */
-                transform: translateX(-0.5rem) rotate(-45deg);
+                transform: translateX(-0.5rem);
             }
         }
 
         &:hover {
             .anchor-link::after {
-                /* 최종 위치: 제자리(0) 및 회전 복구(0) */
                 @apply opacity-100;
-                transform: translateX(0) rotate(0deg);
+                transform: translateX(0);
             }
         }
     }
 
     a:not(.no-styling):not(.anchor-link) {
-        @apply relative bg-none link font-medium text-[var(--primary)]
-        underline decoration-[var(--link-underline)] decoration-1 decoration-dashed underline-offset-4;
+        @apply relative bg-none link font-medium text-[var(--primary)];
         box-decoration-break: clone;
         -webkit-box-decoration-break: clone;
         display: inline-block;
@@ -65,8 +72,6 @@
         &:hover, &:active {
             @apply decoration-transparent;
             background: var(--btn-plain-bg-hover);
-            /* border-bottom: 1px dashed var(--link-hover); */
-            /* text-decoration: none; */
         }
     }
 
@@ -131,6 +136,52 @@
         li::marker {
             @apply text-[var(--primary)];
         }
+    }
+
+    /* 본문 내 각주 번호 및 하단 목록 번호 공통 스타일 */
+    a[id^="user-content-fnref-"],
+    .custom-footnote-link {
+        @apply no-underline font-bold text-[var(--primary)] transition-all inline-flex items-center decoration-transparent border-none;
+        padding: 0;
+        line-height: 1;
+        cursor: pointer;
+    }
+
+    /* 대괄호 간격 통일 */
+    a[id^="user-content-fnref-"] span:first-child,
+    .custom-footnote-link span:first-child {
+        @apply mr-[0.2em];
+    }
+
+    a[id^="user-content-fnref-"] span:last-child,
+    .custom-footnote-link span:last-child {
+        @apply ml-[0.2em];
+    }
+
+    a[id^="user-content-fnref-"]:hover,
+    .custom-footnote-link:hover {
+        @apply opacity-80;
+    }
+
+    /* 각주 하단 목록 스타일링: 기본 번호 숨김 */
+    section[data-footnotes] ol {
+        @apply my-0 list-none pl-0;
+    }
+
+    section[data-footnotes] ol li {
+        @apply my-[5px] pt-1 !important;
+        display: block;
+    }
+
+    /* 기존의 ↩ 화살표 링크는 숨김 */
+    .data-footnote-backref {
+        display: none !important;
+    }
+
+    section[data-footnotes] p {
+        @apply my-0 !important;
+        line-height: 1.35;
+        display: inline;
     }
 
     hr {

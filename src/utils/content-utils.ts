@@ -129,7 +129,6 @@ export async function getCategoryList(): Promise<Category[]> {
 		dev: 100,
 		philosophy: 200,
 		life: 300,
-		guide: 400,
 		// 2차 카테고리 (dev)
 		"dev/study": 110,
 		"dev/projects": 120,
@@ -144,17 +143,19 @@ export async function getCategoryList(): Promise<Category[]> {
 	};
 
 	const lst = Object.keys(count).sort((a, b) => {
-		const weightA = SORT_WEIGHT[a] || 999;
-		const weightB = SORT_WEIGHT[b] || 999;
+		const partsA = a.split("/");
+		const partsB = b.split("/");
+		const rootA = partsA[0];
+		const rootB = partsB[0];
+
+		const weightA = SORT_WEIGHT[rootA] || 999;
+		const weightB = SORT_WEIGHT[rootB] || 999;
 
 		if (weightA !== weightB) {
 			return weightA - weightB;
 		}
 
-		// 가중치가 같거나 없는 경우 기존 로직(깊이 -> 이름) 유지
-		const depthA = a.split("/").length;
-		const depthB = b.split("/").length;
-		if (depthA !== depthB) return depthA - depthB;
+		// 같은 루트 카테고리 내에서는 경로 문자열로 정렬하여 계층 구조 유지
 		return a.toLowerCase().localeCompare(b.toLowerCase());
 	});
 

@@ -343,30 +343,58 @@ function showBanner() {
 	banner.classList.remove('opacity-0', 'scale-105');
 }
 
+function initFootnotes() {
+	// 1. 본문 내 각주 번호 변환 ([1] 형태)
+	const inlineRefs = document.querySelectorAll('a[id^="user-content-fnref-"]');
+	inlineRefs.forEach(ref => {
+		if (ref.querySelector('span')) return; // 이미 변환됨
+		const num = ref.innerText;
+		ref.innerHTML = `<span>[</span>${num}<span>]</span>`;
+	});
+
+	// 2. 하단 목록 각주 번호 변환
+	const footnotes = document.querySelectorAll('section[data-footnotes] ol li');
+	footnotes.forEach((li, index) => {
+		const backref = li.querySelector('.data-footnote-backref');
+		if (!backref) return;
+
+		// 이미 변형되었는지 확인
+		if (li.querySelector('.custom-footnote-link')) return;
+
+		const href = backref.getAttribute('href');
+		const num = index + 1;
+
+		// [n] 전체가 드래그 가능하도록 실제 텍스트로 생성
+		const newLink = document.createElement('a');
+		newLink.href = href || '#';
+		newLink.className = 'custom-footnote-link';
+		newLink.innerHTML = `<span>[</span>${num}<span>]</span>`;
+		
+		// 문장 맨 앞에 삽입 (번호 뒤에 공백 노드 추가)
+		const p = li.querySelector('p');
+		if (p) {
+			p.prepend(document.createTextNode(' '));
+			p.prepend(newLink);
+		} else {
+			li.prepend(document.createTextNode(' '));
+			li.prepend(newLink);
+		}
+	});
+}
+
 function init() {
 	// disableAnimation()()		// TODO
 	loadTheme();
 	loadHue();
 	initCustomScrollbar();
 	showBanner();
+	initFootnotes(); // 각주 초기화 추가
 }
 
 /* Load settings when entering the site */
 init();
 
 const setup = () => {
-	// TODO: temp solution to change the height of the banner
-/*
-	window.swup.hooks.on('animation:out:start', () => {
-		const path = window.location.pathname
-		const body = document.querySelector('body')
-		if (path[path.length - 1] === '/' && !body.classList.contains('is-home')) {
-			body.classList.add('is-home')
-		} else if (path[path.length - 1] !== '/' && body.classList.contains('is-home')) {
-			body.classList.remove('is-home')
-		}
-	})
-*/
 	window.swup.hooks.on('link:click', () => {
 		// Remove the delay for the first time page load
 		document.documentElement.style.setProperty('--content-delay', '0ms')
@@ -384,7 +412,10 @@ const setup = () => {
 			navbar.classList.add('navbar-hidden')
 		}
 	})
-	window.swup.hooks.on('content:replace', initCustomScrollbar)
+	window.swup.hooks.on('content:replace', () => {
+		initCustomScrollbar();
+		initFootnotes();
+	})
 	window.swup.hooks.on('visit:start', (visit: {to: {url: string}}) => {
 		// change banner height immediately when a link is clicked
 		const bodyElement = document.querySelector('body')

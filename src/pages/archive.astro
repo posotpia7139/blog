@@ -9,7 +9,7 @@ import { getSortedPostsList } from "../utils/content-utils";
 const sortedPostsList = await getSortedPostsList();
 ---
 
-<MainGridLayout title={i18n(I18nKey.archive)} showSidebarOnMobile={false}>
+<MainGridLayout title={i18n(I18nKey.archive)} showSidebarOnMobile={true}>
     <ArchivePanel sortedPosts={sortedPostsList} client:load></ArchivePanel>
 </MainGridLayout>
 
