@@ -5,7 +5,7 @@ import { Icon } from "astro-icon/components";
 import I18nKey from "../i18n/i18nKey";
 import { i18n } from "../i18n/translation";
 import { formatDateToYYYYMMDD } from "../utils/date-utils";
-import { getDir } from "../utils/url-utils";
+import { getCategoryUrl, getTagUrl, getDir } from "../utils/url-utils";
 import ImageWrapper from "./misc/ImageWrapper.astro";
 import PostMetadata from "./PostMeta.astro";
 
@@ -43,27 +43,56 @@ const coverWidth = "28%";
 
 const { remarkPluginFrontmatter } = await entry.render();
 ---
-<div class:list={["card-base flex flex-col-reverse md:flex-col w-full rounded-[var(--radius-large)] overflow-hidden relative group", className]} style={style}>
-    <div class:list={["pl-6 md:pl-9 pr-6 md:pr-9 pt-6 md:pt-7 pb-6 relative", {"w-full": !hasCover, "w-full md:w-[calc(100%_-_var(--coverWidth)_-_12px)]": hasCover}]}>
-        <div class="transition w-full font-semibold mb-3 text-2xl md:text-3xl text-90
-        group-hover:text-[var(--primary)]
-        active:text-[var(--title-active)]
-        relative z-10 pointer-events-none
-        line-clamp-1">
-            {title}
-            <Icon class="text-[var(--primary)] text-[2.25rem] transition hidden md:inline absolute translate-y-0.5 opacity-0 group-hover:opacity-100 -translate-x-1 group-hover:translate-x-0" name="material-symbols:chevron-right-rounded"></Icon>
+<div class:list={["card-base w-full rounded-[var(--radius-large)] overflow-hidden relative group", className]} style={style}>
+    <div class:list={["pl-6 md:pl-9 pr-6 md:pr-9 pt-6 md:pt-7 pb-6 relative", {"w-full": !hasCover, "w-[calc(100%_-_var(--coverWidth)_-_12px)]": hasCover}]}>
+        <div class="relative mb-3">
+            <div class="transition w-full font-semibold text-[1.4rem] md:text-3xl text-90
+            group-hover:text-[var(--primary)]
+            active:text-[var(--title-active)]
+            relative z-10 pointer-events-none
+            line-clamp-1">
+                {title}
+            </div>
         </div>
 
                     <!-- description -->
                     <div class="relative z-10 pointer-events-none">
-                        <div class:list={["transition text-75 mb-3.5 pr-4 line-clamp-2 md:line-clamp-1"]}>
+                        <div class:list={["transition text-75 mb-3.5 pr-4 line-clamp-1"]}>
                             { description || remarkPluginFrontmatter.excerpt }
                         </div>
                     </div>
 
-                    
-        <!-- metadata -->
-        <PostMetadata published={published} tags={tags} category={category} hideTagsForMobile={false} hideUpdateDate={true} hideDate={true} class="mb-4 relative z-20"></PostMetadata>
+        <!-- 2-tier metadata -->
+        <div class="mb-4 relative z-30 flex flex-col gap-1">
+            <!-- Tier 1: Category -->
+            {category && (
+                <div class="flex items-center text-[13px] text-50">
+                    <Icon name="material-symbols:folder-open-outline-rounded" class="mr-1.5 text-lg text-[var(--primary)]"></Icon>
+                    <div class="flex items-center">
+                        <a href={getCategoryUrl(category)} class="hover:text-[var(--primary)] transition-colors">
+                            {category.split('/').map((part, i, arr) => (
+                                <>
+                                    <span>{part}</span>
+                                    {i < arr.length - 1 && <span class="mx-1 opacity-30">/</span>}
+                                </>
+                            ))}
+                        </a>
+                    </div>
+                </div>
+            )}
+            
+            <!-- Tier 2: Tags -->
+            {tags && tags.length > 0 && (
+                <div class="flex items-center text-[13px] text-50 w-full overflow-hidden">
+                    <Icon name="material-symbols:tag-rounded" class="mr-1.5 text-lg text-[var(--primary)] shrink-0"></Icon>
+                    <div class="flex truncate gap-x-2.5">
+                        {tags.map(tag => (
+                            <a href={getTagUrl(tag)} class="hover:text-[var(--primary)] transition-colors whitespace-nowrap">{tag}</a>
+                        ))}
+                    </div>
+                </div>
+            )}
+        </div>
 
         <!-- word count, read time, and date -->
         <div class="text-sm text-black/50 dark:text-white/50 flex flex-wrap gap-4 transition relative z-10 pointer-events-none">
@@ -73,9 +102,9 @@ const { remarkPluginFrontmatter } = await entry.render();
             </div>
             <div class="flex items-center">
                 <Icon name="material-symbols:schedule-outline-rounded" class="mr-1.5 text-lg"></Icon>
-                {remarkPluginFrontmatter.minutes} {" " + i18n(remarkPluginFrontmatter.minutes === 1 ? I18nKey.minuteCount : I18nKey.minutesCount)}
+                {remarkPluginFrontmatter.minutes} {i18n(remarkPluginFrontmatter.minutes === 1 ? I18nKey.minuteCount : I18nKey.minutesCount)}
                 <span class="mx-1.5 opacity-50">/</span>
-                {remarkPluginFrontmatter.words} {" " + i18n(remarkPluginFrontmatter.words === 1 ? I18nKey.wordCount : I18nKey.wordsCount)}
+                {remarkPluginFrontmatter.words} {i18n(remarkPluginFrontmatter.words === 1 ? I18nKey.wordCount : I18nKey.wordsCount)}
             </div>
         </div>
 
@@ -83,15 +112,8 @@ const { remarkPluginFrontmatter } = await entry.render();
 
     {hasCover && <div
                     class:list={[
-                        "max-h-[20vh] md:max-h-none mx-4 mt-4 -mb-2 md:mb-0 md:mx-0 md:mt-0",
-                        "md:w-[var(--coverWidth)] relative md:absolute md:top-3 md:bottom-3 md:right-3 rounded-xl overflow-hidden active:scale-95 z-10 pointer-events-none"
+                        "w-[var(--coverWidth)] absolute top-3 bottom-3 right-3 rounded-xl overflow-hidden active:scale-95 z-10 pointer-events-none"
                     ]} >
-        <div class="absolute pointer-events-none z-10 w-full h-full group-hover:bg-black/30 group-active:bg-black/50 transition"></div>
-        <div class="absolute pointer-events-none z-20 w-full h-full flex items-center justify-center ">
-            <Icon name="material-symbols:chevron-right-rounded"
-                  class="transition opacity-0 group-hover:opacity-100 scale-50 group-hover:scale-100 text-white text-5xl">
-            </Icon>
-        </div>
         <ImageWrapper src={image} basePath={path.join("content/posts/", getDir(entry.id))} alt="Cover Image of the Post"
                   class="w-full h-full">
         </ImageWrapper>

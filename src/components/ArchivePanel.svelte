@@ -143,16 +143,23 @@ onMount(async () => {
                     </div>
                 </div>
             {:else if tags.length > 0}
-                <div class="flex items-center">
-                    <span class="text-[var(--primary)] text-xl mr-2">#</span>
-                    <span class="text-[var(--primary)] font-bold text-xl">{tags[0]}</span>
-                    <span class="ml-3 text-75">{groups.reduce((acc, g) => acc + g.posts.length, 0)} {i18n(I18nKey.postsCount)}</span>
+                {@const totalCount = groups.reduce((acc, g) => acc + g.posts.length, 0)}
+                <div class="flex flex-col items-start w-full py-4 pl-2">
+                    <div class="flex flex-row items-center flex-wrap justify-start">
+                        <span class="text-[var(--primary)] text-[13px] mr-1">#</span>
+                        <span class="text-[var(--primary)] font-bold text-[13px]">{tags[0]}</span>
+                    </div>
+                    <div class="mt-1 flex items-center shrink-0">
+                        <span class="text-[13px] opacity-60">게시물&nbsp;</span>
+                        <span class="text-[var(--primary)] font-bold text-[13px]">{totalCount}</span>
+                        <span class="text-[13px] opacity-60">개</span>
+                    </div>
                 </div>
             {:else}
                 {@const newestYear = sortedPosts.length > 0 ? sortedPosts[0].data.published.getFullYear() : new Date().getFullYear()}
                 {@const oldestYear = sortedPosts.length > 0 ? sortedPosts[sortedPosts.length - 1].data.published.getFullYear() : newestYear}
                 
-                <div class="flex flex-col items-center w-full py-16 mt-6 mb-8 overflow-hidden gap-4">
+                <div class="flex flex-col items-center w-full py-8 mt-2 mb-6 overflow-hidden gap-4">
                     <!-- 1단: 제목 (ARCHIVE 및 타이틀 모두 한 글자씩 등장) -->
                     <div class="flex flex-col items-center">
                         <div class="flex flex-row mb-2">
@@ -174,7 +181,7 @@ onMount(async () => {
                     </div>
                     
                     <!-- 2단: 연도 연대기 애니메이션 (균형 잡힌 순차 등장) -->
-                    <div class="flex items-center text-[16px] font-bold text-black/70 dark:text-white/70 h-6">
+                    <div class="flex items-center text-[16px] font-bold text-black/70 dark:text-white/70 h-6 mb-2">
                         <span class="anim-fade-in delay-2500">{oldestYear}</span>
                         <div class="year-connector anim-grow-line delay-2900"></div>
                         <span class="anim-fade-in delay-3300">{newestYear}</span>
@@ -298,7 +305,7 @@ onMount(async () => {
 
     @keyframes initial-pop {
         0% { transform: scale(1); }
-        50% { transform: scale(1.1); }
+        50% { transform: scale(1.05); }
         100% { transform: scale(1); }
     }
 

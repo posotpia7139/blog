@@ -30,7 +30,7 @@ const className = Astro.props.class;
 <div class:list={["flex flex-col gap-2", className]}>
     <!-- First row: Dates (Non-clickable) -->
     {published && !hideDate && (
-        <div class="flex flex-wrap items-center gap-4 text-black/50 dark:text-white/50">
+        <div class="flex flex-wrap items-center justify-center gap-4 text-black/50 dark:text-white/50">
             <div class="flex items-center">
                 <div class="meta-icon">
                     <Icon name="material-symbols:calendar-today-outline-rounded"></Icon>
@@ -50,12 +50,12 @@ const className = Astro.props.class;
 
     <!-- Second row: Category & Tags (Clickable) -->
     {(category || (tags && tags.length > 0)) && (
-        <div class="flex flex-wrap items-center gap-x-4 gap-y-2">
+        <div class="flex flex-wrap items-center justify-center gap-x-4 gap-y-2">
             <!-- category -->
             {category && (
                 <div class="flex items-center">
                     <div class="meta-icon">
-                        <Icon name="material-symbols:menu-rounded"></Icon>
+                        <Icon name="material-symbols:folder-open-outline-rounded" class="text-[var(--primary)]"></Icon>
                     </div>
                                     <div class="flex flex-row items-center">
                                         <a href={getCategoryUrl(category)} aria-label={`View all posts in the ${category} category`}
@@ -78,14 +78,14 @@ const className = Astro.props.class;
             {tags && tags.length > 0 && (
                 <div class:list={["flex items-center", {"hidden md:flex": hideTagsForMobile}]}>
                     <div class="meta-icon">
-                        <Icon name="material-symbols:tag-rounded"></Icon>
+                        <Icon name="material-symbols:tag-rounded" class="text-[var(--primary)]"></Icon>
                     </div>
-                    <div class="flex flex-row items-center gap-2">
+                    <div class="flex flex-row items-center justify-center gap-2">
                         {tags.map((tag) => (
                             <a href={getTagUrl(tag)} aria-label={`View all posts with the ${tag} tag`}
                                class="link-lg transition text-50 text-sm font-medium hover:text-[var(--primary)]"
                             >
-                                #{tag}
+                                {tag}
                             </a>
                         ))}
                     </div>
