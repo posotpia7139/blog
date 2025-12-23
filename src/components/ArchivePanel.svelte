@@ -12,10 +12,10 @@ export let tags: string[] = [];
 export let categories: string[] = [];
 export let sortedPosts: Post[] = [];
 
-// [애니메이션] 숫자가 차오르는 효과를 위한 tweened 변수
+// [애니메이션] 숫자가 차오르는 효과를 위한 tweened 변수 (더 강한 감속 효과 적용)
 const animatedCount = tweened(0, {
-	duration: 2400,
-	easing: expoOut,
+	duration: 3000, // 더 드라마틱한 연출을 위해 시간을 조금 늘림
+	easing: (t) => t === 1 ? 1 : 1 - Math.pow(2, -10 * t), // expoOut과 유사하지만 더 날카로운 커스텀 감속
 });
 
 interface Post {
@@ -59,11 +59,11 @@ function setGroups(posts: Post[]) {
 
 	totalCount = posts.length;
 	
-	// 모든 텍스트와 연도 애니메이션이 끝난 후(약 1.5초 뒤) 카운트업 시작
+	// 모든 텍스트와 연도 애니메이션이 끝난 후(약 4.1초 뒤) 카운트업 시작
 	const isInitialLoad = $animatedCount === 0;
 	setTimeout(() => {
 		animatedCount.set(totalCount);
-	}, isInitialLoad ? 1500 : 0);
+	}, isInitialLoad ? 4100 : 0);
 }
 
 // Initial render with all posts
@@ -152,37 +152,48 @@ onMount(async () => {
                 {@const newestYear = sortedPosts.length > 0 ? sortedPosts[0].data.published.getFullYear() : new Date().getFullYear()}
                 {@const oldestYear = sortedPosts.length > 0 ? sortedPosts[sortedPosts.length - 1].data.published.getFullYear() : newestYear}
                 
-                <div class="flex flex-col items-center w-full py-12 mb-6 border-b border-dashed border-[var(--line-divider)] overflow-hidden">
-                    <div class="relative">
-                        <span class="inline-block text-[18px] text-[var(--primary)] font-bold tracking-tight leading-none anim-fade-in delay-200">
-                            {siteConfig.title}
-                        </span>
-                        <span class="absolute left-full top-[-4px] ml-1 text-[8px] text-[var(--primary)] font-black uppercase tracking-[0.12em] leading-none whitespace-nowrap anim-fade-in delay-400">
-                            Archive
-                        </span>
+                <div class="flex flex-col items-center w-full py-16 mb-8 border-b border-dashed border-[var(--line-divider)] overflow-hidden gap-4">
+                    <!-- 1단: 제목 (ARCHIVE 및 타이틀 모두 한 글자씩 등장) -->
+                    <div class="flex flex-col items-center">
+                        <div class="flex flex-row mb-2">
+                            {#each "ARCHIVE".split("") as char, i}
+                                <span class="text-[10px] text-black/50 dark:text-white/50 font-black uppercase tracking-[0.2em] leading-none anim-char-in"
+                                      style="animation-delay: {i * 100}ms">
+                                    {char}
+                                </span>
+                            {/each}
+                        </div>
+                        <div class="flex flex-row flex-wrap justify-center">
+                            {#each siteConfig.title.split("") as char, i}
+                                <span class="inline-block text-[22px] text-black dark:text-white font-bold tracking-tight leading-none anim-char-in"
+                                      style="animation-delay: {800 + (i * 100)}ms">
+                                    {char === " " ? "\u00A0" : char}
+                                </span>
+                            {/each}
+                        </div>
                     </div>
                     
-                    <div class="mt-5 flex flex-col items-center gap-3">
-                        <!-- 2단: 연도 연대기 애니메이션 -->
-                        <div class="flex items-center text-[13px] font-semibold text-black/70 dark:text-white/70 h-5">
-                            <span class="text-[var(--primary)] font-bold anim-fade-in delay-600">{oldestYear}</span>
-                            <div class="year-connector anim-grow-line"></div>
-                            <span class="text-[var(--primary)] font-bold anim-fade-in delay-1100">{newestYear}</span>
-                        </div>
-                        
-                        <!-- 3단: 게시물 개수 (정밀 2px 간격 최적화) -->
-                        <div class="text-[12px] font-medium text-center text-black/60 dark:text-white/60 anim-fade-in delay-1300">
-                            <span class="surround-text left-text" class:show-surround={$animatedCount >= totalCount - 0.1}>
-                                기록된
-                            </span>
-                            
-                            <span class="inline-block text-right text-[var(--primary)] font-bold text-[14px] transition-all duration-700 mr-[2px]" 
-                                  class:count-finished={$animatedCount >= totalCount - 0.1}
-                                  style="width: {totalCount.toString().length}ch; font-variant-numeric: tabular-nums;">{Math.round($animatedCount)}</span><span class="surround-text right-text" class:show-surround={$animatedCount >= totalCount - 0.1}>개의 불꽃들</span>
-                        </div>
+                    <!-- 2단: 연도 연대기 애니메이션 (균형 잡힌 순차 등장) -->
+                    <div class="flex items-center text-[16px] font-bold text-black/70 dark:text-white/70 h-6">
+                        <span class="anim-fade-in delay-2500">{oldestYear}</span>
+                        <div class="year-connector anim-grow-line delay-2900"></div>
+                        <span class="anim-fade-in delay-3300">{newestYear}</span>
                     </div>
-                </div>
-            {/if}
+                    
+                    <!-- 3단: 게시물 개수 (균형 잡힌 리듬으로 등장) -->
+                    <div class="flex flex-col items-center justify-center anim-fade-in delay-4100 -mt-0.5">
+                        <span class="inline-block font-medium text-[56px] leading-[0.9] transition-all duration-700 tabular-nums tracking-[-0.05em]" 
+                                class:counting-blue={$animatedCount > 0}
+                                class:text-black={$animatedCount === 0}
+                                class:dark:text-white={$animatedCount === 0}
+                                class:count-finished={$animatedCount >= totalCount - 0.1}>
+                            {Math.round($animatedCount)}
+                        </span>
+                        <span class="mt-0 text-[14px] font-bold text-black/40 dark:text-white/40 uppercase">
+                            게시물
+                        </span>
+                    </div>
+                </div>            {/if}
         </div>
     </div>
 
@@ -226,9 +237,10 @@ onMount(async () => {
 </div>
 
 <style>
+    /* 깔끔한 상승 페이드인 (흔들림 없음) */
     @keyframes slide-up-fade {
-        from { opacity: 0; transform: translateY(12px); }
-        to { opacity: 1; transform: translateY(0); }
+        0% { opacity: 0; transform: translateY(12px); }
+        100% { opacity: 1; transform: translateY(0); }
     }
 
     .anim-fade-in {
@@ -236,58 +248,69 @@ onMount(async () => {
         animation: slide-up-fade 1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
     }
 
-    .delay-200 { animation-delay: 200ms; }
-    .delay-400 { animation-delay: 400ms; }
-    .delay-600 { animation-delay: 600ms; }
-    .delay-1100 { animation-delay: 1100ms; }
-    .delay-1300 { animation-delay: 1300ms; }
+    /* 글자 개별 등장 효과 복구 */
+    @keyframes char-in {
+        0% { opacity: 0; transform: translateY(8px); filter: blur(4px); }
+        100% { opacity: 1; transform: translateY(0); filter: blur(0); }
+    }
 
-    /* [베지어 곡선] 주변 텍스트: 강렬한 Burst-Out 연출 */
-    .surround-text {
-        opacity: 0;
-        filter: blur(8px);
-        transition: all 1.1s cubic-bezier(0.16, 1, 0.3, 1);
-        white-space: nowrap;
+    .anim-char-in {
         display: inline-block;
+        opacity: 0;
+        animation: char-in 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
     }
 
-    .left-text {
-        transform: translateX(60px) scale(0.2);
-    }
-    
-    .right-text {
-        transform: translateX(-60px) scale(0.2);
-    }
-
-    .show-surround {
-        opacity: 1;
-        filter: blur(0);
-        transform: translateX(0) scale(1);
-    }
-
-    /* 카운팅 완료 시 번쩍이는 불꽃 효과 */
-
-    .count-finished {
-        text-shadow: 0 0 20px oklch(0.7 0.2 250 / 0.5);
-        transform: scale(1.1);
-        color: var(--primary) !important;
-    }
-
+    /* 가로선 효과 */
     .year-connector {
         width: 0;
-        height: 1px;
-        background: var(--primary);
-        opacity: 0.3;
+        height: 1.25px;
+        background: #888;
+        opacity: 0;
         margin: 0 12px;
+        display: inline-block;
+        visibility: hidden;
     }
 
     @keyframes grow-line {
-        from { width: 0; }
-        to { width: 24px; }
+        0% { 
+            width: 0; 
+            opacity: 0; 
+            visibility: visible;
+            transform: translateX(-4px); 
+        }
+        100% { 
+            width: 32px; 
+            opacity: 0.6; 
+            visibility: visible;
+            transform: translateX(0); 
+        }
     }
 
     .anim-grow-line {
-        animation: grow-line 0.6s cubic-bezier(0.76, 0, 0.24, 1) forwards;
-        animation-delay: 800ms;
+        animation: grow-line 1.2s cubic-bezier(0.33, 1, 0.68, 1) both;
     }
+
+    /* 카운팅 완료 시 1회 팝업 (스케일만 살짝) */
+    .count-finished {
+        animation: initial-pop 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        will-change: transform;
+    }
+
+    @keyframes initial-pop {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.1); }
+        100% { transform: scale(1); }
+    }
+
+    /* 카운팅 중 테마 파란색 유지 */
+    .counting-blue {
+        color: var(--primary) !important;
+        transition: color 0.3s ease;
+    }
+
+    /* 딜레이 클래스: 단축 속성(animation)의 초기화를 방지하기 위해 최하단에 배치 */
+    .delay-2500 { animation-delay: 2500ms; }
+    .delay-2900 { animation-delay: 2900ms; }
+    .delay-3300 { animation-delay: 3300ms; }
+    .delay-4100 { animation-delay: 4100ms; }
 </style>

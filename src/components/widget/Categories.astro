@@ -82,6 +82,7 @@ const { class: className, style } = Astro.props;
 
 <WidgetLayout name={""} id="categories" isCollapsed={false}
                 class={className} style={style}
+                data-id="categories"
 >
     <div class="category-tree">
         <ul class="root-list">
@@ -217,8 +218,82 @@ const { class: className, style } = Astro.props;
 
 <script>
     function setupAccordion() {
-        const tree = document.querySelector('.category-tree');
-        if (!tree || tree.getAttribute('data-initialized') === 'true') return;
+        const tree = document.querySelector('.category-tree') as HTMLElement;
+        if (!tree) return;
+
+        // [방어] 이미 초기화되었다면 더 이상 리스너를 추가하지 않음
+        if (tree.dataset.initialized === 'true') {
+            // 위치 표시 클래스만 업데이트하고 종료
+            updateActiveStates(tree);
+            return;
+        }
+
+        // 이벤트 위임: 트리 전체에 단 한 번만 등록
+        tree.addEventListener('click', (e) => {
+            const target = e.target as HTMLElement;
+            const accordionItem = target.closest('.accordion-item');
+            if (!accordionItem) return;
+
+            const content = accordionItem.querySelector('.accordion-content') as HTMLElement;
+            const icon = accordionItem.querySelector('.toggle-chevron') as HTMLElement;
+            
+            const isTextClick = target.classList.contains('category-text-label') || target.closest('.category-text-label');
+
+            if (content && icon) {
+                // [공통 로직] 아코디언 토글 함수
+                const performToggle = (forceState: boolean | null = null) => {
+                    const willOpen = forceState !== null ? forceState : !content.classList.contains('open');
+                    
+                    if (willOpen) {
+                        // 다른 항목 닫기
+                        const allOpen = tree.querySelectorAll('.accordion-content.open');
+                        allOpen.forEach(el => {
+                            if (el !== content) {
+                                (el as HTMLElement).style.maxHeight = '0px';
+                                el.classList.remove('open');
+                                const otherIcon = el.parentElement?.querySelector('.toggle-chevron') as HTMLElement;
+                                if (otherIcon) {
+                                    otherIcon.style.transform = 'rotate(0deg)';
+                                    otherIcon.classList.remove('active');
+                                }
+                            }
+                        });
+
+                        content.style.maxHeight = content.scrollHeight + 'px';
+                        content.classList.add('open');
+                        icon.style.transform = 'rotate(90deg)';
+                        icon.classList.add('active');
+                    } else {
+                        content.style.maxHeight = '0px';
+                        content.classList.remove('open');
+                        icon.style.transform = 'rotate(0deg)';
+                        icon.classList.remove('active');
+                    }
+                };
+
+                if (!isTextClick) {
+                    // 1. 텍스트 외 클릭: 페이지 이동 방지 + 토글
+                    e.preventDefault();
+                    e.stopPropagation();
+                    performToggle();
+                } else {
+                    // 2. 텍스트 클릭: 페이지 이동 허용 + 강제 펼치기
+                    // 링크 이동 직전에 시각적으로 먼저 펼쳐줌
+                    performToggle(true);
+                }
+            }
+        });
+
+        // 초기 로드 시 한 번만 실행
+        updateActiveStates(tree, true);
+        tree.dataset.initialized = 'true';
+    }
+
+    function updateActiveStates(tree: HTMLElement, firstLoad = false) {
+        // 이전 표시 제거
+        tree.querySelectorAll('.active-category-link, .reading-active-dot, .active-branch').forEach(el => {
+            el.classList.remove('active-category-link', 'reading-active-dot', 'active-branch');
+        });
 
         const urlParams = new URLSearchParams(window.location.search);
         const pathname = window.location.pathname;
@@ -233,72 +308,41 @@ const { class: className, style } = Astro.props;
             }
         }
 
-        // [최적화] 이벤트 위임: 모든 항목 대신 트리 루트에 단 하나의 리스너만 등록
-        tree.addEventListener('click', (e) => {
-            const target = e.target as HTMLElement;
-            const accordionItem = target.closest('.accordion-item');
-            if (!accordionItem) return;
+        if (isPostPage) {
+            tree.classList.add('is-reading');
+        } else {
+            tree.classList.remove('is-reading');
+        }
 
-            const header = accordionItem.querySelector('.group');
-            const content = accordionItem.querySelector('.accordion-content') as HTMLElement;
-            const icon = accordionItem.querySelector('.toggle-chevron') as HTMLElement;
-            const isToggleArea = target.closest('.toggle-icon-wrapper') || !target.closest('.category-text-label');
-
-            if (!content || !icon || !header) return;
-
-            const toggle = (forceOpen: boolean | null = null) => {
-                const isNowOpen = forceOpen !== null ? forceOpen : !content.classList.contains('open');
-                if (!isNowOpen) {
-                    content.style.maxHeight = '0px';
-                    content.classList.remove('open');
-                    icon.style.transform = 'rotate(0deg)';
-                    icon.classList.remove('active');
-                } else {
-                    content.style.maxHeight = content.scrollHeight + 'px';
-                    content.classList.add('open');
-                    icon.style.transform = 'rotate(90deg)';
-                    icon.classList.add('active');
-                }
-            };
-
-            // 텍스트 외 영역 클릭 시 또는 모바일 대응
-            if (isToggleArea || (window.innerWidth < 1024 && !content.classList.contains('open'))) {
-                if (!target.closest('.category-text-label')) {
-                    e.preventDefault();
-                }
-                toggle();
-            }
-        });
-
-        // 초기 상태 설정
         if (activeCategory) {
             const targetItems = document.querySelectorAll(`[data-path="${activeCategory}"]`);
             targetItems.forEach(item => {
-                const btn = item.querySelector('button');
+                item.classList.add('active-branch');
+                const btn = item.querySelector('.category-link');
                 if (btn) {
                     btn.classList.add('active-category-link');
                     if (isPostPage) btn.classList.add('reading-active-dot');
                 }
                 
-                // 부모 아코디언 펼치기
                 let parent = item.closest('.accordion-item');
                 while (parent) {
+                    parent.classList.add('active-branch');
                     const content = parent.querySelector('.accordion-content') as HTMLElement;
                     const icon = parent.querySelector('.toggle-chevron') as HTMLElement;
-                    if (content) {
-                        content.style.maxHeight = content.scrollHeight + 'px';
-                        content.classList.add('open');
-                        if (icon) {
-                            icon.style.transform = 'rotate(90deg)';
-                            icon.classList.add('active');
+                    if (content && firstLoad) { // [핵심] 첫 로드시에만 자동으로 펼침
+                        if (!content.classList.contains('open')) {
+                            content.style.maxHeight = content.scrollHeight + 'px';
+                            content.classList.add('open');
+                            if (icon) {
+                                icon.style.transform = 'rotate(90deg)';
+                                icon.classList.add('active');
+                            }
                         }
                     }
                     parent = parent.parentElement?.closest('.accordion-item') || null;
                 }
             });
         }
-
-        tree.setAttribute('data-initialized', 'true');
     }
 
     setupAccordion();
@@ -330,29 +374,23 @@ const { class: className, style } = Astro.props;
         background-color: oklch(var(--primary) / 0.1) !important;
     }
 
-    /* 독서 모드 전용 '불꽃 별표(*)' 포인트 (애니메이션 추가) */
+    /* 독서 모드 전용 '불꽃 별표(*)' 포인트 (선명하게 표시) */
     :global(button.reading-active-dot .category-text-label::after) {
         content: "*";
         display: inline-block;
         color: var(--primary);
-        font-weight: 700;
-        font-size: 1.25rem;
-        margin-left: 3px;
+        font-weight: 800;
+        font-size: 1.5rem;
+        margin-left: 4px;
         vertical-align: middle;
-        transform: translateY(-3px);
+        transform: translateY(-2px);
         line-height: 0;
-        animation: fire-pulse 2s ease-in-out infinite;
-        will-change: opacity; /* [최적화] 하드웨어 가속 */
-    }
-
-    @keyframes fire-pulse {
-        0%, 100% { opacity: 0.2; }
-        50% { opacity: 1; }
     }
 
     .accordion-content { 
-        transition: max-height 0.3s ease-out; 
-        will-change: max-height; /* [최적화] 하드웨어 가속 */
+        transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1); 
+        will-change: max-height; 
+        overflow: hidden;
     }
     .toggle-chevron { 
         color: black; 

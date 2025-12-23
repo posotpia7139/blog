@@ -149,8 +149,13 @@ const jsonLd = {
         </a>
     </div>
 
-    <div class="card-base p-6 mb-0 md:mb-4 min-h-[413px] md:min-h-[452px]">
+    <div class="card-base p-6 mb-4 min-h-[413px] md:min-h-[452px]">
         <Comment />
+    </div>
+
+    {/* 모바일 전용 카테고리: 댓글창 하단에 위치 */}
+    <div class="block md:hidden">
+        <Categories class="onload-animation" style="animation-delay: 150ms"></Categories>
     </div>
 
 </MainGridLayout>

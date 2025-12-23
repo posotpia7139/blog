@@ -14,42 +14,19 @@ const pathname = Astro.url.pathname;
 const isPostPage = pathname.includes('/posts/');
 ---
 <div id="sidebar" class:list={[className, "w-full"]}>
-    {isPostPage && (
-        <div class="flex flex-col w-full gap-4 mb-4">
-            <Categories class="onload-animation" style="animation-delay: 100ms"></Categories>
-        </div>
-    )}
+    {/* 카테고리: 항상 상단에 위치하며 어디서든 스크롤 시 위로 사라짐 */}
+    <div class="flex flex-col w-full gap-4 mb-4">
+        <Categories class="onload-animation" style="animation-delay: 100ms"></Categories>
+    </div>
+    
     <div id="sidebar-sticky" class="sticky transition-all duration-700 flex flex-col w-full gap-4 top-4">
-        {!isPostPage && <Categories class="onload-animation" style="animation-delay: 100ms"></Categories>}
-        
-        <!-- Ad Space: 기본적으로 숨김, 스크립트로 포스트 본문에서만 노출 -->
-        <div id="sidebar-ad" class="hidden w-[300px] h-[600px] bg-gray-200 dark:bg-gray-800 items-center justify-center text-sm text-gray-500 rounded-lg overflow-hidden">
+        {/* Ad Space: 모든 페이지에서 항상 노출 (sticky 적용) */}
+        <div id="sidebar-ad" class="flex w-[300px] h-[600px] bg-gray-200 dark:bg-gray-800 items-center justify-center text-sm text-gray-500 rounded-lg overflow-hidden">
             Adsense (300x600)
         </div>
-
-        <!-- <Tag class="onload-animation" style="animation-delay: 200ms"></Tag> -->
     </div>
 </div>
 
 <script>
-    function updateAdVisibility() {
-        const ad = document.getElementById('sidebar-ad');
-        if (!ad) return;
-
-        const pathname = window.location.pathname;
-        // 포스트 본문 경로(/posts/...)인 경우에만 광고 노출
-        const isPostPage = pathname.includes('/posts/');
-        
-        if (isPostPage) {
-            ad.classList.remove('hidden');
-            ad.classList.add('lg:flex'); // 데스크탑에서만 flex로 노출
-        } else {
-            ad.classList.add('hidden');
-            ad.classList.remove('lg:flex');
-        }
-    }
-
-    // 초기 로드 및 페이지 전환 시 실행
-    updateAdVisibility();
-    document.addEventListener('astro:page-load', updateAdVisibility);
+    // 모든 페이지에서 광고를 항상 보여주므로 별도의 제어 스크립트가 필요 없음
 </script>
