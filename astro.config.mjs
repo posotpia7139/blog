@@ -31,7 +31,7 @@ export default defineConfig({
 	base: "/",
 	trailingSlash: "always",
 	build: {
-		inlineStylesheets: "auto",
+		inlineStylesheets: "always",
 	},
 	integrations: [
 		tailwind({
