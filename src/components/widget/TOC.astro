@@ -57,22 +57,22 @@ const filteredHeadings = headings.filter((heading) => {
 {isPostsRoute &&
 <table-of-contents class:list={[className, "block relative pb-32 w-fit ml-auto text-left"]}>
     {filteredHeadings.map((heading) =>
-            <a href={`#${heading.slug}`} class="group pl-2 pr-4 flex items-start gap-2 relative transition-all duration-100 ease-out w-full min-h-7 rounded-xl
+            <a href={`#${heading.slug}`} class="group pl-4 pr-4 flex items-start gap-1.5 2xl:gap-2 relative transition-all duration-100 ease-out w-full min-h-6 2xl:min-h-7 rounded-xl
         hover:bg-[var(--toc-btn-active)] active:bg-[var(--toc-btn-active)] py-0.5 2xl:py-1
     ">
-                <div class:list={["transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-semibold mt-0.5",
+                <div class:list={["transition w-4 2xl:w-5 h-4 2xl:h-5 shrink-0 rounded-lg text-[10px] 2xl:text-xs flex items-center justify-center font-bold 2xl:font-semibold mt-0.5",
                     {
                         "bg-[var(--toc-badge-bg)] text-[var(--btn-content)]": heading.depth == minDepth,
-                        "ml-4": heading.depth == minDepth + 1,
-                        "ml-8": heading.depth == minDepth + 2,
+                        "ml-3 2xl:ml-4": heading.depth == minDepth + 1,
+                        "ml-6 2xl:ml-8": heading.depth == minDepth + 2,
                     }
                 ]}
                 >
                     {heading.depth == minDepth && heading1Count++}
-                    {heading.depth == minDepth + 1 && <div class="transition w-2 h-2 rounded-[0.1875rem] bg-[var(--toc-badge-bg)]"></div>}
-                    {heading.depth == minDepth + 2 && <div class="transition w-1.5 h-1.5 rounded-sm bg-black/5 dark:bg-white/10"></div>}
+                    {heading.depth == minDepth + 1 && <div class="transition w-1.5 2xl:w-2 h-1.5 2xl:h-2 rounded-[0.1875rem] bg-[var(--toc-badge-bg)]"></div>}
+                    {heading.depth == minDepth + 2 && <div class="transition w-1 2xl:w-1.5 h-1 2xl:h-1.5 rounded-sm bg-black/5 dark:bg-white/10"></div>}
                 </div>
-                <div class:list={["transition text-[13px] 2xl:text-sm text-left break-words leading-snug py-0.5 text-black/80 dark:text-white/60 [.visible_&]:text-black/100 [.visible_&]:dark:text-white/90 group-hover:text-[oklch(0.20_0.14_var(--hue))] dark:group-hover:text-[var(--primary)]"]}>{cleanHeadingText(heading.text)}</div>
+                <div class:list={["transition text-[12px] 2xl:text-sm text-left break-words leading-snug py-0.5 text-black/80 dark:text-white/60 [.visible_&]:text-black/100 [.visible_&]:dark:text-white/90 group-hover:text-[oklch(0.20_0.14_var(--hue))] dark:group-hover:text-[var(--primary)]"]}>{cleanHeadingText(heading.text)}</div>
             </a>
     )}
     <div id="active-indicator" style="opacity: 0" class:list={[{'hidden': headings.length == 0}, "-z-10 absolute bg-[var(--toc-btn-hover)] rounded-xl transition-all duration-100 ease-out pointer-events-none " +

@@ -85,9 +85,12 @@ const { remarkPluginFrontmatter } = await entry.render();
             {tags && tags.length > 0 && (
                 <div class="flex items-center text-[13px] text-50 w-full overflow-hidden">
                     <Icon name="material-symbols:tag-rounded" class="mr-1.5 text-lg text-[var(--primary)] shrink-0"></Icon>
-                    <div class="flex truncate gap-x-2.5">
-                        {tags.map(tag => (
-                            <a href={getTagUrl(tag)} class="hover:text-[var(--primary)] transition-colors whitespace-nowrap">{tag}</a>
+                    <div class="flex truncate">
+                        {tags.map((tag, i) => (
+                            <>
+                                <a href={getTagUrl(tag)} class="hover:text-[var(--primary)] transition-colors whitespace-nowrap">{tag}</a>
+                                {i < tags.length - 1 && <span class="mx-1.5 text-black/75 dark:text-white/75 font-bold">·</span>}
+                            </>
                         ))}
                     </div>
                 </div>
@@ -97,11 +100,11 @@ const { remarkPluginFrontmatter } = await entry.render();
         <!-- word count, read time, and date -->
         <div class="text-sm text-black/50 dark:text-white/50 flex flex-wrap gap-4 transition relative z-10 pointer-events-none">
             <div class="flex items-center">
-                <Icon name="material-symbols:calendar-today-outline-rounded" class="mr-1.5 text-lg"></Icon>
+                <Icon name="material-symbols:calendar-month-rounded" class="mr-1.5 text-lg"></Icon>
                 {formatDateToYYYYMMDD(published)}
             </div>
             <div class="flex items-center">
-                <Icon name="material-symbols:schedule-outline-rounded" class="mr-1.5 text-lg"></Icon>
+                <Icon name="material-symbols:pace-rounded" class="mr-1.5 text-lg"></Icon>
                 {remarkPluginFrontmatter.minutes} {i18n(remarkPluginFrontmatter.minutes === 1 ? I18nKey.minuteCount : I18nKey.minutesCount)}
                 <span class="mx-1.5 opacity-50">/</span>
                 {remarkPluginFrontmatter.words} {i18n(remarkPluginFrontmatter.words === 1 ? I18nKey.wordCount : I18nKey.wordsCount)}

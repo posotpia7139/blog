@@ -38,9 +38,8 @@
     }
 
     h1, h2, h3, h4, h5, h6 {
-        @apply font-semibold relative mb-2;
-        margin-top: calc(2.2em - 28px);
-        padding-top: 28px;
+        @apply font-semibold relative mb-2 pt-5;
+        margin-top: calc(2.2em - 20px);
         
         .section-num {
             @apply text-[var(--primary)] font-bold;
@@ -147,7 +146,7 @@
     .custom-footnote-link {
         @apply no-underline font-bold text-[var(--primary)] transition-all inline-flex items-center decoration-transparent border-none;
         padding: 0;
-        padding-right: 2px;
+        padding-right: 0px;
         line-height: 1;
         cursor: pointer;
         font-size: inherit;
@@ -178,7 +177,7 @@
     }
 
     section[data-footnotes] ol li {
-        @apply mt-0 mb-3 pt-0 pl-0 !important;
+        @apply mt-0 mb-[14px] pt-0 pl-0 !important;
         display: block;
     }
 
@@ -220,7 +219,7 @@
     }
 
     /* 각주 제목 숨기기 및 구분선 처리 */
-    #footnote-label {
+    #footnote-label, .footnote-sep {
         display: none !important;
     }
 
@@ -231,7 +230,7 @@
 
     /* 각주 제목 전용 스타일 */
     .footnote-title {
-        @apply text-xs font-bold uppercase tracking-widest text-black/30 dark:text-white/30 mt-4 mb-2;
+        display: none !important;
     }
     
 }

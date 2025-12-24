@@ -1,99 +1,149 @@
-# 🍥Fuwari  
+# 🍥 후와리 (Fuwari)
 ![Node.js >= 20](https://img.shields.io/badge/node.js-%3E%3D20-brightgreen) 
 ![pnpm >= 9](https://img.shields.io/badge/pnpm-%3E%3D9-blue) 
-[![DeepWiki](https://img.shields.io/badge/DeepWiki-saicaca%2Ffuwari-blue.svg?logo=data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACwAAAAyCAYAAAAnWDnqAAAAAXNSR0IArs4c6QAAA05JREFUaEPtmUtyEzEQhtWTQyQLHNak2AB7ZnyXZMEjXMGeK/AIi+QuHrMnbChYY7MIh8g01fJoopFb0uhhEqqcbWTp06/uv1saEDv4O3n3dV60RfP947Mm9/SQc0ICFQgzfc4CYZoTPAswgSJCCUJUnAAoRHOAUOcATwbmVLWdGoH//PB8mnKqScAhsD0kYP3j/Yt5LPQe2KvcXmGvRHcDnpxfL2zOYJ1mFwrryWTz0advv1Ut4CJgf5uhDuDj5eUcAUoahrdY/56ebRWeraTjMt/00Sh3UDtjgHtQNHwcRGOC98BJEAEymycmYcWwOprTgcB6VZ5JK5TAJ+fXGLBm3FDAmn6oPPjR4rKCAoJCal2eAiQp2x0vxTPB3ALO2CRkwmDy5WohzBDwSEFKRwPbknEggCPB/imwrycgxX2NzoMCHhPkDwqYMr9tRcP5qNrMZHkVnOjRMWwLCcr8ohBVb1OMjxLwGCvjTikrsBOiA6fNyCrm8V1rP93iVPpwaE+gO0SsWmPiXB+jikdf6SizrT5qKasx5j8ABbHpFTx+vFXp9EnYQmLx02h1QTTrl6eDqxLnGjporxl3NL3agEvXdT0WmEost648sQOYAeJS9Q7bfUVoMGnjo4AZdUMQku50McDcMWcBPvr0SzbTAFDfvJqwLzgxwATnCgnp4wDl6Aa+Ax283gghmj+vj7feE2KBBRMW3FzOpLOADl0Isb5587h/U4gGvkt5v60Z1VLG8BhYjbzRwyQZemwAd6cCR5/XFWLYZRIMpX39AR0tjaGGiGzLVyhse5C9RKC6ai42ppWPKiBagOvaYk8lO7DajerabOZP46Lby5wKjw1HCRx7p9sVMOWGzb/vA1hwiWc6jm3MvQDTogQkiqIhJV0nBQBTU+3okKCFDy9WwferkHjtxib7t3xIUQtHxnIwtx4mpg26/HfwVNVDb4oI9RHmx5WGelRVlrtiw43zboCLaxv46AZeB3IlTkwouebTr1y2NjSpHz68WNFjHvupy3q8TFn3Hos2IAk4Ju5dCo8B3wP7VPr/FGaKiG+T+v+TQqIrOqMTL1VdWV1DdmcbO8KXBz6esmYWYKPwDL5b5FA1a0hwapHiom0r/cKaoqr+27/XcrS5UwSMbQAAAABJRU5ErkJggg==)](https://deepwiki.com/saicaca/fuwari)
-[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fsaicaca%2Ffuwari.svg?type=shield&issueType=license)](https://app.fossa.com/projects/git%2Bgithub.com%2Fsaicaca%2Ffuwari?ref=badge_shield&issueType=license)
 
-A static blog template built with [Astro](https://astro.build).
+[Astro](https://astro.build)로 제작된 정적 블로그 템플릿입니다.
 
-[**🖥️ Live Demo (Vercel)**](https://fuwari.vercel.app)
+[**🖥️ 라이브 데모 (Vercel)**](https://fuwari.vercel.app)
 
-![Preview Image](https://raw.githubusercontent.com/saicaca/resource/main/fuwari/home.png)
+![미리보기 이미지](https://raw.githubusercontent.com/saicaca/resource/main/fuwari/home.png)
 
-🌏 README in
+🌏 다른 언어 읽기:
+[**English**](https://github.com/saicaca/fuwari/blob/main/README.md) /
 [**中文**](https://github.com/saicaca/fuwari/blob/main/docs/README.zh-CN.md) /
 [**日本語**](https://github.com/saicaca/fuwari/blob/main/docs/README.ja.md) /
-[**한국어**](https://github.com/saicaca/fuwari/blob/main/docs/README.ko.md) /
 [**Español**](https://github.com/saicaca/fuwari/blob/main/docs/README.es.md) /
 [**ไทย**](https://github.com/saicaca/fuwari/blob/main/docs/README.th.md) /
 [**Tiếng Việt**](https://github.com/saicaca/fuwari/blob/main/docs/README.vi.md) /
-[**Bahasa Indonesia**](https://github.com/saicaca/fuwari/blob/main/docs/README.id.md) (Provided by the community and may not always be up-to-date)
+[**Bahasa Indonesia**](https://github.com/saicaca/fuwari/blob/main/docs/README.id.md)
 
-## ✨ Features
+## ✨ 주요 기능
 
-- [x] Built with [Astro](https://astro.build) and [Tailwind CSS](https://tailwindcss.com)
-- [x] Smooth animations and page transitions
-- [x] Light / dark mode
-- [x] Customizable theme colors & banner
-- [x] Responsive design
-- [x] Search functionality with [Pagefind](https://pagefind.app/)
-- [x] [Markdown extended features](https://github.com/saicaca/fuwari?tab=readme-ov-file#-markdown-extended-syntax)
-- [x] Table of contents
-- [x] RSS feed
+- [x] [Astro](https://astro.build) 및 [Tailwind CSS](https://tailwindcss.com) 기반 제작
+- [x] 부드러운 애니메이션 및 페이지 전환 효과
+- [x] 라이트 / 다크 모드 지원
+- [x] 테마 색상 및 배너 커스터마이징 가능
+- [x] 반응형 디자인 (모바일 지원)
+- [x] [Pagefind](https://pagefind.app/)를 활용한 검색 기능
+- [x] [확장 마크다운 문법](https://github.com/saicaca/fuwari?tab=readme-ov-file#-markdown-extended-syntax) 지원
+- [x] 게시물 목차(TOC) 생성
+- [x] RSS 피드 제공
 
-## 🚀 Getting Started
+## 🚀 시작하기
 
-1. Create your blog repository:
-    - [Generate a new repository](https://github.com/saicaca/fuwari/generate) from this template or fork this repository.
-    - Or run one of the following commands:
+1. 블로그 저장소 생성:
+    - 이 템플릿에서 [새 저장소 생성](https://github.com/saicaca/fuwari/generate)을 하거나 포크(Fork)합니다.
+    - 또는 아래 명령어를 실행합니다:
        ```sh
-       npm create fuwari@latest
-       yarn create fuwari
        pnpm create fuwari@latest
-       bun create fuwari@latest
-       deno run -A npm:create-fuwari@latest
        ```
-2. To edit your blog locally, clone your repository, run `pnpm install` to install dependencies.
-    - Install [pnpm](https://pnpm.io) `npm install -g pnpm` if you haven't.
-3. Edit the config file `src/config.ts` to customize your blog.
-4. Run `pnpm new-post <filename>` to create a new post and edit it in `src/content/posts/`.
-5. Deploy your blog to Vercel, Netlify, GitHub Pages, etc. following [the guides](https://docs.astro.build/en/guides/deploy/). You need to edit the site configuration in `astro.config.mjs` before deployment.
+2. 로컬에서 편집하려면 저장소를 클론하고 `pnpm install`로 의존성을 설치합니다.
+3. `src/config.ts` 파일을 수정하여 블로그를 나만의 스타일로 꾸밉니다.
+4. `pnpm new-post <파일명>`을 실행하여 새 글을 생성하고 `src/content/posts/`에서 편집합니다.
+5. [배포 가이드](https://docs.astro.build/en/guides/deploy/)를 따라 Vercel, Netlify, GitHub Pages 등에 배포합니다. 배포 전 `astro.config.mjs`의 사이트 설정을 확인하세요.
 
-## 📝 Frontmatter of Posts
+## 📝 포스트 설정 (Frontmatter)
 
 ```yaml
 ---
-title: My First Blog Post
+title: 나의 첫 번째 블로그 글
 published: 2023-09-09
-description: This is the first post of my new Astro blog.
+description: 새 Astro 블로그의 첫 번째 게시물입니다.
 image: ./cover.jpg
-tags: [Foo, Bar]
-category: Front-end
+tags: [일상, 개발]
+category: 프로그래밍
 draft: false
-lang: jp      # Set only if the post's language differs from the site's language in `config.ts`
+lang: ko      # 사이트 기본 언어와 다를 경우에만 설정
 ---
 ```
 
-## 🧩 Markdown Extended Syntax
+## 🧩 마크다운 확장 문법
 
-In addition to Astro's default support for [GitHub Flavored Markdown](https://github.github.com/gfm/), several extra Markdown features are included:
+기본적인 마크다운 외에도 아래와 같은 추가 기능을 지원합니다:
 
-- Admonitions ([Preview and Usage](https://fuwari.vercel.app/posts/markdown-extended/#admonitions))
-- GitHub repository cards ([Preview and Usage](https://fuwari.vercel.app/posts/markdown-extended/#github-repository-cards))
-- Enhanced code blocks with Expressive Code ([Preview](https://fuwari.vercel.app/posts/expressive-code/) / [Docs](https://expressive-code.com/))
+- 어드모니션 (강조 박스)
+- GitHub 저장소 카드
+- Expressive Code를 활용한 강력한 코드 블록
 
-## ⚡ Commands
+## ⚡ 주요 명령어
 
-All commands are run from the root of the project, from a terminal:
+모든 명령어는 프로젝트 루트 터미널에서 실행합니다:
 
-| Command                    | Action                                              |
-|:---------------------------|:----------------------------------------------------|
-| `pnpm install`             | Installs dependencies                               |
-| `pnpm dev`                 | Starts local dev server at `localhost:4321`         |
-| `pnpm build`               | Build your production site to `./dist/`             |
-| `pnpm preview`             | Preview your build locally, before deploying        |
-| `pnpm check`               | Run checks for errors in your code                  |
-| `pnpm format`              | Format your code using Biome                        |
-| `pnpm new-post <filename>` | Create a new post                                   |
-| `pnpm astro ...`           | Run CLI commands like `astro add`, `astro check`    |
-| `pnpm astro --help`        | Get help using the Astro CLI                        |
+| 명령어 | 동작 |
+|:---|:---|
+| `pnpm install` | 의존성 패키지 설치 |
+| `pnpm dev` | 로컬 개발 서버 시작 (`localhost:4321`) |
+| `pnpm build` | 배포용 사이트 빌드 (`./dist/` 폴더 생성) |
+| `pnpm preview` | 배포 전 빌드 결과물 로컬에서 미리보기 |
+| `pnpm check` | 코드 오류 검사 실행 |
+| `pnpm format` | Biome을 사용한 코드 포맷팅 |
+| `pnpm new-post <파일명>` | 새 포스트 생성 |
+| `pnpm astro ...` | `astro add`, `astro check` 등 CLI 명령어 실행 |
 
-## ✏️ Contributing
+---
 
-Check out the [Contributing Guide](https://github.com/saicaca/fuwari/blob/main/CONTRIBUTING.md) for details on how to contribute to this project.
+## 🚀 제임스의 블로그 운영 및 최적화
 
-## 📄 License
+제임스(James)의 블로그 운영 및 성능 개선을 위한 핵심 가이드입니다.
 
-This project is licensed under the MIT License.
+### ⚡ 성능 최적화 (성능)
+- **CSS 인라인화:** `astro.config.mjs`에서 `build: { inlineStylesheets: "always" }` 적용. 렌더링 차단 요소를 제거하여 초기 로딩 속도 극대화.
+- **애니메이션 최적화:** LCP 요소인 포스트 커버 이미지의 페이드 인 애니메이션을 제거하여 즉시 렌더링되도록 수정.
 
-[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fsaicaca%2Ffuwari.svg?type=large&issueType=license)](https://app.fossa.com/projects/git%2Bgithub.com%2Fsaicaca%2Ffuwari?ref=badge_large&issueType=license)
+### 🎨 디자인 및 UI (디자인)
+- **아이콘 라이브러리:** Material Symbols (Rounded)
+  - 날짜: `calendar-month-rounded`
+  - 시간/분: `schedule-rounded`
+  - 카테고리/폴더: `folder-open-outline-rounded`
+- **색상 지침:** 메타데이터 아이콘 및 텍스트는 차분한 회색(`text-black/50`)을 기본으로 유지.
+
+### 📂 지식 관리 전략 (카테고리 전략)
+1. **`fundamentals`**: 근본 원리 이해, CS 기초.
+2. **`development`**: MERN 스택 실무, 개발 테크닉.
+3. **`systems`**: 시스템 아키텍처, 인프라, 환경 구축.
+4. **`game-logic`**: 1인 인디 게임 제작을 위한 기술적 토대.
+5. **`meta`**: 도구 활용 및 운영 지식.
+> **팁:** 세부 기술(React, Node 등)은 폴더 대신 **태그(#)**로 관리.
+
+---
+
+## 🧩 마크다운 확장 가이드 (제임스 마스터 가이드)
+
+블로그 운영에 필요한 모든 마크다운 문법과 특수 기능의 **코드 & 결과** 예시입니다.
+
+### 1. 게시물 설정 상세
+| 항목 | 설명 |
+| :--- | :--- |
+| `title` | 포스트의 메인 제목 |
+| `published` | 게시 날짜 (YYYY-MM-DD) |
+| `description` | 카드 및 검색 결과에 노출될 요약 설명 |
+| `image` | 포스트 상단 커버 이미지 경로 |
+| `tags` | 세부 분류 태그 (검색 및 필터링 연동) |
+| `category` | 사이드바 카테고리 (계층형 구조 지원) |
+
+### 2. 기본 문법 및 각주
+- **텍스트 스타일:** `**굵게**`, `*기울임*`, `~~취소선~~`
+- **각주 (🚀 호버 툴팁 지원):**
+  - **코드:** `본문입니다.[^1]` / `[^1]: 내용`
+  - **결과:** 본문 숫자 위에 마우스를 올리면 내용이 팝업으로 나타납니다.
+
+### 3. 시각적 컴포넌트
+#### 📘 어드모니션 (강조 박스)
+- **코드:** `:::note[알림] 
+ 내용 
+ :::`
+- **결과:** 블로그에서 컬러 박스로 강조되어 표시됩니다. (`tip`, `important` 등 가능)
+
+#### 🐙 GitHub 저장소 카드
+- **코드:** `::github{repo="사용자/저장소"}`
+- **결과:** 저장소 정보가 포함된 세련된 카드가 생성됩니다.
+
+#### 🕵️ 스포일러 (Spoiler)
+- **코드:** `:spoiler[비밀 내용]`
+- **결과:** 클릭해야 내용이 나타나는 가림막 효과가 적용됩니다.
+
+### 4. 코드 블록 및 멀티미디어
+- **코드 강조:** 파일명 표시, 줄 번호, 특정 라인 강조 등을 지원합니다.
+- **유튜브:** 표준 `iframe` 태그를 사용하여 영상을 본문에 삽입할 수 있습니다.
+
+**가장 중요한 요약:** 블로그의 모든 안내와 운영 정보를 한국어로 완전히 전환하여 가독성과 관리 편의성을 높임.
