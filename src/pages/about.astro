@@ -6,6 +6,9 @@ import Profile from "@components/widget/Profile.astro";
 import I18nKey from "../i18n/i18nKey";
 import { i18n } from "../i18n/translation";
 import MainGridLayout from "../layouts/MainGridLayout.astro";
+import { profileConfig } from "../config";
+import ImageWrapper from "@components/misc/ImageWrapper.astro";
+import { Icon } from "astro-icon/components";
 
 const aboutPost = await getEntry("spec", "about");
 
@@ -17,9 +20,22 @@ const { Content } = await render(aboutPost);
 ---
 <MainGridLayout title={i18n(I18nKey.about)} description={i18n(I18nKey.about)} showSidebarOnMobile={false}>
     <div class="flex flex-col gap-4 w-full rounded-[var(--radius-large)] overflow-hidden relative min-h-32">
-        <div class="flex justify-center w-full">
-            <div class="w-full lg:max-w-none">
-                <Profile></Profile>
+        <div class="card-base p-6 md:p-8 flex flex-col md:flex-row items-center md:items-start gap-6 md:gap-8">
+            <div class="shrink-0 w-20 h-20 md:w-24 md:h-24 overflow-hidden rounded-2xl shadow-md">
+                <ImageWrapper src={profileConfig.avatar || ""} alt="Profile Image" class="w-full h-full object-cover" />
+            </div>
+            <div class="flex flex-col justify-center text-center md:text-left pt-2">
+                <h1 class="text-3xl md:text-4xl font-bold text-90 mb-3">{profileConfig.name}</h1>
+                <p class="text-lg text-75 leading-relaxed">{profileConfig.bio}</p>
+                {/* 
+                <div class="flex flex-wrap gap-3 justify-center md:justify-start mt-4">
+                    {profileConfig.links.map(item =>
+                        <a rel="me" aria-label={item.name} href={item.url} target="_blank" class="btn-regular rounded-xl h-10 w-10 active:scale-90">
+                            <Icon name={item.icon} class="text-[1.5rem]"></Icon>
+                        </a>
+                    )}
+                </div>
+                */}
             </div>
         </div>
         <div class="card-base z-10 px-9 py-6 relative w-full ">
