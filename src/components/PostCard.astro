@@ -44,9 +44,9 @@ const coverWidth = "28%";
 const { remarkPluginFrontmatter } = await entry.render();
 ---
 <div class:list={["card-base w-full rounded-[var(--radius-large)] overflow-hidden relative group", className]} style={style}>
-    <div class:list={["pl-6 md:pl-9 pr-6 md:pr-9 pt-6 md:pt-7 pb-6 relative", {"w-full": !hasCover, "w-[calc(100%_-_var(--coverWidth)_-_12px)]": hasCover}]}>
+    <div class:list={["pl-9 pr-9 pt-7 pb-6 relative", {"w-full": !hasCover, "w-[calc(100%_-_var(--coverWidth)_-_12px)]": hasCover}]}>
         <div class="relative mb-3">
-            <div class="transition w-full font-semibold text-[1.4rem] md:text-3xl text-90
+            <div class="transition w-full font-semibold text-3xl text-90
             group-hover:text-[var(--primary)]
             active:text-[var(--title-active)]
             relative z-10 pointer-events-none

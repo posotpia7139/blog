@@ -87,17 +87,57 @@ function setupFootnoteTooltips() {
     });
 }
 
+// 캡처링 단계에서 이벤트를 가로채어 번호 클릭 시 제목으로 튀는 현상 방지
 document.addEventListener("click", function (e: MouseEvent) {
     const target = e.target as Element | null;
+    if (!target) return;
 
-    // 앵커 링크(#) 클릭 시 주소 복사
-    const anchorLink = target?.closest(".anchor-link");
-    if (anchorLink) {
+    // 1. 헤딩 번호(.section-num) 클릭 시 본문 상단 TOC로 즉시(Instant) 이동
+    const sectionNum = target.closest(".section-num");
+    if (sectionNum) {
+        // 가장 먼저 모든 동작 차단
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        
+        const topToc = document.getElementById('top-toc-container');
+        const postContainer = document.getElementById('post-container');
+        
+        if (topToc) {
+            // 1. 가변값: 본문 컨테이너의 실제 패딩을 실시간으로 읽어옴
+            let basePadding = 36;
+            const postContainer = document.getElementById('post-container');
+            if (postContainer) {
+                basePadding = parseInt(window.getComputedStyle(postContainer).paddingLeft) || 36;
+            }
+
+            // 2. 조정값: 여기에 원하는 만큼의 추가 여백을 입력 (예: -15)
+            const adjustment = -15; 
+
+            // 최종 오프셋 적용
+            const totalOffset = basePadding + adjustment;
+            const y = topToc.getBoundingClientRect().top + window.scrollY - totalOffset;
+            
+            window.scrollTo({ top: y, behavior: 'auto' });
+        }
+    }
+}, { capture: true });
+
+document.addEventListener("click", function (e: MouseEvent) {
+    const target = e.target as Element | null;
+    if (!target) return;
+
+    // 2. 앵커 링크(제목 영역) 클릭 시 주소 복사 및 이동
+    const anchorLink = target.closest(".anchor-link");
+    if (anchorLink && !target.closest(".section-num")) {
         const url = new URL(window.location.href);
-        url.hash = anchorLink.getAttribute("href") || "";
+        const hash = anchorLink.getAttribute("href") || "";
+        url.hash = hash;
         navigator.clipboard.writeText(url.toString());
-        // 필요시 여기에 '복사됨' 알림 로직 추가 가능
-        return;
+        
+        anchorLink.classList.add('copied');
+        setTimeout(() => {
+            anchorLink.classList.remove('copied');
+        }, 2000);
     }
 
     if (target && target.classList.contains("copy-btn")) {

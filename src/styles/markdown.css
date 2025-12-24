@@ -39,29 +39,44 @@
 
     h1, h2, h3, h4, h5, h6 {
         @apply font-semibold relative mb-2 pt-5;
-        margin-top: calc(2.2em - 20px);
+        margin-top: calc(2.2em - 28px);
         
         .section-num {
-            @apply text-[var(--primary)] font-bold;
+            @apply text-[var(--primary)] font-bold cursor-pointer transition-all hover:opacity-70 active:scale-90;
         }
         
         .anchor-link {
             @apply text-inherit no-underline relative inline-block;
-            padding-right: 1.25rem; /* 클릭 영역 최적화 */
+            padding-right: 1.5rem; /* 클릭 영역 최적화 */
 
             &::after {
-                content: '#';
-                @apply text-[var(--primary)] opacity-0 transition-all duration-300 ease-in-out;
-                margin-left: 0.5rem;
-                display: inline-block;
-                transform: translateX(-0.5rem);
+                content: '';
+                @apply absolute text-[var(--primary)] opacity-0 transition-all duration-300 ease-in-out bg-current;
+                width: 1.25rem;
+                height: 1.25rem;
+                right: 0;
+                top: 50%;
+                transform: translateY(-50%) translateX(-0.5rem);
+                mask-repeat: no-repeat;
+                mask-size: contain;
+                mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' height='24' viewBox='0 -960 960 960' width='24'%3E%3Cpath d='M440-280H280q-83 0-141.5-58.5T80-480q0-83 58.5-141.5T280-680h160v80H280q-50 0-85 35t-35 85q0 50 35 85t85 35h160v80ZM320-440v-80h320v80H320Zm120 160v-80h160q50 0 85-35t35-85q0-50-35-85t-85-35H520v-80h160q83 0 141.5 58.5T880-480q0 83-58.5 141.5T680-280H440Z'/%3E%3C/svg%3E");
             }
-        }
 
-        &:hover {
-            .anchor-link::after {
+            &:hover::after {
                 @apply opacity-100;
-                transform: translateX(0);
+                transform: translateY(-50%) translateX(0);
+            }
+
+            /* 번호(.section-num)에 호버했을 때는 아이콘 숨김 */
+            &:has(.section-num:hover)::after {
+                @apply opacity-0;
+            }
+
+            &.copied::after {
+                @apply opacity-100;
+                background-color: #10b981; /* 성공 시 초록색 (성공 색상) */
+                mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' height='24' viewBox='0 -960 960 960' width='24'%3E%3Cpath d='M382-240 154-468l57-57 171 171 367-367 57 57-424 424Z'/%3E%3C/svg%3E");
+                transform: translateY(-50%) scale(1.2);
             }
         }
     }

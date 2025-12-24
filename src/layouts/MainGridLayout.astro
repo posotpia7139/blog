@@ -65,7 +65,7 @@ const mainPanelTop = siteConfig.banner.enable
 <div class="absolute w-full z-30 pointer-events-none" style={`top: ${mainPanelTop}`}>
     <!-- The pointer-events-none here prevent blocking the click event of the TOC -->
     <div class="relative max-w-[var(--page-width)] mx-auto pointer-events-auto">
-        <div id="main-grid" class="transition duration-700 w-full left-0 right-0 grid grid-cols-[auto_18.75rem] grid-rows-[auto_auto_auto] lg:grid-rows-[auto_1fr]
+        <div id="main-grid" class="transition duration-700 w-full left-0 right-0 grid grid-cols-[auto_18.75rem]
     mx-auto gap-y-4 gap-x-4 px-0 md:px-4"
              style={`min-height: calc(100vh - ${mainPanelTop})`}
         >
@@ -102,18 +102,50 @@ const mainPanelTop = siteConfig.banner.enable
 </div>
 
 <!-- The things that should be under the banner, only the TOC for now -->
-<div class="absolute w-full z-0 hidden xl:block">
+<div class="absolute w-full z-0 hidden 2xl:block">
     <div class="relative max-w-[var(--page-width)] mx-auto">
         <!-- TOC component -->
-        {siteConfig.toc.enable && <div id="toc-wrapper" class:list={["hidden xl:block transition-opacity duration-700 absolute top-0"]}
+        {siteConfig.toc.enable && <div id="toc-wrapper" class:list={["hidden 2xl:block transition-all duration-500 absolute top-0 opacity-0 pointer-events-none"]}
         >
-            <div id="toc-inner-wrapper" class="fixed top-4 h-[calc(100vh_-_18.5rem)] overflow-y-scroll overflow-x-hidden hide-scrollbar flex flex-col items-end w-[12rem] 2xl:w-[17rem]"
+            <div class="fixed top-4 h-[calc(100vh_-_18.5rem)] overflow-y-scroll overflow-x-hidden hide-scrollbar flex flex-col items-end w-fit"
                  style="right: calc(50vw + var(--page-width) / 2); max-width: calc(50vw - var(--page-width) / 2 - 16px); mask-image: linear-gradient(to bottom, black 85%, transparent 100%); -webkit-mask-image: linear-gradient(to bottom, black 85%, transparent 100%);">
-                <div id="toc" class="w-full h-full transition-swup-fade">
-                    <TOC headings={headings}></TOC>
+                <div id="toc" class="w-full h-full transition-swup-fade flex flex-col items-end">
+                    <TOC headings={headings} class="w-fit ml-auto" isFloating={true}></TOC>
                 </div>
             </div>
         </div>}
+
+        <script is:inline>
+            function initTOCVisibility() {
+                const topToc = document.getElementById('top-toc-container');
+                const floatingToc = document.getElementById('toc-wrapper');
+                
+                if (!topToc || !floatingToc) return;
+
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        // intersectionRatio가 0.5보다 작고, 요소가 화면 상단으로 나가는 중일 때
+                        if (entry.intersectionRatio < 0.5 && entry.boundingClientRect.top < 0) {
+                            // 사이드 TOC 노출
+                            floatingToc.classList.remove('opacity-0', 'pointer-events-none');
+                            floatingToc.classList.add('opacity-100', 'pointer-events-auto');
+                        } else {
+                            // 그 외의 경우 (목차가 충분히 보이거나 아직 도달하지 않음)
+                            floatingToc.classList.add('opacity-0', 'pointer-events-none');
+                            floatingToc.classList.remove('opacity-100', 'pointer-events-auto');
+                        }
+                    });
+                }, { 
+                    threshold: [0, 0.5] // 0%와 50% 가시성 지점에서 감지
+                });
+
+                observer.observe(topToc);
+            }
+
+            // 페이지 로드 및 Swup 전환 시 실행
+            initTOCVisibility();
+            document.addEventListener('swup:content:replace', initTOCVisibility);
+        </script>
 
         <!-- #toc needs to exist for Swup to work normally -->
         {!siteConfig.toc.enable && <div id="toc"></div>}
