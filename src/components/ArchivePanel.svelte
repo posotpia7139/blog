@@ -196,7 +196,7 @@ onMount(async () => {
                                 class:count-finished={$animatedCount >= totalCount - 0.1}>
                             {Math.round($animatedCount)}
                         </span>
-                        <span class="mt-0 text-[14px] font-bold text-black/40 dark:text-white/40 uppercase">
+                        <span class="mt-2 text-[14px] font-bold text-black/40 dark:text-white/40 uppercase">
                             게시물
                         </span>
                     </div>

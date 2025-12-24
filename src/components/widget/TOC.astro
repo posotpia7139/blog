@@ -27,15 +27,38 @@ const removeTailingHash = (text: string) => {
 	return text.substring(0, lastIndexOfHash);
 };
 
+// [추가] 헤더 텍스트 앞의 자동 생성된 번호(1. 1.1. 등) 제거
+const cleanHeadingText = (text: string) => {
+    const textWithoutHash = removeTailingHash(text);
+    return textWithoutHash.replace(/^(\d+\.)+\s*/, '');
+};
+
 let heading1Count = 1;
 
 const maxLevel = siteConfig.toc.depth;
+
+// [수정] Footnotes 제목 제외 (가장 강력한 필터링)
+const filteredHeadings = headings.filter((heading) => {
+    const text = heading.text.toLowerCase().trim();
+    const slug = heading.slug.toLowerCase();
+    
+    const isTooDeep = heading.depth >= minDepth + maxLevel;
+    const isFootnote = 
+        slug.includes('footnote') || 
+        slug.includes('각주') ||
+        text.includes('footnote') ||
+        text === '각주' ||
+        text === 'footnotes' ||
+        heading.depth === 100; // 일부 플러그인에서 숨김용으로 쓰는 트릭 대응
+
+    return !isTooDeep && !isFootnote;
+});
 ---
 {isPostsRoute &&
 <table-of-contents class:list={[className, "block relative pb-32 w-fit ml-auto text-left"]}>
-    {headings.filter((heading) => heading.depth < minDepth + maxLevel).map((heading) =>
+    {filteredHeadings.map((heading) =>
             <a href={`#${heading.slug}`} class="group pl-2 pr-4 flex items-start gap-2 relative transition-all duration-100 ease-out w-full min-h-7 rounded-xl
-        hover:bg-[var(--toc-btn-active)] active:bg-[var(--toc-btn-active)] py-1
+        hover:bg-[var(--toc-btn-active)] active:bg-[var(--toc-btn-active)] py-0.5 2xl:py-1
     ">
                 <div class:list={["transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-semibold mt-0.5",
                     {
@@ -49,7 +72,7 @@ const maxLevel = siteConfig.toc.depth;
                     {heading.depth == minDepth + 1 && <div class="transition w-2 h-2 rounded-[0.1875rem] bg-[var(--toc-badge-bg)]"></div>}
                     {heading.depth == minDepth + 2 && <div class="transition w-1.5 h-1.5 rounded-sm bg-black/5 dark:bg-white/10"></div>}
                 </div>
-                <div class:list={["transition text-sm text-left break-words leading-snug py-0.5 text-black/80 dark:text-white/60 [.visible_&]:text-black/100 [.visible_&]:dark:text-white/90 group-hover:text-[oklch(0.20_0.14_var(--hue))] dark:group-hover:text-[var(--primary)]"]}>{removeTailingHash(heading.text)}</div>
+                <div class:list={["transition text-[13px] 2xl:text-sm text-left break-words leading-snug py-0.5 text-black/80 dark:text-white/60 [.visible_&]:text-black/100 [.visible_&]:dark:text-white/90 group-hover:text-[oklch(0.20_0.14_var(--hue))] dark:group-hover:text-[var(--primary)]"]}>{cleanHeadingText(heading.text)}</div>
             </a>
     )}
     <div id="active-indicator" style="opacity: 0" class:list={[{'hidden': headings.length == 0}, "-z-10 absolute bg-[var(--toc-btn-hover)] rounded-xl transition-all duration-100 ease-out pointer-events-none " +
@@ -253,6 +276,20 @@ class TableOfContents extends HTMLElement {
         this.sections.forEach((section) =>
             this.observer.observe(section)
         );
+
+        // 초기 로드 시 앵커(#)가 있으면 해당 섹션을 활성화하고 스크롤 위치 보정
+        if (window.location.hash) {
+            const id = decodeURIComponent(window.location.hash.substring(1));
+            const idx = this.headingIdxMap.get(id);
+            if (idx !== undefined) {
+                this.markActiveHeading(idx);
+                // 약간의 지연 후 업데이트 (스크롤 애니메이션 등 고려)
+                setTimeout(() => {
+                    this.fallback();
+                    this.update();
+                }, 100);
+            }
+        }
 
         this.fallback();
         this.update();

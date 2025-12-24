@@ -348,7 +348,7 @@ function initFootnotes() {
 	const inlineRefs = document.querySelectorAll('a[id^="user-content-fnref-"]');
 	inlineRefs.forEach(ref => {
 		if (ref.querySelector('span')) return; // 이미 변환됨
-		const num = ref.innerText;
+		const num = ref.textContent;
 		ref.innerHTML = `<span>[</span>${num}<span>]</span>`;
 	});
 
@@ -469,14 +469,6 @@ let toc = document.getElementById('toc-wrapper');
 let navbar = document.getElementById('navbar-wrapper')
 function scrollFunction() {
 	let bannerHeight = window.innerHeight * (BANNER_HEIGHT / 100)
-
-	if (toc) {
-		if (document.body.scrollTop > 80 || document.documentElement.scrollTop > 80) {
-			toc.classList.remove('toc-hide')
-		} else {
-			toc.classList.add('toc-hide')
-		}
-	}
 
 	if (!bannerEnabled) return
 	if (navbar) {

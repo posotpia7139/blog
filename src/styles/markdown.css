@@ -38,9 +38,13 @@
     }
 
     h1, h2, h3, h4, h5, h6 {
-        @apply font-semibold relative;
-        margin-top: calc(1.6em - 25px);
-        padding-top: 25px;
+        @apply font-semibold relative mb-2;
+        margin-top: calc(2.2em - 28px);
+        padding-top: 28px;
+        
+        .section-num {
+            @apply text-[var(--primary)] font-bold;
+        }
         
         .anchor-link {
             @apply text-inherit no-underline relative inline-block;
@@ -143,19 +147,24 @@
     .custom-footnote-link {
         @apply no-underline font-bold text-[var(--primary)] transition-all inline-flex items-center decoration-transparent border-none;
         padding: 0;
+        padding-right: 2px;
         line-height: 1;
         cursor: pointer;
+        font-size: inherit;
+        vertical-align: baseline;
+        position: relative;
+        top: -1px;
     }
 
-    /* 대괄호 간격 통일 */
+    /* 대괄호 간격 제거 및 밀착 */
     a[id^="user-content-fnref-"] span:first-child,
     .custom-footnote-link span:first-child {
-        @apply mr-[0.2em];
+        @apply mr-0;
     }
 
     a[id^="user-content-fnref-"] span:last-child,
     .custom-footnote-link span:last-child {
-        @apply ml-[0.2em];
+        @apply ml-0;
     }
 
     a[id^="user-content-fnref-"]:hover,
@@ -169,7 +178,7 @@
     }
 
     section[data-footnotes] ol li {
-        @apply my-[5px] pt-1 !important;
+        @apply mt-0 mb-3 pt-0 pl-0 !important;
         display: block;
     }
 
@@ -185,7 +194,7 @@
     }
 
     hr {
-        @apply border-dashed border-[var(--line-color)];
+        @apply border-dashed border-[var(--line-color)] mt-10 mb-5;
         border-top-width: 3px;
     }
 
@@ -208,6 +217,21 @@
         max-width: 100%;
         overflow-x: auto;
         margin: 1em 0;
+    }
+
+    /* 각주 제목 숨기기 및 구분선 처리 */
+    #footnote-label {
+        display: none !important;
+    }
+
+    /* 각주 섹션 상단에 선 긋기 */
+    section[data-footnotes] {
+        @apply border-t-2 border-dashed border-[var(--line-color)] mt-10 pt-9;
+    }
+
+    /* 각주 제목 전용 스타일 */
+    .footnote-title {
+        @apply text-xs font-bold uppercase tracking-widest text-black/30 dark:text-white/30 mt-4 mb-2;
     }
     
 }
