@@ -30,6 +30,9 @@ export default defineConfig({
 	site: "https://presentflame.com/",
 	base: "/",
 	trailingSlash: "always",
+	build: {
+		inlineStylesheets: "auto",
+	},
 	integrations: [
 		tailwind({
 			nesting: true,
