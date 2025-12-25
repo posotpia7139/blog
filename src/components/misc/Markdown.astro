@@ -133,11 +133,6 @@ document.addEventListener("click", function (e: MouseEvent) {
         const hash = anchorLink.getAttribute("href") || "";
         url.hash = hash;
         navigator.clipboard.writeText(url.toString());
-        
-        anchorLink.classList.add('copied');
-        setTimeout(() => {
-            anchorLink.classList.remove('copied');
-        }, 2000);
     }
 
     if (target && target.classList.contains("copy-btn")) {
