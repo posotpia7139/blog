@@ -49,9 +49,9 @@ const coverWidth = "28%";
 const { remarkPluginFrontmatter } = await entry.render();
 ---
 <div class:list={["card-base w-full rounded-[var(--radius-large)] overflow-hidden relative group", className]} style={style}>
-    <div class:list={["pl-9 pr-9 pt-7 pb-6 relative", {"w-full": !hasCover, "w-[calc(100%_-_var(--coverWidth)_-_12px)]": hasCover}]}>
+    <div class:list={["px-6 pt-6 md:px-9 md:pt-7 relative", {"w-full": !hasCover, "w-[calc(100%_-_var(--coverWidth)_-_12px)]": hasCover}, {"pb-6": !isProject, "pb-4 md:pb-5": isProject}]}>
         <div class="relative mb-3">
-            <div class="transition w-full font-semibold text-3xl text-90
+            <div class="transition w-full font-semibold text-2xl md:text-3xl text-90
             group-hover:text-[var(--primary)]
             active:text-[var(--title-active)]
             relative z-10 pointer-events-none
@@ -62,24 +62,24 @@ const { remarkPluginFrontmatter } = await entry.render();
 
                     <!-- description -->
                     <div class="relative z-10 pointer-events-none">
-                        <div class:list={["transition text-75 mb-3.5 pr-4 line-clamp-2 [text-wrap:balance] break-keep"]}>
+                        <div class:list={["transition text-75 pr-4 line-clamp-2 [text-wrap:balance] break-keep text-sm md:text-base", {"mb-3.5": !isProject, "mb-2": isProject}]}>
                             { description || remarkPluginFrontmatter.excerpt }
                         </div>
                     </div>
 
         <!-- 2-tier metadata or Project Links -->
-        <div class="mb-4 relative z-30 flex flex-col gap-1">
+        <div class:list={["relative z-30 flex flex-col gap-1", {"mb-4": !isProject, "mb-0": isProject}]}>
             {isProject ? (
-                <div class="flex items-center gap-5 text-lg">
+                <div class="flex items-center gap-5 text-base md:text-lg">
                     {github_url && (
                         <a href={github_url} target="_blank" rel="noopener" class="flex items-center text-50 hover:text-[var(--primary)] transition-colors group/link">
-                            <Icon name="fa6-brands:github" class="mr-2 text-xl"></Icon>
+                            <Icon name="fa6-brands:github" class="mr-2 text-lg md:text-xl"></Icon>
                             <span class="font-bold">GitHub</span>
                         </a>
                     )}
                     {demo_url && (
                         <a href={demo_url} target="_blank" rel="noopener" class="flex items-center text-50 hover:text-[var(--primary)] transition-colors group/link">
-                            <Icon name="material-symbols:open-in-new-rounded" class="mr-2 text-xl"></Icon>
+                            <Icon name="material-symbols:open-in-new-rounded" class="mr-2 text-lg md:text-xl"></Icon>
                             <span class="font-bold">Live Demo</span>
                         </a>
                     )}
