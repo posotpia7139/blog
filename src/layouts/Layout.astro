@@ -403,6 +403,41 @@ function initFootnotes() {
 	});
 }
 
+function setupAnchorLinks() {
+	const anchors = document.querySelectorAll('.anchor-link');
+	anchors.forEach(anchor => {
+		anchor.addEventListener('click', async (e) => {
+			e.preventDefault();
+			const href = anchor.getAttribute('href');
+			const url = window.location.origin + window.location.pathname + href;
+			
+			try {
+				await navigator.clipboard.writeText(url);
+				anchor.classList.add('copied');
+				
+				// 2초 후 페이드 아웃 시작
+				setTimeout(() => {
+					anchor.classList.add('fading-out');
+					// 페이드 아웃 애니메이션(500ms)이 끝난 후 클래스 초기화
+					setTimeout(() => {
+						anchor.classList.remove('copied', 'fading-out');
+					}, 500);
+				}, 2000);
+
+				// Optional: Smooth scroll to the anchor
+				const targetId = href?.substring(1);
+				const target = document.getElementById(targetId || "");
+				if (target) {
+					target.scrollIntoView({ behavior: 'smooth' });
+					history.pushState(null, '', href);
+				}
+			} catch (err) {
+				console.error('Failed to copy: ', err);
+			}
+		});
+	});
+}
+
 function init() {
 	// disableAnimation()()		// TODO
 	loadTheme();
@@ -410,6 +445,7 @@ function init() {
 	initCustomScrollbar();
 	showBanner();
 	initFootnotes(); // 각주 초기화 추가
+	setupAnchorLinks(); // 앵커 링크 초기화 추가
 }
 
 /* Load settings when entering the site */
@@ -436,6 +472,7 @@ const setup = () => {
 	window.swup.hooks.on('content:replace', () => {
 		initCustomScrollbar();
 		initFootnotes();
+		setupAnchorLinks();
 	})
 	window.swup.hooks.on('visit:start', (visit: {to: {url: string}}) => {
 		// change banner height immediately when a link is clicked

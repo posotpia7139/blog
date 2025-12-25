@@ -32,9 +32,15 @@
 }
 
 
-.custom-md {
-    h1 {
-        @apply text-3xl;
+    /* Checkmark pop animation */
+    @keyframes pop-check {
+        0% { transform: translateY(-50%) scale(1); }
+        50% { transform: translateY(-50%) scale(1.15); }
+        100% { transform: translateY(-50%) scale(1); }
+    }
+
+    .custom-md {
+        h1 {        @apply text-3xl;
     }
 
     h1, h2, h3, h4, h5, h6 {
@@ -51,20 +57,21 @@
 
             &::after {
                 content: '';
-                @apply absolute text-[var(--primary)] opacity-0 transition-all duration-300 ease-in-out bg-current;
+                @apply absolute text-[var(--primary)] opacity-0 transition-all duration-500 ease-in-out bg-current;
                 width: 1.25rem;
                 height: 1.25rem;
                 right: 0;
                 top: 50%;
-                transform: translateY(-50%) translateX(-0.5rem);
+                transform: translateY(-50%);
                 mask-repeat: no-repeat;
                 mask-size: contain;
-                mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' height='24' viewBox='0 -960 960 960' width='24'%3E%3Cpath d='M440-280H280q-83 0-141.5-58.5T80-480q0-83 58.5-141.5T280-680h160v80H280q-50 0-85 35t-35 85q0 50 35 85t85 35h160v80ZM320-440v-80h320v80H320Zm120 160v-80h160q50 0 85-35t35-85q0-50-35-85t-85-35H520v-80h160q83 0 141.5 58.5T880-480q0 83-58.5 141.5T680-280H440Z'/%3E%3C/svg%3E");
+                /* Simple Hash (#) icon - thinner lines */
+                mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cline x1='4' y1='9' x2='20' y2='9'%3E%3C/line%3E%3Cline x1='4' y1='15' x2='20' y2='15'%3E%3C/line%3E%3Cline x1='10' y1='3' x2='8' y2='21'%3E%3C/line%3E%3Cline x1='16' y1='3' x2='14' y2='21'%3E%3C/line%3E%3C/svg%3E");
             }
 
             &:hover::after {
                 @apply opacity-100;
-                transform: translateY(-50%) translateX(0);
+                transform: translateY(-50%);
             }
 
             /* 번호(.section-num)에 호버했을 때는 아이콘 숨김 */
@@ -74,9 +81,19 @@
 
             &.copied::after {
                 @apply opacity-100;
-                background-color: #10b981; /* 성공 시 초록색 (성공 색상) */
-                mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' height='24' viewBox='0 -960 960 960' width='24'%3E%3Cpath d='M382-240 154-468l57-57 171 171 367-367 57 57-424 424Z'/%3E%3C/svg%3E");
-                transform: translateY(-50%) scale(1.2);
+                background-color: #3b82f6; /* 성공 시 파란색 */
+                /* Sharp Stroke Checkmark icon */
+                mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'/%3E%3C/svg%3E");
+                /* 팝 애니메이션 적용 */
+                animation: pop-check 0.4s ease-out forwards;
+            }
+
+            /* 페이드 아웃 시 체크 모양 유지하며 사라지기 */
+            &.fading-out::after {
+                @apply opacity-0;
+                background-color: #3b82f6; /* 여전히 파란색 유지 */
+                mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'/%3E%3C/svg%3E");
+                transform: translateY(-50%) scale(1);
             }
         }
     }
