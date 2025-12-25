@@ -189,10 +189,7 @@ onMount(async () => {
                     
                     <!-- 3단: 게시물 개수 (균형 잡힌 리듬으로 등장) -->
                     <div class="flex flex-col items-center justify-center anim-fade-in delay-4100 -mt-0.5">
-                        <span class="inline-block font-medium text-[56px] leading-[0.9] transition-all duration-700 tabular-nums tracking-[-0.05em]" 
-                                class:counting-blue={$animatedCount > 0}
-                                class:text-black={$animatedCount === 0}
-                                class:dark:text-white={$animatedCount === 0}
+                        <span class="inline-block font-medium text-[56px] leading-[0.9] transition-all duration-700 tabular-nums tracking-[-0.05em] text-[var(--primary)]" 
                                 class:count-finished={$animatedCount >= totalCount - 0.1}>
                             {Math.round($animatedCount)}
                         </span>
