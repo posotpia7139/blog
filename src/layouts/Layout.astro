@@ -22,6 +22,7 @@ import { pathsEqual, url } from "../utils/url-utils";
 import "../styles/main.css";
 import "photoswipe/style.css";
 import "../styles/photoswipe.css";
+import "overlayscrollbars/overlayscrollbars.css";
 
 interface Props {
 	title?: string;
@@ -146,16 +147,37 @@ const bannerOffset =
 			'page-width': `${PAGE_WIDTH}rem`,
 		}}></style>  <!-- defines global css variables. This will be applied to <html> <body> and some other elements idk why -->
 
-		<!-- Google AdSense -->
-		<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3632254045012910"
-     crossorigin="anonymous"></script>
+		<!-- Google AdSense (Lazy Load) -->
+		<script is:inline>
+			function loadAdSense() {
+				if (window.adSenseLoaded) return;
+				window.adSenseLoaded = true;
+				const script = document.createElement('script');
+				script.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3632254045012910";
+				script.crossOrigin = "anonymous";
+				script.async = true;
+				document.head.appendChild(script);
+			}
+
+			// Load on user interaction
+			const events = ['mousemove', 'scroll', 'touchstart', 'keydown'];
+			function triggerAdSense() {
+				loadAdSense();
+				events.forEach(e => window.removeEventListener(e, triggerAdSense));
+			}
+
+			events.forEach(e => window.addEventListener(e, triggerAdSense, { passive: true }));
+			
+			// Backup: load after 3 seconds if no interaction
+			setTimeout(loadAdSense, 3000);
+		</script>
 
 		<slot name="head"></slot>
 
 		<link rel="alternate" type="application/rss+xml" title={profileConfig.name} href={`${Astro.site}rss.xml`}/>
 
 	</head>
-	<body class=" min-h-screen transition " class:list={[{"lg:is-home": isHomePage, "enable-banner": enableBanner}]}
+	<body class=" min-h-screen " class:list={[{"lg:is-home": isHomePage, "enable-banner": enableBanner}]}
 		  data-overlayscrollbars-initialize
 	>
 		<ScrollProgress />
@@ -175,7 +197,6 @@ const bannerOffset =
 </style>
 
 <script>
-import 'overlayscrollbars/overlayscrollbars.css';
 import {
 	OverlayScrollbars,
 	// ScrollbarsHidingPlugin,
@@ -468,8 +489,6 @@ if (window?.swup?.hooks) {
 let toc = document.getElementById('toc-wrapper');
 let navbar = document.getElementById('navbar-wrapper')
 function scrollFunction() {
-	let bannerHeight = window.innerHeight * (BANNER_HEIGHT / 100)
-
 	if (!bannerEnabled) return
 	if (navbar) {
 		const NAVBAR_HEIGHT = 72
@@ -487,13 +506,35 @@ function scrollFunction() {
 		}
 	}
 }
-window.onscroll = scrollFunction
 
-window.onresize = () => {
+// Throttle the scroll event to improve performance
+let isScrolling = false;
+window.onscroll = () => {
+	if (!isScrolling) {
+		window.requestAnimationFrame(() => {
+			scrollFunction();
+			isScrolling = false;
+		});
+		isScrolling = true;
+	}
+}
+
+function updateBannerHeightExtend() {
 	// calculate the --banner-height-extend, which needs to be a multiple of 4 to avoid blurry text
 	let offset = Math.floor(window.innerHeight * (BANNER_HEIGHT_EXTEND / 100));
 	offset = offset - offset % 4;
 	document.documentElement.style.setProperty('--banner-height-extend', `${offset}px`);
+}
+
+let isResizing = false;
+window.onresize = () => {
+	if (!isResizing) {
+		window.requestAnimationFrame(() => {
+			updateBannerHeightExtend();
+			isResizing = false;
+		});
+		isResizing = true;
+	}
 }
 
 </script>
