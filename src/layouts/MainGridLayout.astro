@@ -65,7 +65,7 @@ const mainPanelTop = siteConfig.banner.enable
 <div class="absolute w-full z-30 pointer-events-none" style={`top: ${mainPanelTop}`}>
     <!-- The pointer-events-none here prevent blocking the click event of the TOC -->
     <div class="relative max-w-[var(--page-width)] mx-auto pointer-events-auto">
-        <div id="main-grid" class="transition duration-700 w-full left-0 right-0 grid grid-cols-[auto_18.75rem]
+        <div id="main-grid" class="transition duration-700 w-full left-0 right-0 grid grid-cols-[auto_18.75rem] grid-rows-[auto_auto_1fr] lg:grid-rows-[1fr_auto]
     mx-auto gap-y-4 gap-x-4 px-0 md:px-4"
              style={`min-height: calc(100vh - ${mainPanelTop})`}
         >
@@ -93,7 +93,7 @@ const mainPanelTop = siteConfig.banner.enable
                 {"block": showSidebarOnMobile, "hidden lg:block": !showSidebarOnMobile}
             ]} headings={headings}></SideBar>
 
-            <div id="footer-wrapper" class="onload-animation col-span-2 lg:col-start-1 lg:col-span-1 row-start-3 lg:row-start-2 pb-4">
+            <div id="footer-wrapper" class="onload-animation col-span-2 lg:col-start-1 lg:col-span-1 row-start-3 lg:row-start-2 pb-4 flex flex-col justify-end">
                 <Footer></Footer>
             </div>
         </div>

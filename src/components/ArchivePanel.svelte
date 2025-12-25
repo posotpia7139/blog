@@ -306,12 +306,6 @@ onMount(async () => {
         100% { transform: scale(1); }
     }
 
-    /* 카운팅 중 테마 파란색 유지 */
-    .counting-blue {
-        color: var(--primary) !important;
-        transition: color 0.3s ease;
-    }
-
     /* 딜레이 클래스: 단축 속성(animation)의 초기화를 방지하기 위해 최하단에 배치 */
     .delay-2500 { animation-delay: 2500ms; }
     .delay-2900 { animation-delay: 2900ms; }

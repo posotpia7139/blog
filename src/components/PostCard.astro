@@ -62,7 +62,7 @@ const { remarkPluginFrontmatter } = await entry.render();
 
                     <!-- description -->
                     <div class="relative z-10 pointer-events-none">
-                        <div class:list={["transition text-75 pr-4 line-clamp-2 [text-wrap:balance] break-keep text-sm md:text-base", {"mb-3.5": !isProject, "mb-2": isProject}]}>
+                        <div class:list={["transition text-75 pr-4 [text-wrap:balance] break-keep text-sm md:text-base", {"line-clamp-3": isProject, "line-clamp-2": !isProject}, {"mb-3.5": !isProject, "mb-2": isProject}]}>
                             { description || remarkPluginFrontmatter.excerpt }
                         </div>
                     </div>

@@ -32,6 +32,12 @@ const projectsCollection = defineCollection({
 		lang: z.string().optional().default(""),
 		github_url: z.string().url().optional(),
 		demo_url: z.string().url().optional(),
+
+		/* For internal use */
+		prevTitle: z.string().default(""),
+		prevSlug: z.string().default(""),
+		nextTitle: z.string().default(""),
+		nextSlug: z.string().default(""),
 	}),
 });
 const specCollection = defineCollection({
