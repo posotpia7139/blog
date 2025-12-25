@@ -130,7 +130,7 @@ onMount(async () => {
                     <div class="flex flex-row items-center flex-wrap justify-start">
                         {#each allParts as part, i}
                             {@const isLast = i === allParts.length - 1}
-                            <span class="{isLast ? 'text-[var(--primary)] font-bold text-[13px]' : 'text-[13px]'}">{part}</span>
+                            <span class="{isLast ? 'text-[var(--primary)] font-bold text-[13px]' : 'text-[13px]'} capitalize">{part}</span>
                             {#if !isLast}
                                 <span class="mx-1.5 text-black/30 dark:text-white/30 font-normal">/</span>
                             {/if}

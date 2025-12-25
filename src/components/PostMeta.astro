@@ -33,14 +33,14 @@ const className = Astro.props.class;
         <div class="flex flex-wrap items-center justify-start gap-4 text-black/50 dark:text-white/50">
             <div class="flex items-center">
                 <div class="meta-icon">
-                    <Icon name="material-symbols:calendar-today-outline-rounded"></Icon>
+                    <Icon name="material-symbols:edit-calendar-rounded"></Icon>
                 </div>
                 <span class="text-sm">{formatDateToYYYYMMDD(published)}</span>
             </div>
             {updated && updated !== published && (
                 <div class="flex items-center">
                     <div class="meta-icon">
-                        <Icon name="material-symbols:edit-calendar-outline-rounded"></Icon>
+                        <Icon name="material-symbols:edit-square-outline-rounded"></Icon>
                     </div>
                     <span class="text-sm">{formatDateToYYYYMMDD(updated)}</span>
                 </div>
@@ -62,7 +62,7 @@ const className = Astro.props.class;
                                            class="link-lg transition text-50 text-sm font-medium hover:text-[var(--primary)] whitespace-nowrap"
                                         >
                                                                     {category.split('/').map((part, i, arr) => (
-                                                                        <span>
+                                                                        <span class="capitalize">
                                                                             {part}
                                                                             {i < arr.length - 1 && <span class="mx-0.5 text-black/30 dark:text-white/30 font-normal">/</span>}
                                                                         </span>

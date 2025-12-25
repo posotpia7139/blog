@@ -336,6 +336,10 @@ const { class: className, style } = Astro.props;
     .sub-list > .category-item > :global(a) { font-weight: 400; }
     .grandchild-list > .category-item > :global(a) { font-weight: 300; }
 
+    .category-text-label {
+        text-transform: capitalize;
+    }
+
     /* 활성화 카테고리 (글자색 강조) */
     :global(button.active-category-link) {
         color: var(--primary) !important;
