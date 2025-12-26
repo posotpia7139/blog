@@ -40,11 +40,11 @@ const projectsCollection = defineCollection({
 		nextSlug: z.string().default(""),
 	}),
 });
-const specCollection = defineCollection({
+const aboutCollection = defineCollection({
 	schema: z.object({}),
 });
 export const collections = {
 	posts: postsCollection,
 	projects: projectsCollection,
-	spec: specCollection,
+	about: aboutCollection,
 };

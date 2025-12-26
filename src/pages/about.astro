@@ -10,7 +10,7 @@ import { profileConfig } from "../config";
 import ImageWrapper from "@components/misc/ImageWrapper.astro";
 import { Icon } from "astro-icon/components";
 
-const aboutPost = await getEntry("spec", "about");
+const aboutPost = await getEntry("about", "about");
 
 if (!aboutPost) {
 	throw new Error("About page content not found");
