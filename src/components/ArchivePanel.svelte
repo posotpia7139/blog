@@ -14,8 +14,8 @@ export let sortedPosts: Post[] = [];
 
 // [애니메이션] 숫자가 차오르는 효과를 위한 tweened 변수 (더 강한 감속 효과 적용)
 const animatedCount = tweened(0, {
-	duration: 3000, // 더 드라마틱한 연출을 위해 시간을 조금 늘림
-	easing: (t) => t === 1 ? 1 : 1 - Math.pow(2, -10 * t), // expoOut과 유사하지만 더 날카로운 커스텀 감속
+	duration: 5000, // 더 드라마틱한 연출을 위해 시간을 늘림
+	easing: (t) => 1 - Math.pow(1 - t, 5), // quintOut: 마지막에 훨씬 더 강하게 감속하여 숫자가 하나씩 천천히 차오름
 });
 
 interface Post {
@@ -63,7 +63,7 @@ function setGroups(posts: Post[]) {
 	const isInitialLoad = $animatedCount === 0;
 	setTimeout(() => {
 		animatedCount.set(totalCount);
-	}, isInitialLoad ? 4100 : 0);
+	}, isInitialLoad ? 5000 : 0);
 }
 
 // Initial render with all posts
@@ -189,8 +189,8 @@ onMount(async () => {
                     
                     <!-- 3단: 게시물 개수 (균형 잡힌 리듬으로 등장) -->
                     <div class="flex flex-col items-center justify-center anim-fade-in delay-4100 -mt-0.5">
-                        <span class="inline-block font-medium text-[56px] leading-[0.9] transition-all duration-700 tabular-nums tracking-[-0.05em] text-[var(--primary)]" 
-                                class:count-finished={$animatedCount >= totalCount - 0.1}>
+                        <span class="inline-block font-medium text-[56px] leading-[0.9] tabular-nums tracking-[-0.05em] text-[var(--primary)]" 
+                                class:count-finished={$animatedCount >= totalCount - 0.5}>
                             {Math.round($animatedCount)}
                         </span>
                         <span class="mt-2 text-[14px] font-bold text-black/40 dark:text-white/40 uppercase">
@@ -302,7 +302,7 @@ onMount(async () => {
 
     @keyframes initial-pop {
         0% { transform: scale(1); }
-        50% { transform: scale(1.05); }
+        50% { transform: scale(1.15); }
         100% { transform: scale(1); }
     }
 
