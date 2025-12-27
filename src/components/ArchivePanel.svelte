@@ -1,7 +1,7 @@
 <script lang="ts">
 import { onMount } from "svelte";
-import { tweened } from "svelte/motion";
 import { expoOut } from "svelte/easing";
+import { tweened } from "svelte/motion";
 
 import { siteConfig } from "../config";
 import I18nKey from "../i18n/i18nKey";
@@ -15,7 +15,7 @@ export let sortedPosts: Post[] = [];
 // [애니메이션] 숫자가 차오르는 효과를 위한 tweened 변수 (더 강한 감속 효과 적용)
 const animatedCount = tweened(0, {
 	duration: 5000, // 더 드라마틱한 연출을 위해 시간을 늘림
-	easing: (t) => 1 - Math.pow(1 - t, 5), // quintOut: 마지막에 훨씬 더 강하게 감속하여 숫자가 하나씩 천천히 차오름
+	easing: (t) => 1 - (1 - t) ** 5, // quintOut: 마지막에 훨씬 더 강하게 감속하여 숫자가 하나씩 천천히 차오름
 });
 
 interface Post {
@@ -58,12 +58,15 @@ function setGroups(posts: Post[]) {
 	groups = groupedPostsArray;
 
 	totalCount = posts.length;
-	
+
 	// 모든 텍스트와 연도 애니메이션이 끝난 후(약 4.1초 뒤) 카운트업 시작
 	const isInitialLoad = $animatedCount === 0;
-	setTimeout(() => {
-		animatedCount.set(totalCount);
-	}, isInitialLoad ? 5000 : 0);
+	setTimeout(
+		() => {
+			animatedCount.set(totalCount);
+		},
+		isInitialLoad ? 5000 : 0,
+	);
 }
 
 // Initial render with all posts

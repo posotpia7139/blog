@@ -11,7 +11,7 @@ interface Props {
 
 const className = Astro.props.class;
 const pathname = Astro.url.pathname;
-const isPostPage = pathname.includes('/posts/');
+const isPostPage = pathname.includes("/posts/");
 ---
 <div id="sidebar" class:list={[className, "w-full"]}>
     {/* 카테고리: 항상 상단에 위치하며 어디서든 스크롤 시 위로 사라짐 */}

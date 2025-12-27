@@ -1,19 +1,18 @@
 ---
-import path from "node:path";
 import { getCollection } from "astro:content";
+import path from "node:path";
 import License from "@components/misc/License.astro";
 import Markdown from "@components/misc/Markdown.astro";
 import I18nKey from "@i18n/i18nKey";
 import { i18n } from "@i18n/translation";
 import MainGridLayout from "@layouts/MainGridLayout.astro";
-import { getCollection } from "astro:content";
 import { getDir, getPostUrlBySlug } from "@utils/url-utils";
 import { Icon } from "astro-icon/components";
 import { licenseConfig } from "src/config";
 import ImageWrapper from "../../../components/misc/ImageWrapper.astro";
 import PostMetadata from "../../../components/PostMeta.astro";
-import TOC from "../../../components/widget/TOC.astro";
 import Comment from "../../../components/widget/Comment.astro";
+import TOC from "../../../components/widget/TOC.astro";
 import { profileConfig, siteConfig } from "../../../config";
 import { formatDateToYYYYMMDD } from "../../../utils/date-utils";
 
@@ -72,7 +71,7 @@ const jsonLd = {
     <div class="flex w-full rounded-[var(--radius-large)] overflow-hidden relative mb-4">
         <div id="post-container" class="card-base z-10 px-9 pt-6 pb-4 relative w-full">
             <!-- Date (Subtle) -->
-            <div class="flex items-center text-black/50 dark:text-white/50 mb-2 onload-animation">
+            <div class="flex items-center justify-center text-black/50 dark:text-white/50 mb-2 onload-animation">
                 <div class="transition h-6 w-6 rounded-md bg-black/5 dark:bg-white/10 text-black/50 dark:text-white/50 flex items-center justify-center mr-2">
                     <Icon name="material-symbols:edit-calendar-rounded"></Icon>
                 </div>
@@ -83,7 +82,7 @@ const jsonLd = {
             <div class="relative onload-animation">
                 <div
                     data-pagefind-body data-pagefind-weight="10" data-pagefind-meta="title"
-                    class="transition w-full block font-semibold mb-3 text-left
+                    class="transition w-full block font-semibold mb-3 text-center
                     text-3xl md:text-[2.25rem]/[2.75rem]
                     text-black/90 dark:text-white/90
                     [text-wrap:balance] break-keep
@@ -93,16 +92,19 @@ const jsonLd = {
             </div>
 
             <!-- Project Links -->
-            <div class="flex flex-row items-center gap-5 text-lg mb-8 onload-animation">
+            <div class="flex flex-row items-center justify-center text-lg mb-8 onload-animation">
                 {entry.data.github_url && (
                     <a href={entry.data.github_url} target="_blank" rel="noopener" class="flex items-center text-50 hover:text-[var(--primary)] transition-colors group/link">
-                        <Icon name="fa6-brands:github" class="mr-2 text-xl"></Icon>
+                        <Icon name="fa6-brands:github" class="mr-1.5 text-xl"></Icon>
                         <span class="font-bold">GitHub</span>
                     </a>
                 )}
+                {entry.data.github_url && entry.data.demo_url && (
+                    <span class="mx-4 text-black/20 dark:text-white/20">|</span>
+                )}
                 {entry.data.demo_url && (
                     <a href={entry.data.demo_url} target="_blank" rel="noopener" class="flex items-center text-50 hover:text-[var(--primary)] transition-colors group/link">
-                        <Icon name="material-symbols:open-in-new-rounded" class="mr-2 text-xl"></Icon>
+                        <Icon name="material-symbols:open-in-new-rounded" class="mr-1.5 text-xl"></Icon>
                         <span class="font-bold">Live Demo</span>
                     </a>
                 )}
@@ -123,6 +125,27 @@ const jsonLd = {
             <Markdown class="mb-6 markdown-content onload-animation">
                 <Content />
             </Markdown>
+
+            <!-- Project Links (Bottom) -->
+            {(entry.data.github_url || entry.data.demo_url) && (
+                <div class="flex flex-row items-center justify-center text-lg mb-8 mt-10 onload-animation">
+                    {entry.data.github_url && (
+                        <a href={entry.data.github_url} target="_blank" rel="noopener" class="flex items-center text-50 hover:text-[var(--primary)] transition-colors group/link">
+                            <Icon name="fa6-brands:github" class="mr-1.5 text-xl"></Icon>
+                            <span class="font-bold">GitHub</span>
+                        </a>
+                    )}
+                    {entry.data.github_url && entry.data.demo_url && (
+                        <span class="mx-4 text-black/20 dark:text-white/20">|</span>
+                    )}
+                    {entry.data.demo_url && (
+                        <a href={entry.data.demo_url} target="_blank" rel="noopener" class="flex items-center text-50 hover:text-[var(--primary)] transition-colors group/link">
+                            <Icon name="material-symbols:open-in-new-rounded" class="mr-1.5 text-xl"></Icon>
+                            <span class="font-bold">Live Demo</span>
+                        </a>
+                    )}
+                </div>
+            )}
 
             {licenseConfig.enable && <License title={entry.data.title} slug={entry.slug} pubDate={entry.data.published} class="mb-6 rounded-xl license-container onload-animation"></License>}
 
