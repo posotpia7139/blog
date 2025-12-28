@@ -13,7 +13,7 @@ interface Post {
 		title: string;
 		tags: string[];
 		category?: string | null;
-		published: Date | string; // 하이드레이션 시 문자열로 올 수 있음
+		published: Date | string;
 	};
 }
 
@@ -29,11 +29,45 @@ let {
     sortedPosts = [] 
 } = $props();
 
-// [Svelte 5] 상태 관리 (컴포넌트 내부에서 변경 가능하도록 $state로 선언)
-let tags = $state(initialTags);
-let categories = $state(initialCategories);
-let groups = $state<Group[]>([]);
-let totalCount = $state(0);
+// [Svelte 5] 상태 관리
+let mounted = $state(false);
+let filterTags = $state(initialTags);
+let filterCategories = $state(initialCategories);
+
+// 날짜를 안전하게 Date 객체로 변환하는 헬퍼
+const toDate = (d: Date | string) => {
+    const date = d instanceof Date ? d : new Date(d);
+    return isNaN(date.getTime()) ? new Date() : date; // 유효하지 않은 날짜 대비
+};
+
+// [Svelte 5] $derived를 사용하여 필터링된 게시물 계산
+const filteredPosts = $derived.by(() => {
+    let posts = sortedPosts;
+    if (filterTags.length > 0) {
+        posts = posts.filter(p => Array.isArray(p.data.tags) && p.data.tags.some((t: string) => filterTags.includes(t)));
+    }
+    if (filterCategories.length > 0) {
+        posts = posts.filter(p => p.data.category && filterCategories.some((c: string) => p.data.category === c || p.data.category.startsWith(`${c}/`)));
+    }
+    return posts;
+});
+
+// [Svelte 5] $derived를 사용하여 그룹화된 데이터 계산
+const groups = $derived.by(() => {
+    const grouped = filteredPosts.reduce((acc, post) => {
+        const date = toDate(post.data.published);
+        const year = date.getFullYear();
+        if (!acc[year]) acc[year] = [];
+        acc[year].push(post);
+        return acc;
+    }, {} as Record<number, Post[]>);
+
+    return Object.keys(grouped)
+        .map(year => ({ year: Number.parseInt(year), posts: grouped[Number.parseInt(year)] }))
+        .sort((a, b) => b.year - a.year);
+});
+
+const totalCount = $derived(filteredPosts.length);
 
 // [애니메이션] 숫자가 차오르는 효과
 const animatedCount = tweened(0, {
@@ -41,40 +75,22 @@ const animatedCount = tweened(0, {
 	easing: (t) => 1 - (1 - t) ** 5,
 });
 
-// 날짜를 안전하게 Date 객체로 변환하는 헬퍼
-const toDate = (d: Date | string) => d instanceof Date ? d : new Date(d);
+// 카운트 애니메이션 트리거
+$effect(() => {
+    if (mounted) {
+        animatedCount.set(totalCount);
+    }
+});
 
-function setGroups(posts: Post[]) {
-	const grouped = posts.reduce(
-		(acc, post) => {
-			const date = toDate(post.data.published);
-			const year = date.getFullYear();
-			if (!acc[year]) {
-				acc[year] = [];
-			}
-			acc[year].push(post);
-			return acc;
-		},
-		{} as Record<number, Post[]>,
-	);
-
-	const groupedPostsArray = Object.keys(grouped).map((yearStr) => ({
-		year: Number.parseInt(yearStr, 10),
-		posts: grouped[Number.parseInt(yearStr, 10)],
-	}));
-
-	groupedPostsArray.sort((a, b) => b.year - a.year);
-	groups = groupedPostsArray;
-	totalCount = posts.length;
-
-	const isInitialLoad = $animatedCount === 0;
-	setTimeout(() => {
-		animatedCount.set(totalCount);
-	}, isInitialLoad ? 5000 : 0);
-}
-
-// 초기 로드 시 실행 (SSR 및 클라이언트 하이드레이션 대응)
-setGroups(sortedPosts);
+onMount(() => {
+	mounted = true;
+	const params = new URLSearchParams(window.location.search);
+	const tagParams = params.has("tag") ? params.getAll("tag") : [];
+	const categoryParams = params.has("category") ? params.getAll("category") : [];
+    
+    if (tagParams.length > 0) filterTags = tagParams;
+    if (categoryParams.length > 0) filterCategories = categoryParams;
+});
 
 function formatDate(date: Date | string) {
 	const d = toDate(date);
@@ -86,52 +102,13 @@ function formatDate(date: Date | string) {
 function formatTag(tagList: string[]) {
 	return tagList.map((t) => `#${t}`).join(" ");
 }
-
-onMount(async () => {
-	const params = new URLSearchParams(window.location.search);
-	const tagParams = params.has("tag") ? params.getAll("tag") : [];
-	const categoryParams = params.has("category") ? params.getAll("category") : [];
-	const uncategorizedParam = params.get("uncategorized");
-
-	if (tagParams.length > 0 || categoryParams.length > 0 || uncategorizedParam) {
-		tags = tagParams;
-		categories = categoryParams;
-		let filteredPosts: Post[] = sortedPosts;
-
-		if (tags.length > 0) {
-			filteredPosts = filteredPosts.filter(
-				(post) =>
-					Array.isArray(post.data.tags) &&
-					post.data.tags.some((tag) => tags.includes(tag)),
-			);
-		}
-
-		if (categories.length > 0) {
-			filteredPosts = filteredPosts.filter(
-				(post) =>
-					post.data.category &&
-					categories.some(
-						(c) =>
-							post.data.category === c ||
-							(post.data.category as string).startsWith(`${c}/`),
-					),
-			);
-		}
-
-		if (uncategorizedParam) {
-			filteredPosts = filteredPosts.filter((post) => !post.data.category);
-		}
-		setGroups(filteredPosts);
-	}
-});
 </script>
 
 <div class="card-base px-8 py-6">
     <div class="">
         <div class="transition text-left text-50 flex items-center flex-wrap">
-            {#if categories.length > 0}
-                {@const allParts = categories[0].split('/')}
-                {@const currentTotalCount = groups.reduce((acc, g) => acc + g.posts.length, 0)}
+            {#if filterCategories.length > 0}
+                {@const allParts = filterCategories[0].split('/')}
                 <div class="flex flex-col items-start w-full py-4 pl-2">
                     <div class="flex flex-row items-center flex-wrap justify-start">
                         {#each allParts as part, i}
@@ -144,20 +121,19 @@ onMount(async () => {
                     </div>
                     <div class="mt-1 flex items-center shrink-0">
                         <span class="text-[13px] opacity-60">게시물&nbsp;</span>
-                        <span class="text-[var(--primary)] font-bold text-[13px]">{currentTotalCount}</span>
+                        <span class="text-[var(--primary)] font-bold text-[13px]">{totalCount}</span>
                         <span class="text-[13px] opacity-60">개</span>
                     </div>
                 </div>
-            {:else if tags.length > 0}
-                {@const currentTotalCount = groups.reduce((acc, g) => acc + g.posts.length, 0)}
+            {:else if filterTags.length > 0}
                 <div class="flex flex-col items-start w-full py-4 pl-2">
                     <div class="flex flex-row items-center flex-wrap justify-start">
                         <span class="text-[var(--primary)] text-[13px] mr-1">#</span>
-                        <span class="text-[var(--primary)] font-bold text-[13px]">{tags[0]}</span>
+                        <span class="text-[var(--primary)] font-bold text-[13px]">{filterTags[0]}</span>
                     </div>
                     <div class="mt-1 flex items-center shrink-0">
                         <span class="text-[13px] opacity-60">게시물&nbsp;</span>
-                        <span class="text-[var(--primary)] font-bold text-[13px]">{currentTotalCount}</span>
+                        <span class="text-[var(--primary)] font-bold text-[13px]">{totalCount}</span>
                         <span class="text-[13px] opacity-60">개</span>
                     </div>
                 </div>

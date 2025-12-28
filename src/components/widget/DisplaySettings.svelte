@@ -4,16 +4,19 @@ import { i18n } from "@i18n/translation";
 import Icon from "@iconify/svelte";
 import { getDefaultHue, getHue, setHue } from "@utils/setting-utils";
 
-let hue = getHue();
+let hue = $state(getHue());
 const defaultHue = getDefaultHue();
 
 function resetHue() {
 	hue = getDefaultHue();
 }
 
-$: if (hue || hue === 0) {
-	setHue(hue);
-}
+// [Svelte 5] hue 변경 시 테마 업데이트
+$effect(() => {
+	if (hue || hue === 0) {
+		setHue(hue);
+	}
+});
 </script>
 
 <div id="display-setting" class="float-panel float-panel-closed absolute transition-all w-80 right-4 px-4 py-4">
