@@ -6,48 +6,70 @@ html.is-animating .transition-swup-fade {
     @apply opacity-0 translate-y-4
 }
 
-/* Fade-in animations for components */
-@keyframes fade-in-up {
+/* 1. 기본 페이드 인 (절제의 미학) */
+@keyframes fade-in {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+}
+
+/* 2. 상승하며 페이드 인 (아카이브 스타일) */
+@keyframes slide-up-fade {
     0% {
-        transform: translateY(2rem);
         opacity: 0;
+        transform: translateY(8px);
     }
     100% {
-        transform: translateY(0);
         opacity: 1;
+        transform: translateY(0);
     }
 }
 
-/* Main components */
+/* 3. 글자 개별 등장 (아카이브 스타일) */
+@keyframes char-in {
+    0% {
+        opacity: 0;
+        transform: translateY(4px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* --- 공용 애니메이션 클래스 --- */
+
+/* 사이트 전체 기본 로딩 애니메이션 (300ms로 복구) */
 .onload-animation {
     opacity: 0;
-    animation: 300ms fade-in-up;
-    animation-fill-mode: forwards;
-}
-#navbar {
-    animation-delay: 0ms
-}
-#sidebar {
-    animation-delay: 100ms
-}
-#swup-container {
-    outline: none;
-}
-#content-wrapper {
-    animation-delay: var(--content-delay);
-}
-.footer {
-    animation-delay: 250ms;
-}
-#banner-credit {
-    animation-delay: 400ms;
+    animation: 200ms fade-in forwards;
+    animation-delay: 300ms;
 }
 
-/* Post content */
-#post-container :nth-child(1) { animation-delay: calc(var(--content-delay) + 0ms) }
-#post-container :nth-child(2) { animation-delay: calc(var(--content-delay) + 50ms) }
-#post-container :nth-child(3) { animation-delay: calc(var(--content-delay) + 100ms) }
-#post-container :nth-child(4) { animation-delay: calc(var(--content-delay) + 175ms) }
-#post-container :nth-child(5) { animation-delay: calc(var(--content-delay) + 250ms) }
-#post-container :nth-child(6) { animation-delay: calc(var(--content-delay) + 325ms) }
+/* 요소별 부드러운 상승 페이드 */
+.anim-fade-in {
+    opacity: 0;
+    animation: slide-up-fade 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
 
+/* 글자/아이콘 전용 정밀 등장 */
+.anim-char-in {
+    display: inline-block;
+    opacity: 0;
+    animation: char-in 0.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+/* --- 컴포넌트별 딜레이 제어 (300ms 기반으로 복구) --- */
+#navbar { animation-delay: 300ms }
+#sidebar { animation-delay: 400ms }
+#swup-container { outline: none; }
+#content-wrapper { animation-delay: calc(var(--content-delay) + 300ms); }
+.footer { animation-delay: 550ms; }
+#banner-credit { animation-delay: 700ms; }
+
+/* Post content 시퀀스 */
+#post-container :nth-child(1) { animation-delay: calc(var(--content-delay) + 300ms) }
+#post-container :nth-child(2) { animation-delay: calc(var(--content-delay) + 350ms) }
+#post-container :nth-child(3) { animation-delay: calc(var(--content-delay) + 400ms) }
+#post-container :nth-child(4) { animation-delay: calc(var(--content-delay) + 475ms) }
+#post-container :nth-child(5) { animation-delay: calc(var(--content-delay) + 550ms) }
+#post-container :nth-child(6) { animation-delay: calc(var(--content-delay) + 625ms) }
