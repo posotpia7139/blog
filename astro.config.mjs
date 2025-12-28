@@ -9,6 +9,7 @@ import { defineConfig } from "astro/config";
 import compress from "astro-compress";
 import expressiveCode from "astro-expressive-code";
 import icon from "astro-icon";
+import robotsTxt from "astro-robots-txt";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
 import rehypeComponents from "rehype-components"; /* Render the custom directive content */
 import rehypeExternalLinks from "rehype-external-links";
@@ -109,6 +110,14 @@ export default defineConfig({
 		}),
 		svelte(),
 		sitemap(),
+		robotsTxt({
+			policy: [
+				{
+					userAgent: "*",
+					disallow: ["/_astro/"],
+				},
+			],
+		}),
 		partytown({
 			config: {
 				forward: ["dataLayer.push"],

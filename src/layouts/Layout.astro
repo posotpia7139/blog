@@ -23,6 +23,7 @@ import "../styles/main.css";
 import "photoswipe/style.css";
 import "../styles/photoswipe.css";
 import "overlayscrollbars/overlayscrollbars.css";
+import { SEO } from "astro-seo";
 
 interface Props {
 	title?: string;
@@ -81,30 +82,38 @@ const bannerOffset =
 	  data-overlayscrollbars-initialize
 >
 	<head>
-
-		<title>{pageTitle}</title>
+		<SEO
+			title={pageTitle}
+			description={description || pageTitle}
+			canonical={Astro.url.href}
+			openGraph={{
+				basic: {
+					title: pageTitle,
+					type: setOGTypeArticle ? 'article' : 'website',
+					image: banner.startsWith("/") ? new URL(banner, Astro.url).href : banner,
+					url: Astro.url.href,
+				},
+				optional: {
+					siteName: siteConfig.title,
+					description: description || pageTitle,
+				}
+			}}
+			twitter={{
+				card: 'summary_large_image',
+				title: pageTitle,
+				description: description || pageTitle,
+				image: banner.startsWith("/") ? new URL(banner, Astro.url).href : banner,
+			}}
+			extend={{
+				meta: [
+					{ name: 'author', content: profileConfig.name },
+					{ name: 'viewport', content: 'width=device-width' },
+					{ name: 'generator', content: Astro.generator },
+				],
+			}}
+		/>
 
 		<meta charset="UTF-8" />
-		<meta name="description" content={description || pageTitle}>
-		<meta name="author" content={profileConfig.name}>
-
-		<meta property="og:site_name" content={siteConfig.title}>
-		<meta property="og:url" content={Astro.url}>
-		<meta property="og:title" content={pageTitle}>
-		<meta property="og:description" content={description || pageTitle}>
-		{setOGTypeArticle ? (
-        <meta property="og:type" content="article" />
-        ) : (
-        <meta property="og:type" content="website" />
-        )}
-
-		<meta name="twitter:card" content="summary_large_image">
-		<meta property="twitter:url" content={Astro.url}>
-		<meta name="twitter:title" content={pageTitle}>
-		<meta name="twitter:description" content={description || pageTitle}>
-
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
 		<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css" />
 		{favicons.map(favicon => (
 			<link rel="icon"
