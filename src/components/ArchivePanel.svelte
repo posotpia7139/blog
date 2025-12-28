@@ -1,6 +1,5 @@
 <script lang="ts">
 import { onMount } from "svelte";
-import { expoOut } from "svelte/easing";
 import { tweened } from "svelte/motion";
 
 import { siteConfig } from "../config";
@@ -8,23 +7,13 @@ import I18nKey from "../i18n/i18nKey";
 import { i18n } from "../i18n/translation";
 import { getPostUrlBySlug } from "../utils/url-utils";
 
-export let tags: string[] = [];
-export let categories: string[] = [];
-export let sortedPosts: Post[] = [];
-
-// [애니메이션] 숫자가 차오르는 효과를 위한 tweened 변수 (더 강한 감속 효과 적용)
-const animatedCount = tweened(0, {
-	duration: 5000, // 더 드라마틱한 연출을 위해 시간을 늘림
-	easing: (t) => 1 - (1 - t) ** 5, // quintOut: 마지막에 훨씬 더 강하게 감속하여 숫자가 하나씩 천천히 차오름
-});
-
 interface Post {
 	slug: string;
 	data: {
 		title: string;
 		tags: string[];
 		category?: string | null;
-		published: Date;
+		published: Date | string; // 하이드레이션 시 문자열로 올 수 있음
 	};
 }
 
@@ -33,13 +22,33 @@ interface Group {
 	posts: Post[];
 }
 
-let groups: Group[] = [];
-let totalCount = 0;
+// [Svelte 5] Props 정의
+let { 
+    tags: initialTags = [], 
+    categories: initialCategories = [], 
+    sortedPosts = [] 
+} = $props();
+
+// [Svelte 5] 상태 관리 (컴포넌트 내부에서 변경 가능하도록 $state로 선언)
+let tags = $state(initialTags);
+let categories = $state(initialCategories);
+let groups = $state<Group[]>([]);
+let totalCount = $state(0);
+
+// [애니메이션] 숫자가 차오르는 효과
+const animatedCount = tweened(0, {
+	duration: 5000,
+	easing: (t) => 1 - (1 - t) ** 5,
+});
+
+// 날짜를 안전하게 Date 객체로 변환하는 헬퍼
+const toDate = (d: Date | string) => d instanceof Date ? d : new Date(d);
 
 function setGroups(posts: Post[]) {
 	const grouped = posts.reduce(
 		(acc, post) => {
-			const year = post.data.published.getFullYear();
+			const date = toDate(post.data.published);
+			const year = date.getFullYear();
 			if (!acc[year]) {
 				acc[year] = [];
 			}
@@ -56,25 +65,21 @@ function setGroups(posts: Post[]) {
 
 	groupedPostsArray.sort((a, b) => b.year - a.year);
 	groups = groupedPostsArray;
-
 	totalCount = posts.length;
 
-	// 모든 텍스트와 연도 애니메이션이 끝난 후(약 4.1초 뒤) 카운트업 시작
 	const isInitialLoad = $animatedCount === 0;
-	setTimeout(
-		() => {
-			animatedCount.set(totalCount);
-		},
-		isInitialLoad ? 5000 : 0,
-	);
+	setTimeout(() => {
+		animatedCount.set(totalCount);
+	}, isInitialLoad ? 5000 : 0);
 }
 
-// Initial render with all posts
+// 초기 로드 시 실행 (SSR 및 클라이언트 하이드레이션 대응)
 setGroups(sortedPosts);
 
-function formatDate(date: Date) {
-	const month = (date.getMonth() + 1).toString().padStart(2, "0");
-	const day = date.getDate().toString().padStart(2, "0");
+function formatDate(date: Date | string) {
+	const d = toDate(date);
+	const month = (d.getMonth() + 1).toString().padStart(2, "0");
+	const day = d.getDate().toString().padStart(2, "0");
 	return `${month}-${day}`;
 }
 
@@ -85,9 +90,7 @@ function formatTag(tagList: string[]) {
 onMount(async () => {
 	const params = new URLSearchParams(window.location.search);
 	const tagParams = params.has("tag") ? params.getAll("tag") : [];
-	const categoryParams = params.has("category")
-		? params.getAll("category")
-		: [];
+	const categoryParams = params.has("category") ? params.getAll("category") : [];
 	const uncategorizedParam = params.get("uncategorized");
 
 	if (tagParams.length > 0 || categoryParams.length > 0 || uncategorizedParam) {
@@ -128,7 +131,7 @@ onMount(async () => {
         <div class="transition text-left text-50 flex items-center flex-wrap">
             {#if categories.length > 0}
                 {@const allParts = categories[0].split('/')}
-                {@const totalCount = groups.reduce((acc, g) => acc + g.posts.length, 0)}
+                {@const currentTotalCount = groups.reduce((acc, g) => acc + g.posts.length, 0)}
                 <div class="flex flex-col items-start w-full py-4 pl-2">
                     <div class="flex flex-row items-center flex-wrap justify-start">
                         {#each allParts as part, i}
@@ -141,12 +144,12 @@ onMount(async () => {
                     </div>
                     <div class="mt-1 flex items-center shrink-0">
                         <span class="text-[13px] opacity-60">게시물&nbsp;</span>
-                        <span class="text-[var(--primary)] font-bold text-[13px]">{totalCount}</span>
+                        <span class="text-[var(--primary)] font-bold text-[13px]">{currentTotalCount}</span>
                         <span class="text-[13px] opacity-60">개</span>
                     </div>
                 </div>
             {:else if tags.length > 0}
-                {@const totalCount = groups.reduce((acc, g) => acc + g.posts.length, 0)}
+                {@const currentTotalCount = groups.reduce((acc, g) => acc + g.posts.length, 0)}
                 <div class="flex flex-col items-start w-full py-4 pl-2">
                     <div class="flex flex-row items-center flex-wrap justify-start">
                         <span class="text-[var(--primary)] text-[13px] mr-1">#</span>
@@ -154,16 +157,17 @@ onMount(async () => {
                     </div>
                     <div class="mt-1 flex items-center shrink-0">
                         <span class="text-[13px] opacity-60">게시물&nbsp;</span>
-                        <span class="text-[var(--primary)] font-bold text-[13px]">{totalCount}</span>
+                        <span class="text-[var(--primary)] font-bold text-[13px]">{currentTotalCount}</span>
                         <span class="text-[13px] opacity-60">개</span>
                     </div>
                 </div>
             {:else}
-                {@const newestYear = sortedPosts.length > 0 ? sortedPosts[0].data.published.getFullYear() : new Date().getFullYear()}
-                {@const oldestYear = sortedPosts.length > 0 ? sortedPosts[sortedPosts.length - 1].data.published.getFullYear() : newestYear}
+                {@const newestDate = sortedPosts.length > 0 ? toDate(sortedPosts[0].data.published) : new Date()}
+                {@const oldestDate = sortedPosts.length > 0 ? toDate(sortedPosts[sortedPosts.length - 1].data.published) : newestDate}
+                {@const newestYear = newestDate.getFullYear()}
+                {@const oldestYear = oldestDate.getFullYear()}
                 
                 <div class="flex flex-col items-center w-full py-8 mt-2 mb-6 overflow-hidden gap-4">
-                    <!-- 1단: 제목 (ARCHIVE 및 타이틀 모두 한 글자씩 등장) -->
                     <div class="flex flex-col items-center">
                         <div class="flex flex-row mb-2">
                             {#each "ARCHIVE".split("") as char, i}
@@ -183,14 +187,12 @@ onMount(async () => {
                         </div>
                     </div>
                     
-                    <!-- 2단: 연도 연대기 애니메이션 (균형 잡힌 순차 등장) -->
                     <div class="flex items-center text-[16px] font-bold text-black/70 dark:text-white/70 h-6 mb-2">
                         <span class="anim-fade-in delay-2500">{oldestYear}</span>
                         <div class="year-connector anim-grow-line delay-2900"></div>
                         <span class="anim-fade-in delay-3300">{newestYear}</span>
                     </div>
                     
-                    <!-- 3단: 게시물 개수 (균형 잡힌 리듬으로 등장) -->
                     <div class="flex flex-col items-center justify-center anim-fade-in delay-4100 -mt-0.5">
                         <span class="inline-block font-medium text-[56px] leading-[0.9] tabular-nums tracking-[-0.05em] text-[var(--primary)]" 
                                 class:count-finished={$animatedCount >= totalCount - 0.5}>
@@ -200,7 +202,8 @@ onMount(async () => {
                             게시물
                         </span>
                     </div>
-                </div>            {/if}
+                </div>
+            {/if}
         </div>
     </div>
 
