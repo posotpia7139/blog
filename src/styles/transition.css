@@ -6,13 +6,17 @@ html.is-animating .transition-swup-fade {
     @apply opacity-0 translate-y-4
 }
 
-/* 1. 기본 페이드 인 (절제의 미학) */
+/* 1. 순수 페이드 인 (절제의 미학) */
 @keyframes fade-in {
-    0% { opacity: 0; }
-    100% { opacity: 1; }
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
 }
 
-/* 2. 상승하며 페이드 인 (아카이브 스타일) */
+/* 2. 상승하며 페이드 인 (아카이브 특수 효과용으로만 남김) */
 @keyframes slide-up-fade {
     0% {
         opacity: 0;
@@ -24,7 +28,7 @@ html.is-animating .transition-swup-fade {
     }
 }
 
-/* 3. 글자 개별 등장 (아카이브 스타일) */
+/* 3. 글자 개별 등장 */
 @keyframes char-in {
     0% {
         opacity: 0;
@@ -38,7 +42,7 @@ html.is-animating .transition-swup-fade {
 
 /* --- 공용 애니메이션 클래스 --- */
 
-/* 사이트 전체 기본 로딩 애니메이션 (300ms로 복구) */
+/* 사이트 전체 기본 로딩 애니메이션 (Pure Fade 적용) */
 .onload-animation {
     opacity: 0;
     animation: 200ms fade-in forwards;
@@ -58,7 +62,7 @@ html.is-animating .transition-swup-fade {
     animation: char-in 0.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
-/* --- 컴포넌트별 딜레이 제어 (300ms 기반으로 복구) --- */
+/* --- 컴포넌트별 딜레이 제어 --- */
 #navbar { animation-delay: 300ms }
 #sidebar { animation-delay: 400ms }
 #swup-container { outline: none; }
