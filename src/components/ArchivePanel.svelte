@@ -69,14 +69,13 @@ const START_DELAY = 2300;
 
 $effect(() => {
     // Svelte 5: mounted만 추적하여 로직이 한 번만 실행되도록 함
-    if (mounted) {
+    if (mounted && targetCount > 0) {
         untrack(() => {
-            const testTarget = 1000; // 테스트용 임시 목표
             displayCount = 0;
             isPopping = false;
             
             const startTimeout = setTimeout(() => {
-                const duration = 5000; // [수정] 지속시간 1초 연장 (5초)
+                const duration = 5000; // 카운팅 지속시간 (5초)
                 const frameRate = 1000 / 60;
                 const totalFrames = duration / frameRate;
                 let currentFrame = 0;
@@ -85,17 +84,16 @@ $effect(() => {
                     currentFrame++;
                     const progress = currentFrame / totalFrames;
                     
-                    // [수정] 후반부가 초반부보다 훨씬 느려지는 비대칭 Ease-In-Out 공식
-                    // 초반은 3차 가속, 후반은 7차 감속으로 설정하여 후반부의 '여운'을 극대화함
+                    // 후반부가 초반부보다 훨씬 느려지는 비대칭 Ease-In-Out 공식
                     const p = 3;
                     const q = 7;
                     const ease = Math.pow(progress, p) / (Math.pow(progress, p) + Math.pow(1 - progress, q));
                         
-                    displayCount = testTarget * ease;
+                    displayCount = targetCount * ease;
 
-                    // [핵심 수정] 반올림한 숫자가 목표치에 도달하는 순간 즉시 팝!
-                    if (Math.round(displayCount) >= testTarget && !isPopping) {
-                        displayCount = testTarget;
+                    // [핵심] 실제 게시물 숫자에 도달하는 순간 즉시 팝!
+                    if (Math.round(displayCount) >= targetCount && !isPopping) {
+                        displayCount = targetCount;
                         isPopping = true;
                     }
 
