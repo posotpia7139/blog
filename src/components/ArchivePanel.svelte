@@ -1,5 +1,5 @@
 <script lang="ts">
-import { onMount } from "svelte";
+import { onMount, untrack } from "svelte";
 import { siteConfig } from "../config";
 import I18nKey from "../i18n/i18nKey";
 import { i18n } from "../i18n/translation";
@@ -28,6 +28,7 @@ let {
 
 let mounted = $state(false);
 let displayCount = $state(0); 
+let isPopping = $state(false);
 let filterTags = $state(initialTags);
 let filterCategories = $state(initialCategories);
 
@@ -63,32 +64,47 @@ const groups = $derived.by(() => {
 
 const targetCount = $derived(filteredPosts.length);
 
-// [타임라인 최종 보정] 숫자 노출(2200ms) + 추가 지연(400ms) = 2600ms
-const START_DELAY = 2600; 
+// [타임라인] 숫자 노출 시작 지연 시간
+const START_DELAY = 2300; 
 
 $effect(() => {
-    if (mounted && targetCount > 0) {
-        displayCount = 0;
-        const startTimeout = setTimeout(() => {
-            const duration = 2000; 
-            const frameRate = 1000 / 60;
-            const totalFrames = duration / frameRate;
-            let currentFrame = 0;
+    // Svelte 5: mounted만 추적하여 로직이 한 번만 실행되도록 함
+    if (mounted) {
+        untrack(() => {
+            const testTarget = 1000; // 테스트용 임시 목표
+            displayCount = 0;
+            isPopping = false;
+            
+            const startTimeout = setTimeout(() => {
+                const duration = 5000; // [수정] 지속시간 1초 연장 (5초)
+                const frameRate = 1000 / 60;
+                const totalFrames = duration / frameRate;
+                let currentFrame = 0;
 
-            const timer = setInterval(() => {
-                currentFrame++;
-                const progress = currentFrame / totalFrames;
-                const ease = 1 - Math.pow(1 - progress, 6);
-                displayCount = targetCount * ease;
+                const timer = setInterval(() => {
+                    currentFrame++;
+                    const progress = currentFrame / totalFrames;
+                    
+                    // [수정] 후반부가 초반부보다 훨씬 느려지는 비대칭 Ease-In-Out 공식
+                    // 초반은 3차 가속, 후반은 7차 감속으로 설정하여 후반부의 '여운'을 극대화함
+                    const p = 3;
+                    const q = 7;
+                    const ease = Math.pow(progress, p) / (Math.pow(progress, p) + Math.pow(1 - progress, q));
+                        
+                    displayCount = testTarget * ease;
 
-                if (currentFrame >= totalFrames) {
-                    displayCount = targetCount;
-                    clearInterval(timer);
-                }
-            }, frameRate);
-        }, START_DELAY);
+                    // [핵심 수정] 반올림한 숫자가 목표치에 도달하는 순간 즉시 팝!
+                    if (Math.round(displayCount) >= testTarget && !isPopping) {
+                        displayCount = testTarget;
+                        isPopping = true;
+                    }
 
-        return () => clearTimeout(startTimeout);
+                    if (currentFrame >= totalFrames) {
+                        clearInterval(timer);
+                    }
+                }, frameRate);
+            }, START_DELAY);
+        });
     }
 });
 
@@ -156,11 +172,11 @@ function formatTag(tagList: string[]) {
                     <span class="anim-fade-in delay-y-end">{newestDate.getFullYear()}</span>
                 </div>
                 
-                <div class="flex flex-col items-center justify-center -mt-0.5">
-                    <span class="inline-block font-medium text-[56px] leading-[0.9] tabular-nums tracking-[-0.05em] text-[var(--primary)] anim-fade-in delay-number">
+                <div class="flex flex-col items-center justify-center -mt-0.5 anim-fade-in delay-number">
+                    <span class="inline-block font-medium text-[56px] leading-[0.9] tabular-nums tracking-[-0.05em] text-[var(--primary)] {isPopping ? 'anim-pop' : ''}">
                         {Math.round(displayCount)}
                     </span>
-                    <span class="mt-2 text-[14px] font-bold text-black/40 dark:text-white/40 uppercase anim-fade-in delay-label">
+                    <span class="mt-2 text-[14px] font-bold text-black/40 dark:text-white/40 uppercase">
                         게시물
                     </span>
                 </div>
@@ -207,10 +223,29 @@ function formatTag(tagList: string[]) {
     }
     .anim-grow-line { animation: grow-line 1s cubic-bezier(0.33, 1, 0.68, 1) both; }
 
-    /* [7단계 균등 타임라인 - 200ms 텀 고수] */
-    .delay-y-start { animation-delay: 1400ms; } /* 3. 시작 연도 */
-    .delay-y-line  { animation-delay: 1600ms; } /* 4. 가로바 */
-    .delay-y-end   { animation-delay: 1800ms; } /* 5. 종료 연도 */
-    .delay-label   { animation-delay: 2000ms; } /* 6. 게시물 라벨 */
-    .delay-number  { animation-delay: 2200ms; } /* 7. 숫자 등장 */
+    .delay-y-start { animation-delay: 1400ms; }
+    .delay-y-line  { animation-delay: 1600ms; }
+    .delay-y-end   { animation-delay: 1800ms; }
+    .delay-number  { animation-delay: 2200ms; }
+
+    @keyframes pop-effect {
+        0% { transform: scale(1); }
+        10% { transform: scale(1.3); }   /* 1차 박동: 팡! */
+        20% { transform: scale(0.9); }   /* 1차 수축 */
+        30% { transform: scale(1.2); }   /* 2차 박동: 팝! */
+        40% { transform: scale(0.95); }  /* 2차 수축 */
+        50% { transform: scale(1.1); }   /* 3차 박동: 툭 */
+        60% { transform: scale(0.97); }  /* 3차 수축 */
+        70% { transform: scale(1.06); }  /* 4차 박동: 잔상 */
+        80% { transform: scale(0.985); } /* 4차 수축 */
+        90% { transform: scale(1.03); }  /* 5차 박동: 미세 여운 */
+        95% { transform: scale(0.995); } /* 5차 수축 */
+        98% { transform: scale(1.012); } /* 6차 박동: 찰나의 떨림 */
+        100% { transform: scale(1); }    /* 최종 안착 */
+    }
+    .anim-pop {
+        display: inline-block;
+        will-change: transform;
+        animation: pop-effect 1.4s ease-in-out forwards;
+    }
 </style>
