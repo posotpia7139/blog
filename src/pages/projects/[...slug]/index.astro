@@ -92,10 +92,10 @@ const jsonLd = {
             </div>
 
             <!-- Project Links -->
-            <div class="flex flex-row items-center justify-center text-lg mb-8 onload-animation">
+            <div class="flex flex-row items-center justify-center text-lg mb-8 onload-animation text-90">
                 {entry.data.github_url && (
-                    <a href={entry.data.github_url} target="_blank" rel="noopener" class="flex items-center text-50 hover:text-[var(--primary)] transition-colors group/link">
-                        <Icon name="fa6-brands:github" class="mr-1.5 text-xl"></Icon>
+                    <a href={entry.data.github_url} target="_blank" rel="noopener" class="flex items-center hover:text-[var(--primary)] transition-colors group/link px-4 py-4 -mx-4 -my-4 gap-2">
+                        <Icon name="fa6-brands:github" class="text-xl"></Icon>
                         <span class="font-bold">GitHub</span>
                     </a>
                 )}
@@ -103,8 +103,8 @@ const jsonLd = {
                     <span class="mx-4 text-black/20 dark:text-white/20">|</span>
                 )}
                 {entry.data.demo_url && (
-                    <a href={entry.data.demo_url} target="_blank" rel="noopener" class="flex items-center text-50 hover:text-[var(--primary)] transition-colors group/link">
-                        <Icon name="material-symbols:open-in-new-rounded" class="mr-1.5 text-xl"></Icon>
+                    <a href={entry.data.demo_url} target="_blank" rel="noopener" class="flex items-center hover:text-[var(--primary)] transition-colors group/link px-4 py-4 -mx-4 -my-4 gap-2">
+                        <Icon name="material-symbols:open-in-new-rounded" class="text-xl"></Icon>
                         <span class="font-bold">Live Demo</span>
                     </a>
                 )}
@@ -128,10 +128,10 @@ const jsonLd = {
 
             <!-- Project Links (Bottom) -->
             {(entry.data.github_url || entry.data.demo_url) && (
-                <div class="flex flex-row items-center justify-center text-lg mb-8 mt-10 onload-animation">
+                <div class="flex flex-row items-center justify-center text-lg mb-8 mt-10 onload-animation text-90">
                     {entry.data.github_url && (
-                        <a href={entry.data.github_url} target="_blank" rel="noopener" class="flex items-center text-50 hover:text-[var(--primary)] transition-colors group/link">
-                            <Icon name="fa6-brands:github" class="mr-1.5 text-xl"></Icon>
+                        <a href={entry.data.github_url} target="_blank" rel="noopener" class="flex items-center hover:text-[var(--primary)] transition-colors group/link px-4 py-4 -mx-4 -my-4 gap-2">
+                            <Icon name="fa6-brands:github" class="text-xl"></Icon>
                             <span class="font-bold">GitHub</span>
                         </a>
                     )}
@@ -139,8 +139,8 @@ const jsonLd = {
                         <span class="mx-4 text-black/20 dark:text-white/20">|</span>
                     )}
                     {entry.data.demo_url && (
-                        <a href={entry.data.demo_url} target="_blank" rel="noopener" class="flex items-center text-50 hover:text-[var(--primary)] transition-colors group/link">
-                            <Icon name="material-symbols:open-in-new-rounded" class="mr-1.5 text-xl"></Icon>
+                        <a href={entry.data.demo_url} target="_blank" rel="noopener" class="flex items-center hover:text-[var(--primary)] transition-colors group/link px-4 py-4 -mx-4 -my-4 gap-2">
+                            <Icon name="material-symbols:open-in-new-rounded" class="text-xl"></Icon>
                             <span class="font-bold">Live Demo</span>
                         </a>
                     )}

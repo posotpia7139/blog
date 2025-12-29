@@ -73,9 +73,9 @@ const { remarkPluginFrontmatter } = await entry.render();
         <!-- 2-tier metadata or Project Links -->
         <div class:list={["relative flex flex-col gap-1.5 pointer-events-auto", {"mb-4": !isProject, "mb-0": isProject}]}>
             {isProject ? (
-                <div class="flex items-center text-base md:text-lg meta-content w-fit pointer-events-auto">
+                <div class="flex items-center text-base md:text-lg meta-content w-fit pointer-events-auto text-90">
                     {github_url && (
-                        <a href={github_url} target="_blank" rel="noopener" class="meta-link relative z-30 flex items-center text-50 hover:text-[var(--primary)] transition-colors group/link pl-4 pr-4 py-4 -ml-4 -my-4 gap-2">
+                        <a href={github_url} target="_blank" rel="noopener" class="meta-link relative z-30 flex items-center hover:text-[var(--primary)] transition-colors group/link pl-4 pr-4 py-4 -ml-4 -my-4 gap-2">
                             <Icon name="fa6-brands:github" class="text-lg md:text-xl"></Icon>
                             <span class="font-bold">GitHub</span>
                         </a>
@@ -84,7 +84,7 @@ const { remarkPluginFrontmatter } = await entry.render();
                         <span class="mx-px text-black/20 dark:text-white/20">|</span>
                     )}
                     {demo_url && (
-                        <a href={demo_url} target="_blank" rel="noopener" class="meta-link relative z-30 flex items-center text-50 hover:text-[var(--primary)] transition-colors group/link pl-4 pr-4 py-4 -my-4 gap-2">
+                        <a href={demo_url} target="_blank" rel="noopener" class="meta-link relative z-30 flex items-center hover:text-[var(--primary)] transition-colors group/link pl-4 pr-4 py-4 -my-4 gap-2">
                             <Icon name="material-symbols:open-in-new-rounded" class="text-lg md:text-xl"></Icon>
                             <span class="font-bold">Live Demo</span>
                         </a>
