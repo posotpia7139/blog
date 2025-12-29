@@ -111,7 +111,7 @@ function formatTag(tagList: string[]) {
 }
 </script>
 
-<div class="card-base px-8 py-6 onload-animation">
+<div class="card-base px-8 py-6 onload-animation min-h-[400px] md:min-h-[600px]">
     <div class="transition text-left text-50 flex items-center flex-wrap">
         {#if filterCategories.length > 0 || filterTags.length > 0}
             <div class="flex flex-col items-start w-full py-4 pl-2">
