@@ -124,8 +124,8 @@ const mainPanelTop = siteConfig.banner.enable
 
                 const observer = new IntersectionObserver((entries) => {
                     entries.forEach(entry => {
-                        // intersectionRatio가 0.5보다 작고, 요소가 화면 상단으로 나가는 중일 때
-                        if (entry.intersectionRatio < 0.5 && entry.boundingClientRect.top < 0) {
+                        // intersectionRatio가 0.95보다 작고, 요소가 화면 상단으로 나가는 중일 때
+                        if (entry.intersectionRatio < 0.95 && entry.boundingClientRect.top < 0) {
                             // 사이드 TOC 노출
                             floatingToc.classList.remove('opacity-0', 'pointer-events-none');
                             floatingToc.classList.add('opacity-100', 'pointer-events-auto');
@@ -136,7 +136,7 @@ const mainPanelTop = siteConfig.banner.enable
                         }
                     });
                 }, { 
-                    threshold: [0, 0.5] // 0%와 50% 가시성 지점에서 감지
+                    threshold: [0, 0.95] // 0%와 95% 가시성 지점에서 감지
                 });
 
                 observer.observe(topToc);

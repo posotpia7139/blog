@@ -101,11 +101,10 @@ const { remarkPluginFrontmatter } = await entry.render();
                                     <div class="flex items-center">
                                         {category.split('/').map((part, i, arr) => (
                                             <>
-                                                <span class="capitalize">{part}</span>
-                                                {i < arr.length - 1 && <span class="mx-1 opacity-30">/</span>}
-                                            </>
-                                        ))}
-                                    </div>
+                                                                                            <span class="capitalize">{part}</span>
+                                                                                            {i < arr.length - 1 && <span class="mx-1 opacity-50">/</span>}
+                                                                                        </>
+                                                                                    ))}                                    </div>
                                 </a>
                             </div>
                         </div>

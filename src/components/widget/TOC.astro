@@ -100,54 +100,46 @@ class TableOfContents extends HTMLElement {
     tocEntries: HTMLAnchorElement[] = [];
     active: boolean[] = [];
     activeIndicator: HTMLElement | null = null;
+    lastScrollY = 0;
+    isScrollingDown = true;
 
     constructor() {
         super();
         this.observer = new IntersectionObserver(
-            this.markVisibleSection, { threshold: 0 }
+            this.markVisibleSection, { 
+                threshold: 0,
+                rootMargin: "-15% 0px 0px 0px"
+            }
         );
     };
 
     markVisibleSection = (entries: IntersectionObserverEntry[]) => {
-        entries.forEach((entry) => {
-            const id = entry.target.children[0]?.getAttribute("id");
-            const idx = id ? this.headingIdxMap.get(id) : undefined;
-            if (idx != undefined)
-                this.active[idx] = entry.isIntersecting;
-
-            if (entry.isIntersecting && this.anchorNavTarget == entry.target.firstChild)
-                this.anchorNavTarget = null;
-        });
-
         this.fallback();
         this.update();
     };
 
     toggleActiveHeading = () => {
-        let i = this.active.length - 1;
-        let min = this.active.length - 1, max = -1;
-        while (i >= 0 && !this.active[i]) {
-            this.tocEntries[i].classList.remove(this.visibleClass);
-            i--;
+        let activeIdx = -1;
+
+        for (let i = this.active.length - 1; i >= 0; i--) {
+            if (this.active[i]) {
+                activeIdx = i;
+                break;
+            }
         }
-        while (i >= 0 && this.active[i]) {
-            this.tocEntries[i].classList.add(this.visibleClass);
-            min = Math.min(min, i);
-            max = Math.max(max, i);
-            i--;
-        }
-        while (i >= 0) {
-            this.tocEntries[i].classList.remove(this.visibleClass);
-            i--;
-        }
-        if (min > max) {
+
+        this.tocEntries.forEach(entry => entry.classList.remove(this.visibleClass));
+
+        if (activeIdx === -1) {
             this.activeIndicator?.setAttribute("style", `opacity: 0`);
         } else {
-            const entry = this.tocEntries[min];
+            const entry = this.tocEntries[activeIdx];
+            entry.classList.add(this.visibleClass);
+
             const top = entry.offsetTop;
             const left = entry.offsetLeft;
             const width = entry.offsetWidth;
-            const height = (this.tocEntries[max].offsetTop + this.tocEntries[max].offsetHeight) - top;
+            const height = entry.offsetHeight;
             
             this.activeIndicator?.setAttribute("style", `top: ${top}px; left: ${left}px; width: ${width}px; height: ${height}px; opacity: 1`);
         }
@@ -160,15 +152,9 @@ class TableOfContents extends HTMLElement {
         if (!activeHeading.length) return;
 
         const topmost = activeHeading[0];
-        const bottommost = activeHeading[activeHeading.length - 1];
         const tocHeight = this.tocEl.clientHeight;
 
-        let top;
-        if (bottommost.getBoundingClientRect().bottom -
-            topmost.getBoundingClientRect().top < 0.9 * tocHeight)
-            top = topmost.offsetTop - 32;
-        else
-            top = bottommost.offsetTop - tocHeight * 0.8;
+        let top = topmost.offsetTop - 32;
 
         this.tocEl.scrollTo({
             top,
@@ -185,26 +171,33 @@ class TableOfContents extends HTMLElement {
     };
 
     fallback = () => {
-        if (!this.sections.length) return;
+        if (!this.headings.length) return;
 
-        let anyActive = false;
-        for (let i = 0; i < this.sections.length; i++) {
-            let offsetTop = this.sections[i].getBoundingClientRect().top;
-            let offsetBottom = this.sections[i].getBoundingClientRect().bottom;
+        this.active.fill(false);
 
-            if (this.isInRange(offsetTop, 0, window.innerHeight)
-                || this.isInRange(offsetBottom, 0, window.innerHeight)
-                || (offsetTop < 0 && offsetBottom > window.innerHeight)) {                    
-                this.markActiveHeading(i);
-                anyActive = true;
-            }
-            else if (offsetTop > window.innerHeight) break;
+        // 최상단일 때는 무조건 첫 번째 항목 활성화
+        if (window.scrollY < 50) {
+            this.active[0] = true;
+            return;
         }
 
-        if (!anyActive && this.sections.length > 0) {
-            if (this.sections[this.sections.length - 1].getBoundingClientRect().bottom < 0) {
-                this.markActiveHeading(this.sections.length - 1);
+        // 스크롤 방향에 따라 기준선을 다르게 설정하여 '지연 현상' 해결
+        const downThreshold = window.innerHeight * 0.15;
+        const upThreshold = window.innerHeight * 0.1; 
+        const thresholdLine = this.isScrollingDown ? downThreshold : upThreshold;
+
+        let currentIdx = -1;
+        for (let i = 0; i < this.headings.length; i++) {
+            const rect = this.headings[i].getBoundingClientRect();
+            if (rect.top <= thresholdLine) {
+                currentIdx = i;
+            } else {
+                break;
             }
+        }
+
+        if (currentIdx !== -1) {
+            this.active[currentIdx] = true;
         }
     };
 
@@ -228,6 +221,15 @@ class TableOfContents extends HTMLElement {
         }
     };
 
+    handleScroll = () => {
+        const currentScrollY = window.scrollY;
+        this.isScrollingDown = currentScrollY > this.lastScrollY;
+        this.lastScrollY = currentScrollY;
+        
+        this.fallback();
+        this.update();
+    };
+
     isInRange(value: number, min: number, max: number) {
         return min < value && value < max;
     };
@@ -247,6 +249,9 @@ class TableOfContents extends HTMLElement {
         } else {
             this.init();
         }
+
+        this.lastScrollY = window.scrollY;
+        window.addEventListener('scroll', this.handleScroll, { passive: true });
     };
 
     init() {
@@ -266,46 +271,32 @@ class TableOfContents extends HTMLElement {
 
         if (this.tocEntries.length === 0) return;
 
-        this.sections = new Array(this.tocEntries.length);
         this.headings = new Array(this.tocEntries.length);
         for (let i = 0; i < this.tocEntries.length; i++) {
             const id = decodeURIComponent(this.tocEntries[i].hash?.substring(1));
             const heading = document.getElementById(id);
-            const section = heading?.parentElement;
-            if (heading instanceof HTMLElement && section instanceof HTMLElement) {
+            if (heading instanceof HTMLElement) {
                 this.headings[i] = heading;
-                this.sections[i] = section;
                 this.headingIdxMap.set(id, i);
             }
         }
         this.active = new Array(this.tocEntries.length).fill(false);
 
-        this.sections.forEach((section) =>
-            this.observer.observe(section)
-        );
-
-        if (window.location.hash) {
-            const id = decodeURIComponent(window.location.hash.substring(1));
-            const idx = this.headingIdxMap.get(id);
-            if (idx !== undefined) {
-                this.markActiveHeading(idx);
-                setTimeout(() => {
-                    this.fallback();
-                    this.update();
-                }, 100);
-            }
-        }
+        this.headings.forEach((heading) => {
+            if (heading) this.observer.observe(heading);
+        });
 
         this.fallback();
         this.update();
     };
 
     disconnectedCallback() {
-        this.sections.forEach((section) =>
-            this.observer.unobserve(section)
-        );
+        this.headings.forEach((heading) => {
+            if (heading) this.observer.unobserve(heading);
+        });
         this.observer.disconnect();
         this.tocEl?.removeEventListener("click", this.handleAnchorClick);
+        window.removeEventListener('scroll', this.handleScroll);
     };
 }
 

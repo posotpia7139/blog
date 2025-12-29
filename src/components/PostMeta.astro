@@ -64,7 +64,7 @@ const className = Astro.props.class;
                                                                     {category.split('/').map((part, i, arr) => (
                                                                         <span class="capitalize">
                                                                             {part}
-                                                                            {i < arr.length - 1 && <span class="mx-0.5 text-black/30 dark:text-white/30 font-normal">/</span>}
+                                                                            {i < arr.length - 1 && <span class="mx-0.5 text-black/50 dark:text-white/50 font-normal select-none cursor-default">/</span>}
                                                                         </span>
                                                                     ))}
                                             
@@ -88,7 +88,7 @@ const className = Astro.props.class;
                                 >
                                     {tag}
                                 </a>
-                                {i < tags.length - 1 && <span class="mx-1.5 text-black/75 dark:text-white/75 font-bold">·</span>}
+                                {i < tags.length - 1 && <span class="mx-1.5 text-black/75 dark:text-white/75 font-bold select-none cursor-default">·</span>}
                             </>
                         ))}
                     </div>
