@@ -65,7 +65,9 @@ const { remarkPluginFrontmatter } = await entry.render();
 
                     <!-- description -->
                     <div class:list={["relative z-10 pointer-events-none", {"pr-[calc(var(--coverWidth)+1rem)]": hasCover}]}>
-                        <div class:list={["transition text-75 pr-4 [text-wrap:balance] break-keep text-sm md:text-base", {"line-clamp-3": isProject, "line-clamp-2": !isProject}, {"mb-3.5": !isProject, "mb-3": isProject}]}>
+                        <div class:list={["transition text-75 [text-wrap:balance] break-keep text-sm md:text-base line-clamp-3", {"mb-3.5": !isProject, "mb-3": isProject}]}
+                             style={hasCover ? "mask-image: linear-gradient(to right, black 90%, transparent 100%);" : ""}
+                        >
                             { description || remarkPluginFrontmatter.excerpt }
                         </div>
                     </div>
@@ -94,7 +96,9 @@ const { remarkPluginFrontmatter } = await entry.render();
                 <>
                     <!-- Tier 1: Category -->
                     {category && (
-                        <div class="flex items-center text-[13px] text-50">
+                        <div class:list={["flex items-center text-[13px] text-50", {"pr-[calc(var(--coverWidth)+1rem)]": hasCover}]}
+                             style={hasCover ? "mask-image: linear-gradient(to right, black 80%, transparent 100%);" : ""}
+                        >
                             <a href={getCategoryUrl(category)} class="meta-link relative z-30 pointer-events-auto hover:text-[var(--primary)] transition-colors pl-2 pr-2 pt-4 pb-2 -ml-2 -my-4 flex items-center gap-2">
                                 <div class="meta-icon !bg-[var(--primary)]/10 !text-[var(--primary)] !w-6 !h-6 !mr-0 shrink-0">
                                     <Icon name="material-symbols:folder-open-outline-rounded" class="text-base"></Icon>
@@ -113,8 +117,9 @@ const { remarkPluginFrontmatter } = await entry.render();
                     
                     <!-- Tier 2: Tags -->
                     {tags && tags.length > 0 && (
-                        <div class="flex items-center text-[12px] text-50 w-full mt-2 relative z-30 pointer-events-auto">
-                            <div class="flex items-center overflow-hidden w-full whitespace-nowrap gap-2 pl-2 -ml-2" style="mask-image: linear-gradient(to right, black 90%, transparent 100%);">
+                        <div class:list={["flex items-center text-[12px] text-50 w-full mt-2 relative z-30 pointer-events-auto", {"pr-[calc(var(--coverWidth)+1rem)]": hasCover}]}>
+                            <div class="flex items-center overflow-hidden w-full whitespace-nowrap gap-2 pl-2 -ml-2" 
+                                 style={hasCover ? "mask-image: linear-gradient(to right, black 80%, transparent 100%);" : ""}>
                                 <div class="meta-icon !bg-[var(--primary)]/10 !text-[var(--primary)] !w-6 !h-6 !mr-0 shrink-0">
                                     <Icon name="material-symbols:tag-rounded" class="text-base"></Icon>
                                 </div>
@@ -134,7 +139,7 @@ const { remarkPluginFrontmatter } = await entry.render();
 
         <!-- word count, read time, and date (Hidden for Projects) -->
         {!isProject && (
-            <div class="text-sm text-black/50 dark:text-white/50 flex flex-wrap gap-y-2 gap-x-4 transition relative z-10 pointer-events-none mt-2">
+            <div class:list={["text-sm text-black/50 dark:text-white/50 flex flex-wrap gap-y-2 gap-x-4 transition relative z-10 pointer-events-none mt-2", {"pr-[calc(var(--coverWidth)+1rem)]": hasCover}]}>
                 <div class="flex items-center pl-2 -ml-2 pb-2">
                     <div class="meta-icon !bg-black/5 dark:!bg-white/10 !text-black/50 dark:!text-white/50 !w-6 !h-6 !mr-2 shrink-0">
                         <Icon name="material-symbols:edit-calendar-rounded" class="text-base"></Icon>
@@ -156,8 +161,9 @@ const { remarkPluginFrontmatter } = await entry.render();
 
     {hasCover && <div
                     class:list={[
-                        "w-[var(--coverWidth)] absolute top-6 md:top-7 right-3 rounded-xl overflow-hidden active:scale-95 z-10 pointer-events-none",
-                        "aspect-square"
+                        "absolute top-6 md:top-7 right-3 rounded-xl overflow-hidden active:scale-95 z-40 pointer-events-none",
+                        "aspect-square",
+                        {"bottom-6": !isProject, "bottom-4 md:bottom-5": isProject}
                     ]} >
         <ImageWrapper src={image} basePath={path.join("content", entry.collection, getDir(entry.id))} alt="Cover Image of the Post"
                   class="w-full h-full object-cover">
