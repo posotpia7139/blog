@@ -52,8 +52,8 @@ const { remarkPluginFrontmatter } = await entry.render();
     {/* 전체 카드 링크 - peer로 설정하여 호버 상태를 추적함. z-index는 메타 링크(z-30)보다 낮게 설정. */}
     <a href={url} aria-label={title} class="absolute inset-0 z-20 peer"></a>
 
-    <div class:list={["px-6 pt-6 md:px-9 md:pt-7 relative", {"w-full": !hasCover, "w-[calc(100%_-_var(--coverWidth)_-_12px)]": hasCover}, {"pb-6": !isProject, "pb-4 md:pb-5": isProject}]}>
-        <div class="relative mb-3">
+    <div class:list={["px-6 pt-6 md:px-9 md:pt-7 relative w-full", {"pb-6": !isProject, "pb-4 md:pb-5": isProject}]}>
+        <div class:list={["relative mb-3", {"pr-[calc(var(--coverWidth)+1rem)]": hasCover}]}>
             <div class="transition w-full font-semibold text-2xl md:text-3xl text-90
             title-text
             active:text-[var(--title-active)]
@@ -64,14 +64,14 @@ const { remarkPluginFrontmatter } = await entry.render();
         </div>
 
                     <!-- description -->
-                    <div class="relative z-10 pointer-events-none">
+                    <div class:list={["relative z-10 pointer-events-none", {"pr-[calc(var(--coverWidth)+1rem)]": hasCover}]}>
                         <div class:list={["transition text-75 pr-4 [text-wrap:balance] break-keep text-sm md:text-base", {"line-clamp-3": isProject, "line-clamp-2": !isProject}, {"mb-3.5": !isProject, "mb-3": isProject}]}>
                             { description || remarkPluginFrontmatter.excerpt }
                         </div>
                     </div>
 
         <!-- 2-tier metadata or Project Links -->
-        <div class:list={["relative flex flex-col gap-1.5 pointer-events-auto", {"mb-4": !isProject, "mb-0": isProject}]}>
+        <div class:list={["relative flex flex-col gap-1.5 pointer-events-auto", {"pr-[calc(var(--coverWidth)+1rem)]": hasCover}]}>
             {isProject ? (
                 <div class="flex items-center text-base md:text-lg meta-content w-fit pointer-events-auto text-90">
                     {github_url && (
@@ -95,33 +95,35 @@ const { remarkPluginFrontmatter } = await entry.render();
                     <!-- Tier 1: Category -->
                     {category && (
                         <div class="flex items-center text-[13px] text-50">
-                            <div class="flex items-center">
-                                <a href={getCategoryUrl(category)} class="meta-link relative z-30 pointer-events-auto hover:text-[var(--primary)] transition-colors pl-2 pr-2 py-4 -ml-2 -my-4 flex items-center gap-2">
-                                    <Icon name="material-symbols:folder-open-outline-rounded" class="text-lg text-[var(--primary)]"></Icon>
-                                    <div class="flex items-center">
-                                        {category.split('/').map((part, i, arr) => (
-                                            <>
-                                                                                            <span class="capitalize">{part}</span>
-                                                                                            {i < arr.length - 1 && <span class="mx-1 opacity-50">/</span>}
-                                                                                        </>
-                                                                                    ))}                                    </div>
-                                </a>
-                            </div>
+                            <a href={getCategoryUrl(category)} class="meta-link relative z-30 pointer-events-auto hover:text-[var(--primary)] transition-colors pl-2 pr-2 pt-4 pb-2 -ml-2 -my-4 flex items-center gap-2">
+                                <div class="meta-icon !bg-[var(--primary)]/10 !text-[var(--primary)] !w-6 !h-6 !mr-0 shrink-0">
+                                    <Icon name="material-symbols:folder-open-outline-rounded" class="text-base"></Icon>
+                                </div>
+                                <div class="flex items-center">
+                                    {category.split('/').map((part, i, arr) => (
+                                        <>
+                                            <span class="capitalize">{part}</span>
+                                            {i < arr.length - 1 && <span class="mx-1 opacity-50">/</span>}
+                                        </>
+                                    ))}
+                                </div>
+                            </a>
                         </div>
                     )}
                     
                     <!-- Tier 2: Tags -->
                     {tags && tags.length > 0 && (
-                        <div class="flex items-center text-[13px] text-50 w-full overflow-hidden">
-                            <div class="flex truncate items-center">
+                        <div class="flex items-center text-[12px] text-50 w-full mt-2 relative z-30 pointer-events-auto">
+                            <div class="flex items-center overflow-hidden w-full whitespace-nowrap gap-2 pl-2 -ml-2" style="mask-image: linear-gradient(to right, black 90%, transparent 100%);">
+                                <div class="meta-icon !bg-[var(--primary)]/10 !text-[var(--primary)] !w-6 !h-6 !mr-0 shrink-0">
+                                    <Icon name="material-symbols:tag-rounded" class="text-base"></Icon>
+                                </div>
                                 {tags.map((tag, i) => (
-                                    <>
-                                        <a href={getTagUrl(tag)} class="meta-link relative z-30 pointer-events-auto hover:text-[var(--primary)] transition-colors whitespace-nowrap pl-2 pr-2 py-4 -my-4 flex items-center gap-2" class:list={[{"-ml-2": i === 0}]}>
-                                            {i === 0 && <Icon name="material-symbols:tag-rounded" class="text-lg text-[var(--primary)] shrink-0"></Icon>}
-                                            {tag}
-                                        </a>
-                                        {i < tags.length - 1 && <span class="mx-px text-black/75 dark:text-white/75 font-bold">·</span>}
-                                    </>
+                                    <a href={getTagUrl(tag)} 
+                                       class="inline-flex items-center h-6 px-2 rounded-md bg-black/5 dark:bg-white/10 hover:bg-[var(--primary)]/10 hover:text-[var(--primary)] transition-all whitespace-nowrap shrink-0"
+                                    >
+                                        {tag.replaceAll(' ', '\u00A0')}
+                                    </a>
                                 ))}
                             </div>
                         </div>
@@ -132,13 +134,17 @@ const { remarkPluginFrontmatter } = await entry.render();
 
         <!-- word count, read time, and date (Hidden for Projects) -->
         {!isProject && (
-            <div class="text-sm text-black/50 dark:text-white/50 flex flex-wrap gap-4 transition relative z-10 pointer-events-none">
-                <div class="flex items-center">
-                    <Icon name="material-symbols:edit-calendar-rounded" class="mr-1.5 text-lg"></Icon>
+            <div class="text-sm text-black/50 dark:text-white/50 flex flex-wrap gap-y-2 gap-x-4 transition relative z-10 pointer-events-none mt-2">
+                <div class="flex items-center pl-2 -ml-2 pb-2">
+                    <div class="meta-icon !bg-black/5 dark:!bg-white/10 !text-black/50 dark:!text-white/50 !w-6 !h-6 !mr-2 shrink-0">
+                        <Icon name="material-symbols:edit-calendar-rounded" class="text-base"></Icon>
+                    </div>
                     {formatDateToYYYYMMDD(published)}
                 </div>
-                <div class="flex items-center">
-                    <Icon name="material-symbols:pace-rounded" class="mr-1.5 text-lg"></Icon>
+                <div class="flex items-center pl-2 -ml-2 pb-2">
+                    <div class="meta-icon !bg-black/5 dark:!bg-white/10 !text-black/50 dark:!text-white/50 !w-6 !h-6 !mr-2 shrink-0">
+                        <Icon name="material-symbols:pace-rounded" class="text-base"></Icon>
+                    </div>
                     {remarkPluginFrontmatter.minutes} {i18n(remarkPluginFrontmatter.minutes === 1 ? I18nKey.minuteCount : I18nKey.minutesCount)}
                     <span class="mx-1.5 opacity-50">/</span>
                     {remarkPluginFrontmatter.words} {i18n(remarkPluginFrontmatter.words === 1 ? I18nKey.wordCount : I18nKey.wordsCount)}
@@ -150,10 +156,11 @@ const { remarkPluginFrontmatter } = await entry.render();
 
     {hasCover && <div
                     class:list={[
-                        "w-[var(--coverWidth)] absolute top-3 bottom-3 right-3 rounded-xl overflow-hidden active:scale-95 z-10 pointer-events-none"
+                        "w-[var(--coverWidth)] absolute top-6 md:top-7 right-3 rounded-xl overflow-hidden active:scale-95 z-10 pointer-events-none",
+                        "aspect-square"
                     ]} >
         <ImageWrapper src={image} basePath={path.join("content", entry.collection, getDir(entry.id))} alt="Cover Image of the Post"
-                  class="w-full h-full">
+                  class="w-full h-full object-cover">
         </ImageWrapper>
     </div>}
 </div>
