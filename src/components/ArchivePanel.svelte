@@ -83,7 +83,7 @@ const groups = $derived.by(() => {
 const targetCount = $derived(filteredPosts.length);
 
 // [타임라인] 숫자 노출 시작 지연 시간
-const START_DELAY = 2300;
+const START_DELAY = 1550;
 
 $effect(() => {
 	// Svelte 5: mounted만 추적하여 로직이 한 번만 실행되도록 함

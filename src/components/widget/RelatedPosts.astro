@@ -64,13 +64,13 @@ const relatedPosts = allPosts
 		if (b.score !== a.score) return b.score - a.score;
 		return b.post.data.published.valueOf() - a.post.data.published.valueOf();
 	})
-	.slice(0, 3);
+	.slice(0, 4);
 ---
 
 {relatedPosts.length > 0 && (
     <div class="card-base p-3 md:p-6 mb-4 onload-animation">
-        <div class="grid grid-cols-3 gap-2 md:gap-6">
-            {relatedPosts.map(({ post }) => (
+        <div class="grid grid-cols-2 gap-3 md:gap-6">
+            {relatedPosts.map(({ post }, i) => (
                 <a 
                     href={getPostUrlBySlug(post.slug)} 
                     class="group flex flex-col transition-all duration-300 active:scale-[0.98]"
