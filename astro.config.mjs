@@ -26,6 +26,7 @@ import { AdmonitionComponent } from "./src/plugins/rehype-component-admonition.m
 import { GithubCardComponent } from "./src/plugins/rehype-component-github-card.mjs";
 import { rehypeHeaderNumbering } from "./src/plugins/rehype-header-numbering.mjs";
 import { rehypeMidlineEllipsis } from "./src/plugins/rehype-midline-ellipsis.mjs";
+import { rehypeStylizedQuote } from "./src/plugins/rehype-stylized-quote.mjs";
 import { parseDirectiveNode } from "./src/plugins/remark-directive-rehype.js";
 import { remarkExcerpt } from "./src/plugins/remark-excerpt.js";
 // import { remarkMidlineEllipsis } from "./src/plugins/remark-midline-ellipsis.mjs"; // Removed
@@ -139,6 +140,7 @@ export default defineConfig({
 		],
 		rehypePlugins: [
 			rehypeHeaderNumbering,
+			rehypeStylizedQuote,
 			rehypeMidlineEllipsis,
 			rehypeKatex,
 			rehypeSlug,

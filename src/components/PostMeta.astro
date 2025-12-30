@@ -48,37 +48,35 @@ const className = Astro.props.class;
         </div>
     )}
 
-    <!-- Second row: Category & Tags (Clickable) -->
+    <!-- Second row: Category & Tags (Clickable, 2-tier) -->
     {(category || (tags && tags.length > 0)) && (
-        <div class="flex flex-wrap items-center justify-start gap-x-4 gap-y-2">
-            <!-- category -->
+        <div class="flex flex-col gap-2.5 w-full">
+            <!-- Tier 1: Category -->
             {category && (
                 <div class="flex items-center">
-                    <div class="meta-icon">
-                        <Icon name="material-symbols:folder-open-outline-rounded" class="text-[var(--primary)]"></Icon>
+                    <div class="meta-icon !bg-[var(--primary)]/10 !text-[var(--primary)]">
+                        <Icon name="material-symbols:folder-open-outline-rounded" class="text-base"></Icon>
                     </div>
-                                    <div class="flex flex-row items-center">
-                                        <a href={getCategoryUrl(category)} aria-label={`View all posts in the ${category} category`}
-                                           class="link-lg transition text-50 text-sm font-medium hover:text-[var(--primary)] whitespace-nowrap"
-                                        >
-                                                                    {category.split('/').map((part, i, arr) => (
-                                                                        <span class="capitalize">
-                                                                            {part}
-                                                                            {i < arr.length - 1 && <span class="mx-0.5 text-black/50 dark:text-white/50 font-normal select-none cursor-default">/</span>}
-                                                                        </span>
-                                                                    ))}
-                                            
-                                        </a>
-                                    </div>
-                    
+                    <div class="flex flex-row items-center">
+                        <a href={getCategoryUrl(category)} aria-label={`View all posts in the ${category} category`}
+                           class="transition text-50 text-sm font-medium hover:text-[var(--primary)] whitespace-nowrap"
+                        >
+                            {category.split('/').map((part, i, arr) => (
+                                <span class="capitalize">
+                                    {part}
+                                    {i < arr.length - 1 && <span class="mx-1 opacity-50 font-normal">/</span>}
+                                </span>
+                            ))}
+                        </a>
+                    </div>
                 </div>
             )}
 
-            <!-- tags -->
+            <!-- Tier 2: Tags -->
             {tags && tags.length > 0 && (
                 <div class:list={["flex items-start", {"hidden md:flex": hideTagsForMobile}]}>
-                    <div class="meta-icon !bg-[var(--primary)]/10 !text-[var(--primary)] !mr-1.5 !mt-0">
-                        <Icon name="material-symbols:tag-rounded" class="text-lg"></Icon>
+                    <div class="meta-icon !bg-[var(--primary)]/10 !text-[var(--primary)]">
+                        <Icon name="material-symbols:tag-rounded" class="text-base"></Icon>
                     </div>
                     <div class="flex flex-wrap items-center gap-1.5">
                         {tags.map((tag, i) => (

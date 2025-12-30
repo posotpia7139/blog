@@ -59,7 +59,7 @@ const filteredHeadings = headings.filter((heading) => {
 ---
 {shouldShowTOC &&
 <table-of-contents class:list={[className, "block relative text-left"]} data-is-floating={isFloating}>
-    <div class:list={["w-full", {"toc-inner-wrapper hide-scrollbar flex flex-col": isFloating}]}>
+    <div class:list={["w-full", {"toc-inner-wrapper hide-scrollbar flex flex-col pb-24": isFloating}]}>
         <div class="toc w-full h-full">
             {filteredHeadings.map((heading) =>
                 <a href={`#${heading.slug}`} class:list={["group pr-4 flex items-start gap-2 relative transition-all duration-100 ease-out w-full min-h-7 rounded-xl hover:bg-[var(--toc-btn-active)] active:bg-[var(--toc-btn-active)] py-1",

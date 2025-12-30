@@ -53,19 +53,21 @@ const { remarkPluginFrontmatter } = await entry.render();
     <a href={url} aria-label={title} class="absolute inset-0 z-20 peer"></a>
 
     <div class:list={["px-6 pt-6 md:px-9 md:pt-7 relative w-full", {"pb-6": !isProject, "pb-4 md:pb-5": isProject}]}>
-        <div class:list={["relative mb-3", {"pr-[calc(var(--coverWidth)+1rem)]": hasCover}]}>
+        <div class:list={["relative mb-3", {"pr-[230px]": hasCover}]}>
             <div class="transition w-full font-semibold text-2xl md:text-3xl text-90
             title-text
             active:text-[var(--title-active)]
             relative z-10 pointer-events-none
-            line-clamp-2 [text-wrap:balance] break-keep">
+            whitespace-nowrap overflow-hidden break-keep"
+                 style={hasCover ? "mask-image: linear-gradient(to right, black 80%, transparent 100%);" : ""}
+            >
                 {title}
             </div>
         </div>
 
                     <!-- description -->
-                    <div class:list={["relative z-10 pointer-events-none", {"pr-[calc(var(--coverWidth)+1rem)]": hasCover}]}>
-                        <div class:list={["transition text-75 [text-wrap:balance] break-keep text-sm md:text-base line-clamp-3", {"mb-3.5": !isProject, "mb-3": isProject}]}
+                    <div class:list={["relative z-10 pointer-events-none", {"pr-[230px]": hasCover}]}>
+                        <div class:list={["transition text-75 [text-wrap:balance] break-keep text-sm md:text-base line-clamp-2", {"mb-3.5": !isProject, "mb-3": isProject}]}
                              style={hasCover ? "mask-image: linear-gradient(to right, black 90%, transparent 100%);" : ""}
                         >
                             { description || remarkPluginFrontmatter.excerpt }
@@ -73,7 +75,7 @@ const { remarkPluginFrontmatter } = await entry.render();
                     </div>
 
         <!-- 2-tier metadata or Project Links -->
-        <div class:list={["relative flex flex-col gap-1.5 pointer-events-auto", {"pr-[calc(var(--coverWidth)+1rem)]": hasCover}]}>
+        <div class:list={["relative flex flex-col gap-2.5 pointer-events-auto", {"pr-[230px]": hasCover}]}>
             {isProject ? (
                 <div class="flex items-center text-base md:text-lg meta-content w-fit pointer-events-auto text-90">
                     {github_url && (
@@ -96,10 +98,10 @@ const { remarkPluginFrontmatter } = await entry.render();
                 <>
                     <!-- Tier 1: Category -->
                     {category && (
-                        <div class:list={["flex items-center text-[13px] text-50", {"pr-[calc(var(--coverWidth)+1rem)]": hasCover}]}
+                        <div class:list={["flex items-center text-[13px] text-50 relative z-50"]}
                              style={hasCover ? "mask-image: linear-gradient(to right, black 80%, transparent 100%);" : ""}
                         >
-                            <a href={getCategoryUrl(category)} class="meta-link relative z-30 pointer-events-auto hover:text-[var(--primary)] transition-colors pl-2 pr-2 pt-4 pb-2 -ml-2 -my-4 flex items-center gap-2">
+                            <a href={getCategoryUrl(category)} class="meta-link relative z-50 pointer-events-auto hover:text-[var(--primary)] transition-colors pl-2 pr-2 py-3 -ml-2 -my-2 flex items-center gap-2">
                                 <div class="meta-icon !bg-[var(--primary)]/10 !text-[var(--primary)] !w-6 !h-6 !mr-0 shrink-0">
                                     <Icon name="material-symbols:folder-open-outline-rounded" class="text-base"></Icon>
                                 </div>
@@ -117,7 +119,7 @@ const { remarkPluginFrontmatter } = await entry.render();
                     
                     <!-- Tier 2: Tags -->
                     {tags && tags.length > 0 && (
-                        <div class:list={["flex items-center text-[12px] text-50 w-full mt-2 relative z-30 pointer-events-auto", {"pr-[calc(var(--coverWidth)+1rem)]": hasCover}]}>
+                        <div class:list={["flex items-center text-[12px] text-50 w-full relative z-30 pointer-events-auto"]}>
                             <div class="flex items-center overflow-hidden w-full whitespace-nowrap gap-2 pl-2 -ml-2" 
                                  style={hasCover ? "mask-image: linear-gradient(to right, black 80%, transparent 100%);" : ""}>
                                 <div class="meta-icon !bg-[var(--primary)]/10 !text-[var(--primary)] !w-6 !h-6 !mr-0 shrink-0">
@@ -133,29 +135,27 @@ const { remarkPluginFrontmatter } = await entry.render();
                             </div>
                         </div>
                     )}
+
+                    <!-- Tier 3: word count, read time, and date -->
+                    <div class:list={["text-[12px] text-black/50 dark:text-white/50 flex flex-wrap gap-y-2 gap-x-4 transition relative z-10 pointer-events-none"]}>
+                        <div class="flex items-center pl-2 -ml-2">
+                            <div class="meta-icon !bg-black/5 dark:!bg-white/10 !text-black/50 dark:!text-white/50 !w-6 !h-6 !mr-2 shrink-0">
+                                <Icon name="material-symbols:edit-calendar-rounded" class="text-base"></Icon>
+                            </div>
+                            {formatDateToYYYYMMDD(published)}
+                        </div>
+                        <div class="flex items-center pl-2 -ml-2">
+                            <div class="meta-icon !bg-black/5 dark:!bg-white/10 !text-black/50 dark:!text-white/50 !w-6 !h-6 !mr-2 shrink-0">
+                                <Icon name="material-symbols:pace-rounded" class="text-base"></Icon>
+                            </div>
+                            {remarkPluginFrontmatter.minutes} {i18n(remarkPluginFrontmatter.minutes === 1 ? I18nKey.minuteCount : I18nKey.minutesCount)}
+                            <span class="mx-1.5 opacity-50">/</span>
+                            {remarkPluginFrontmatter.words} {i18n(remarkPluginFrontmatter.words === 1 ? I18nKey.wordCount : I18nKey.wordsCount)}
+                        </div>
+                    </div>
                 </>
             )}
         </div>
-
-        <!-- word count, read time, and date (Hidden for Projects) -->
-        {!isProject && (
-            <div class:list={["text-sm text-black/50 dark:text-white/50 flex flex-wrap gap-y-2 gap-x-4 transition relative z-10 pointer-events-none mt-2", {"pr-[calc(var(--coverWidth)+1rem)]": hasCover}]}>
-                <div class="flex items-center pl-2 -ml-2 pb-2">
-                    <div class="meta-icon !bg-black/5 dark:!bg-white/10 !text-black/50 dark:!text-white/50 !w-6 !h-6 !mr-2 shrink-0">
-                        <Icon name="material-symbols:edit-calendar-rounded" class="text-base"></Icon>
-                    </div>
-                    {formatDateToYYYYMMDD(published)}
-                </div>
-                <div class="flex items-center pl-2 -ml-2 pb-2">
-                    <div class="meta-icon !bg-black/5 dark:!bg-white/10 !text-black/50 dark:!text-white/50 !w-6 !h-6 !mr-2 shrink-0">
-                        <Icon name="material-symbols:pace-rounded" class="text-base"></Icon>
-                    </div>
-                    {remarkPluginFrontmatter.minutes} {i18n(remarkPluginFrontmatter.minutes === 1 ? I18nKey.minuteCount : I18nKey.minutesCount)}
-                    <span class="mx-1.5 opacity-50">/</span>
-                    {remarkPluginFrontmatter.words} {i18n(remarkPluginFrontmatter.words === 1 ? I18nKey.wordCount : I18nKey.wordsCount)}
-                </div>
-            </div>
-        )}
 
     </div>
 
