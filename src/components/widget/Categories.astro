@@ -1,6 +1,10 @@
 ---
 import { Icon } from "astro-icon/components";
-import { getCategoryList, getSortedPosts } from "../../utils/content-utils";
+import {
+	type Category,
+	getCategoryList,
+	getSortedPosts,
+} from "../../utils/content-utils";
 import ButtonLink from "../control/ButtonLink.astro";
 import WidgetLayout from "./WidgetLayout.astro";
 
@@ -14,7 +18,7 @@ const isPostPage = !!Astro.params.slug; // 포스트 본문 여부 확인
 
 if (!activeCategory && Astro.params.slug) {
 	const currentPost = allPosts.find((p) => p.slug === Astro.params.slug);
-	if (currentPost && currentPost.data.category) {
+	if (currentPost?.data.category) {
 		activeCategory = currentPost.data.category;
 	}
 }
@@ -27,7 +31,7 @@ interface CategoryNode {
 	children: CategoryNode[];
 }
 
-function buildTree(flatCategories: any[]): CategoryNode[] {
+function buildTree(flatCategories: Category[]): CategoryNode[] {
 	const root: CategoryNode[] = [];
 	const map: { [key: string]: CategoryNode } = {};
 
@@ -70,7 +74,7 @@ const categoryTree = buildTree(categories);
 
 function isPathActive(nodePath: string, active: string | null) {
 	if (!active) return false;
-	return active === nodePath || active.startsWith(nodePath + "/");
+	return active === nodePath || active.startsWith(`${nodePath}/`);
 }
 
 interface Props {

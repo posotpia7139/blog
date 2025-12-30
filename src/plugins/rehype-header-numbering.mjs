@@ -70,7 +70,7 @@ export function rehypeHeaderNumbering() {
 					type: "element",
 					tagName: "span",
 					properties: { className: ["section-num"] },
-					children: [{ type: "text", value: numberString + " " }],
+					children: [{ type: "text", value: `${numberString} ` }],
 				};
 
 				// 기존 자식 요소들 앞에 span 추가

@@ -14,6 +14,9 @@ let pagefindLoaded = $state(false);
 let initialized = $state(false);
 let closing = $state(false);
 
+// [Svelte 5] Props 정의 (Astro 디렉티브 지원을 위해 추가)
+let { ...props } = $props();
+
 const fakeResult: SearchResult[] = [
 	{
 		url: url("/"),
@@ -109,7 +112,7 @@ onMount(() => {
 			typeof window !== "undefined" &&
 			!!window.pagefind &&
 			typeof window.pagefind.search === "function";
-		
+
 		if (keywordDesktop) search(keywordDesktop, true);
 		if (keywordMobile) search(keywordMobile, false);
 	};

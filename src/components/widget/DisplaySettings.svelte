@@ -7,6 +7,9 @@ import { getDefaultHue, getHue, setHue } from "@utils/setting-utils";
 let hue = $state(getHue());
 const defaultHue = getDefaultHue();
 
+// [Svelte 5] Props 정의 (Astro 디렉티브 지원을 위해 추가)
+let { ...props } = $props();
+
 function resetHue() {
 	hue = getDefaultHue();
 }
@@ -27,7 +30,7 @@ $effect(() => {
         >
             {i18n(I18nKey.themeColor)}
             <button aria-label="Reset to Default" class="btn-regular w-7 h-7 rounded-md  active:scale-90 will-change-transform"
-                    class:opacity-0={hue === defaultHue} class:pointer-events-none={hue === defaultHue} on:click={resetHue}>
+                    class:opacity-0={hue === defaultHue} class:pointer-events-none={hue === defaultHue} onclick={resetHue}>
                 <div class="text-[var(--btn-content)]">
                     <Icon icon="fa6-solid:arrow-rotate-left" class="text-[0.875rem]"></Icon>
                 </div>

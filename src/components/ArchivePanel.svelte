@@ -1,10 +1,10 @@
 <script lang="ts">
+import Icon from "@iconify/svelte";
 import { onMount, untrack } from "svelte";
 import { siteConfig } from "../config";
 import I18nKey from "../i18n/i18nKey";
 import { i18n } from "../i18n/translation";
 import { getPostUrlBySlug } from "../utils/url-utils";
-import Icon from "@iconify/svelte";
 
 interface Post {
 	slug: string;
@@ -21,99 +21,118 @@ interface Group {
 	posts: Post[];
 }
 
-let { 
-    tags: initialTags = [], 
-    categories: initialCategories = [], 
-    sortedPosts = [] 
+let {
+	tags: initialTags = [],
+	categories: initialCategories = [],
+	sortedPosts = [],
 } = $props();
 
 let mounted = $state(false);
-let displayCount = $state(0); 
+let displayCount = $state(0);
 let isPopping = $state(false);
 let filterTags = $state(initialTags);
 let filterCategories = $state(initialCategories);
 
 const toDate = (d: Date | string) => {
-    const date = d instanceof Date ? d : new Date(d);
-    return isNaN(date.getTime()) ? new Date() : date;
+	const date = d instanceof Date ? d : new Date(d);
+	return Number.isNaN(date.getTime()) ? new Date() : date;
 };
 
 const filteredPosts = $derived.by(() => {
-    let posts = sortedPosts;
-    if (filterTags.length > 0) {
-        posts = posts.filter(p => Array.isArray(p.data.tags) && p.data.tags.some((t: string) => filterTags.includes(t)));
-    }
-    if (filterCategories.length > 0) {
-        posts = posts.filter(p => p.data.category && filterCategories.some((c: string) => p.data.category === c || p.data.category.startsWith(`${c}/`)));
-    }
-    return posts;
+	let posts = sortedPosts;
+	if (filterTags.length > 0) {
+		posts = posts.filter(
+			(p) =>
+				Array.isArray(p.data.tags) &&
+				p.data.tags.some((t: string) => filterTags.includes(t)),
+		);
+	}
+	if (filterCategories.length > 0) {
+		posts = posts.filter(
+			(p) =>
+				p.data.category &&
+				filterCategories.some(
+					(c: string) =>
+						p.data.category === c || p.data.category.startsWith(`${c}/`),
+				),
+		);
+	}
+	return posts;
 });
 
 const groups = $derived.by(() => {
-    const grouped = filteredPosts.reduce((acc, post) => {
-        const date = toDate(post.data.published);
-        const year = date.getFullYear();
-        if (!acc[year]) acc[year] = [];
-        acc[year].push(post);
-        return acc;
-    }, {} as Record<number, Post[]>);
+	const grouped = filteredPosts.reduce(
+		(acc, post) => {
+			const date = toDate(post.data.published);
+			const year = date.getFullYear();
+			if (!acc[year]) acc[year] = [];
+			acc[year].push(post);
+			return acc;
+		},
+		{} as Record<number, Post[]>,
+	);
 
-    return Object.keys(grouped)
-        .map(year => ({ year: Number.parseInt(year), posts: grouped[Number.parseInt(year)] }))
-        .sort((a, b) => b.year - a.year);
+	return Object.keys(grouped)
+		.map((year) => ({
+			year: Number.parseInt(year, 10),
+			posts: grouped[Number.parseInt(year, 10)],
+		}))
+		.sort((a, b) => b.year - a.year);
 });
 
 const targetCount = $derived(filteredPosts.length);
 
 // [타임라인] 숫자 노출 시작 지연 시간
-const START_DELAY = 2300; 
+const START_DELAY = 2300;
 
 $effect(() => {
-    // Svelte 5: mounted만 추적하여 로직이 한 번만 실행되도록 함
-    if (mounted && targetCount > 0) {
-        untrack(() => {
-            displayCount = 0;
-            isPopping = false;
-            
-            const startTimeout = setTimeout(() => {
-                const duration = 5000; // 카운팅 지속시간 (5초)
-                const frameRate = 1000 / 60;
-                const totalFrames = duration / frameRate;
-                let currentFrame = 0;
+	// Svelte 5: mounted만 추적하여 로직이 한 번만 실행되도록 함
+	if (mounted && targetCount > 0) {
+		untrack(() => {
+			displayCount = 0;
+			isPopping = false;
 
-                const timer = setInterval(() => {
-                    currentFrame++;
-                    const progress = currentFrame / totalFrames;
-                    
-                    // 후반부가 초반부보다 훨씬 느려지는 비대칭 Ease-In-Out 공식
-                    const p = 3;
-                    const q = 7;
-                    const ease = Math.pow(progress, p) / (Math.pow(progress, p) + Math.pow(1 - progress, q));
-                        
-                    displayCount = targetCount * ease;
+			const startTimeout = setTimeout(() => {
+				const duration = 5000; // 카운팅 지속시간 (5초)
+				const frameRate = 1000 / 60;
+				const totalFrames = duration / frameRate;
+				let currentFrame = 0;
 
-                    // [핵심] 실제 게시물 숫자에 도달하는 순간 즉시 팝!
-                    if (Math.round(displayCount) >= targetCount && !isPopping) {
-                        displayCount = targetCount;
-                        isPopping = true;
-                    }
+				const timer = setInterval(() => {
+					currentFrame++;
+					const progress = currentFrame / totalFrames;
 
-                    if (currentFrame >= totalFrames) {
-                        clearInterval(timer);
-                    }
-                }, frameRate);
-            }, START_DELAY);
-        });
-    }
+					// 후반부가 초반부보다 훨씬 느려지는 비대칭 Ease-In-Out 공식
+					const p = 3;
+					const q = 7;
+					const ease = progress ** p / (progress ** p + (1 - progress) ** q);
+
+					displayCount = targetCount * ease;
+
+					// [핵심] 실제 게시물 숫자에 도달하는 순간 즉시 팝!
+					if (Math.round(displayCount) >= targetCount && !isPopping) {
+						displayCount = targetCount;
+						isPopping = true;
+					}
+
+					if (currentFrame >= totalFrames) {
+						clearInterval(timer);
+					}
+				}, frameRate);
+			}, START_DELAY);
+		});
+	}
 });
 
 onMount(() => {
 	mounted = true;
 	const params = new URLSearchParams(window.location.search);
-    const tagParams = params.has("tag") ? params.getAll("tag") : [];
-	const categoryParams = params.has("category") ? params.getAll("category") : [];
-    if (tagParams.length > 0) filterTags = tagParams;
-    if (categoryParams.length > 0) filterCategories = categoryParams;
+	const tagParams = params.has("tag") ? params.getAll("tag") : [];
+	const categoryParams = params.has("category")
+		? params.getAll("category")
+		: [];
+	if (tagParams.length > 0) filterTags = tagParams;
+	if (categoryParams.length > 0) filterCategories = categoryParams;
 });
 
 function formatDate(date: Date | string) {

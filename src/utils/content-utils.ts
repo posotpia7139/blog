@@ -201,7 +201,7 @@ export async function getCategoryList(): Promise<Category[]> {
  */
 export function stylizeText(text: string): string {
 	const regex = /["“]([^"“”]+?)["”]|['‘]([^'‘’]+?)['’]|[『]([^『』]+?)[』]/g;
-	return text.replace(regex, (match, p1, p2, p3) => {
+	return text.replace(regex, (_, p1, p2, p3) => {
 		let className = "";
 		let content = "";
 		if (p1 !== undefined) {

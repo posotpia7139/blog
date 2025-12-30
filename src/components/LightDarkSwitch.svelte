@@ -20,8 +20,8 @@ let mode: LIGHT_DARK_MODE = $state(AUTO_MODE);
 onMount(() => {
 	mode = getStoredTheme();
 	const darkModePreference = window.matchMedia("(prefers-color-scheme: dark)");
-	
-	const changeThemeWhenSchemeChanged = (e: MediaQueryListEvent) => {
+
+	const changeThemeWhenSchemeChanged = (_e: MediaQueryListEvent) => {
 		if (mode === AUTO_MODE) {
 			applyThemeToDocument(AUTO_MODE);
 		}
@@ -29,7 +29,10 @@ onMount(() => {
 
 	darkModePreference.addEventListener("change", changeThemeWhenSchemeChanged);
 	return () => {
-		darkModePreference.removeEventListener("change", changeThemeWhenSchemeChanged);
+		darkModePreference.removeEventListener(
+			"change",
+			changeThemeWhenSchemeChanged,
+		);
 	};
 });
 

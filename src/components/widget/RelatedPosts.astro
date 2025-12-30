@@ -1,13 +1,14 @@
 ---
-import { getSortedPosts } from "@utils/content-utils";
-import { getPostUrlBySlug, getDir } from "@utils/url-utils";
-import { Icon } from "astro-icon/components";
-import { formatDateToYYYYMMDD } from "@utils/date-utils";
-import ImageWrapper from "../misc/ImageWrapper.astro";
+import type { CollectionEntry } from "astro:content";
 import path from "node:path";
+import { getSortedPosts } from "@utils/content-utils";
+import { formatDateToYYYYMMDD } from "@utils/date-utils";
+import { getDir, getPostUrlBySlug } from "@utils/url-utils";
+import { Icon } from "astro-icon/components";
+import ImageWrapper from "../misc/ImageWrapper.astro";
 
 interface Props {
-	entry: any; // 현재 포스트 데이터
+	entry: CollectionEntry<"posts">; // 현재 포스트 데이터
 }
 
 const { entry } = Astro.props;
@@ -24,19 +25,25 @@ const relatedPosts = allPosts
 		const postCategory = post.data.category || "";
 
 		// 1. 대분류 격리 (Mismatch Root Category: -5)
-		const currentRoot = currentCategory.split('/')[0];
-		const postRoot = postCategory.split('/')[0];
+		const currentRoot = currentCategory.split("/")[0];
+		const postRoot = postCategory.split("/")[0];
 		if (currentRoot !== postRoot) score -= 5;
 
 		// 2. 카테고리 완전 일치 (Full Category Match: +2)
 		if (currentCategory === postCategory) score += 2;
 
 		// 3. 태그 일치 (Individual Tag Match: +1 each)
-		const intersection = postTags.filter((t: string) => currentTags.includes(t));
+		const intersection = postTags.filter((t: string) =>
+			currentTags.includes(t),
+		);
 		score += intersection.length;
 
 		// 4. 첫 번째 태그 일치 (Primary Tag Match: +3)
-		if (currentTags.length > 0 && postTags.length > 0 && currentTags[0] === postTags[0]) {
+		if (
+			currentTags.length > 0 &&
+			postTags.length > 0 &&
+			currentTags[0] === postTags[0]
+		) {
 			score += 3;
 		}
 
@@ -46,7 +53,9 @@ const relatedPosts = allPosts
 		}
 
 		// 6. 작성일 차이에 따른 페널티 (Age Penalty: -1 per year)
-		const yearDiff = Math.abs(entry.data.published.getFullYear() - post.data.published.getFullYear());
+		const yearDiff = Math.abs(
+			entry.data.published.getFullYear() - post.data.published.getFullYear(),
+		);
 		score -= yearDiff;
 
 		return { post, score };
