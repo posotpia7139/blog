@@ -4,6 +4,7 @@ import { siteConfig } from "../config";
 import I18nKey from "../i18n/i18nKey";
 import { i18n } from "../i18n/translation";
 import { getPostUrlBySlug } from "../utils/url-utils";
+import Icon from "@iconify/svelte";
 
 interface Post {
 	slug: string;
@@ -130,9 +131,27 @@ function formatTag(tagList: string[]) {
         {#if filterCategories.length > 0 || filterTags.length > 0}
             <div class="flex flex-col items-start w-full py-4 pl-2">
                 <div class="flex flex-row items-center flex-wrap justify-start">
-                    <span class="text-[var(--primary)] font-bold text-[13px] capitalize">
-                        {filterCategories[0] || `#${filterTags[0]}`}
-                    </span>
+                    {#if filterCategories.length > 0}
+                        <div class="h-6 w-6 rounded-md bg-black/5 dark:bg-white/10 flex items-center justify-center mr-2">
+                            <Icon icon="material-symbols:folder-open-outline-rounded" class="text-[var(--primary)] text-[15px]" />
+                        </div>
+                        {@const segments = filterCategories[0].split('/')}
+                        {#each segments as segment, i}
+                            {#if i > 0}
+                                <span class="mx-2 opacity-30 text-[13px]">/</span>
+                            {/if}
+                            <span class="text-[13px] capitalize {i === segments.length - 1 ? 'text-[var(--primary)] font-bold' : 'text-black/75 dark:text-white/75'}">
+                                {segment}
+                            </span>
+                        {/each}
+                    {:else if filterTags.length > 0}
+                        <div class="h-6 w-6 rounded-md bg-black/5 dark:bg-white/10 flex items-center justify-center mr-2">
+                            <Icon icon="material-symbols:tag-rounded" class="text-[var(--primary)] text-[15px]" />
+                        </div>
+                        <span class="text-[var(--primary)] font-bold text-[13px] capitalize">
+                            {filterTags[0]}
+                        </span>
+                    {/if}
                 </div>
                 <div class="mt-1 flex items-center shrink-0">
                     <span class="text-[13px] opacity-60">게시물&nbsp;</span>
