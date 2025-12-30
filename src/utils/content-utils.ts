@@ -193,3 +193,27 @@ export async function getCategoryList(): Promise<Category[]> {
 	}
 	return ret;
 }
+
+/**
+ * 텍스트 내의 따옴표와 『』 문자를 스타일링된 span 태그로 변환함.
+ * @param text 대상 텍스트
+ * @returns 스타일링된 HTML 문자열
+ */
+export function stylizeText(text: string): string {
+	const regex = /["“]([^"“”]+?)["”]|['‘]([^'‘’]+?)['’]|[『]([^『』]+?)[』]/g;
+	return text.replace(regex, (match, p1, p2, p3) => {
+		let className = "";
+		let content = "";
+		if (p1 !== undefined) {
+			className = "quote-double";
+			content = p1;
+		} else if (p2 !== undefined) {
+			className = "quote-single";
+			content = p2;
+		} else {
+			className = "quote-corner";
+			content = p3;
+		}
+		return `<span class="${className} stylized-quote">${content}</span>`;
+	});
+}
