@@ -56,11 +56,11 @@ const { remarkPluginFrontmatter } = await entry.render();
 
                     {/* 상단 영역: 제목, 설명글, 썸네일 */}
 
-                    <div class="flex flex-row gap-4 md:gap-9 mb-0">
+                    <div class="flex flex-row items-center gap-4 md:gap-9 mb-0">
 
                 <div class="flex-1 min-w-0">
 
-                    <div class:list={["relative mb-3"]}>
+                    <div class:list={["relative mb-2"]}>
 
                         <div class="transition w-full font-semibold text-xl md:text-2xl text-90
 
@@ -80,13 +80,12 @@ const { remarkPluginFrontmatter } = await entry.render();
 
                     </div>
 
-    
 
                     <!-- description -->
 
                     <div class:list={["relative z-10 pointer-events-none"]}>
 
-                        <div class:list={["transition text-75 [text-wrap:balance] break-keep text-sm md:text-base line-clamp-2", {"mb-3.5": !isProject, "mb-3": isProject}]}
+                        <div class:list={["transition text-75 [text-wrap:balance] break-keep text-sm md:text-base line-clamp-2", {"mb-2": isProject, "mb-3": !isProject}]}
 
                         >
 
@@ -95,6 +94,176 @@ const { remarkPluginFrontmatter } = await entry.render();
                         </div>
 
                     </div>
+
+
+                    {isProject && (
+
+                        <div class="flex items-center text-base md:text-lg meta-content w-fit pointer-events-auto text-90 mb-1 relative z-30">
+
+                            {github_url && (
+
+                                <a href={github_url} target="_blank" rel="noopener" class="meta-link relative z-30 flex items-center hover:text-[var(--primary)] transition-colors group/link pr-4 py-2 -my-2 gap-2">
+
+                                    <Icon name="fa6-brands:github" class="text-lg md:text-xl"></Icon>
+
+                                    <span class="font-bold text-sm md:text-base">GitHub</span>
+
+                                </a>
+
+                            )}
+
+                            {github_url && demo_url && (
+
+                                <span class="mx-px text-black/20 dark:text-white/20">|</span>
+
+                            )}
+
+                            {demo_url && (
+
+                                <a href={demo_url} target="_blank" rel="noopener" class="meta-link relative z-30 flex items-center hover:text-[var(--primary)] transition-colors group/link pl-4 pr-4 py-2 -my-2 gap-2">
+
+                                    <Icon name="material-symbols:open-in-new-rounded" class="text-lg md:text-xl"></Icon>
+
+                                    <span class="font-bold text-sm md:text-base">Live Demo</span>
+
+                                </a>
+
+                            )}
+
+                        </div>
+
+                    )}
+
+
+                    {!isProject && (
+
+                        <div class="relative flex flex-col gap-2 pointer-events-auto">
+
+                            <!-- Tier 1: Category -->
+
+                            {category && (
+
+                                <div class:list={["flex items-center text-[13px] text-50 relative z-50"]}
+
+                                >
+
+                                    <a href={getCategoryUrl(category)} class="meta-link relative z-50 pointer-events-auto hover:text-[var(--primary)] transition-colors pl-2 pr-2 py-3 -ml-2 -my-2 flex items-center gap-2">
+
+                                        <div class="meta-icon !bg-[var(--primary)]/10 !text-[var(--primary)] !w-6 !h-6 !mr-0 shrink-0">
+
+                                            <Icon name="material-symbols:folder-open-outline-rounded" class="text-base"></Icon>
+
+                                        </div>
+
+                                        <div class="flex items-center">
+
+                                            {category.split('/').map((part, i, arr) => (
+
+                                                <>
+
+                                                    <span class="capitalize">{part}</span>
+
+                                                    {i < arr.length - 1 && <span class="mx-1 opacity-50">/</span>}
+
+                                                </>
+
+                                            ))}
+
+                                        </div>
+
+                                    </a>
+
+                                </div>
+
+                            )}
+
+                            
+
+                            <!-- Tier 2: Tags -->
+
+                            {tags && tags.length > 0 && (
+
+                                <div class:list={["flex items-center text-[12px] text-50 w-full relative z-30 pointer-events-auto"]}>
+
+                                    <div class="flex items-center flex-nowrap w-full gap-2 pl-2 -ml-2" 
+
+                                    >
+
+                                        <div class="meta-icon !bg-[var(--primary)]/10 !text-[var(--primary)] !w-6 !h-6 !mr-0 shrink-0 mt-0">
+
+                                            <Icon name="material-symbols:tag-rounded" class="text-base"></Icon>
+
+                                        </div>
+
+                                        {tags.slice(0, 4).map((tag, i) => (
+
+                                            <a href={getTagUrl(tag)} 
+
+                                               class="inline-flex items-center h-6 px-2 rounded-md bg-black/5 dark:bg-white/10 hover:bg-[var(--primary)]/10 hover:text-[var(--primary)] transition-all whitespace-nowrap shrink-0"
+
+                                            >
+
+                                                {tag.replaceAll(' ', '\u00A0')}
+
+                                            </a>
+
+                                        ))}
+
+                                        {tags.length > 4 && (
+
+                                            <div class="inline-flex items-center h-6 px-2 rounded-md bg-black/5 dark:bg-white/10 whitespace-nowrap shrink-0 text-[11px] font-medium opacity-70">
+
+                                                +{tags.length - 4}
+
+                                            </div>
+
+                                        )}
+
+                                    </div>
+
+                                </div>
+
+                            )}
+
+        
+
+                            <!-- Tier 3: word count, read time, and date -->
+
+                            <div class:list={["text-[11px] md:text-[12px] text-black/50 dark:text-white/50 flex flex-nowrap gap-x-2 md:gap-x-4 transition relative z-10 pointer-events-none whitespace-nowrap"]}>
+
+                                <div class="flex items-center pl-2 -ml-2 shrink-0">
+
+                                    <div class="meta-icon !bg-black/5 dark:!bg-white/10 !text-black/50 dark:!text-white/50 !w-6 !h-6 !mr-2 shrink-0">
+
+                                        <Icon name="material-symbols:edit-calendar-rounded" class="text-base"></Icon>
+
+                                    </div>
+
+                                    {formatDateToYYYYMMDD(published)}
+
+                                </div>
+
+                                <div class="flex items-center pl-2 -ml-2 shrink-0">
+
+                                    <div class="meta-icon !bg-black/5 dark:!bg-white/10 !text-black/50 dark:!text-white/50 !w-6 !h-6 !mr-2 shrink-0">
+
+                                        <Icon name="material-symbols:pace-rounded" class="text-base"></Icon>
+
+                                    </div>
+
+                                    {remarkPluginFrontmatter.minutes} {i18n(remarkPluginFrontmatter.minutes === 1 ? I18nKey.minuteCount : I18nKey.minutesCount)}
+
+                                    <span class="mx-1.5 opacity-50">/</span>
+
+                                    {remarkPluginFrontmatter.words} {i18n(remarkPluginFrontmatter.words === 1 ? I18nKey.wordCount : I18nKey.wordsCount)}
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    )}
 
                 </div>
 
@@ -108,7 +277,7 @@ const { remarkPluginFrontmatter } = await entry.render();
 
                                     {"w-24 h-24 md:w-32 md:h-32 aspect-square self-start mt-1": !isProject},
 
-                                    {"w-28 h-28 md:w-44 md:h-44 aspect-square self-center": isProject}
+                                    {"w-28 h-28 md:w-40 md:h-40 aspect-square self-center": isProject}
 
                                 ]} >
 
@@ -122,175 +291,18 @@ const { remarkPluginFrontmatter } = await entry.render();
 
             </div>
 
-    
-
-            {/* 하단 영역: 메타데이터 (카테고리, 태그, 날짜 등) */}
-
-            <div class:list={["relative flex flex-col gap-2.5 pointer-events-auto"]}>
-
-                {isProject ? (
-
-                    <div class="flex items-center text-base md:text-lg meta-content w-fit pointer-events-auto text-90">
-
-                        {github_url && (
-
-                            <a href={github_url} target="_blank" rel="noopener" class="meta-link relative z-30 flex items-center hover:text-[var(--primary)] transition-colors group/link pl-4 pr-4 py-4 -ml-4 -my-4 gap-2">
-
-                                <Icon name="fa6-brands:github" class="text-lg md:text-xl"></Icon>
-
-                                <span class="font-bold">GitHub</span>
-
-                            </a>
-
-                        )}
-
-                        {github_url && demo_url && (
-
-                            <span class="mx-px text-black/20 dark:text-white/20">|</span>
-
-                        )}
-
-                        {demo_url && (
-
-                            <a href={demo_url} target="_blank" rel="noopener" class="meta-link relative z-30 flex items-center hover:text-[var(--primary)] transition-colors group/link pl-4 pr-4 py-4 -my-4 gap-2">
-
-                                <Icon name="material-symbols:open-in-new-rounded" class="text-lg md:text-xl"></Icon>
-
-                                <span class="font-bold">Live Demo</span>
-
-                            </a>
-
-                        )}
-
-                    </div>
-
-                ) : (
-
-                    <>
-
-                        <!-- Tier 1: Category -->
-
-                        {category && (
-
-                            <div class:list={["flex items-center text-[13px] text-50 relative z-50"]}
-
-                            >
-
-                                <a href={getCategoryUrl(category)} class="meta-link relative z-50 pointer-events-auto hover:text-[var(--primary)] transition-colors pl-2 pr-2 py-3 -ml-2 -my-2 flex items-center gap-2">
-
-                                    <div class="meta-icon !bg-[var(--primary)]/10 !text-[var(--primary)] !w-6 !h-6 !mr-0 shrink-0">
-
-                                        <Icon name="material-symbols:folder-open-outline-rounded" class="text-base"></Icon>
-
-                                    </div>
-
-                                    <div class="flex items-center">
-
-                                        {category.split('/').map((part, i, arr) => (
-
-                                            <>
-
-                                                <span class="capitalize">{part}</span>
-
-                                                {i < arr.length - 1 && <span class="mx-1 opacity-50">/</span>}
-
-                                            </>
-
-                                        ))}
-
-                                    </div>
-
-                                </a>
-
-                            </div>
-
-                        )}
-
-                        
-
-                        <!-- Tier 2: Tags -->
-
-                        {tags && tags.length > 0 && (
-
-                            <div class:list={["flex items-center text-[12px] text-50 w-full relative z-30 pointer-events-auto"]}>
-
-                                <div class="flex items-start flex-wrap w-full gap-2 pl-2 -ml-2" 
-
-                                >
-
-                                    <div class="meta-icon !bg-[var(--primary)]/10 !text-[var(--primary)] !w-6 !h-6 !mr-0 shrink-0 mt-[2px]">
-
-                                        <Icon name="material-symbols:tag-rounded" class="text-base"></Icon>
-
-                                    </div>
-
-                                    {tags.map((tag, i) => (
-
-                                        <a href={getTagUrl(tag)} 
-
-                                           class="inline-flex items-center h-6 px-2 rounded-md bg-black/5 dark:bg-white/10 hover:bg-[var(--primary)]/10 hover:text-[var(--primary)] transition-all whitespace-nowrap shrink-0"
-
-                                        >
-
-                                            {tag.replaceAll(' ', '\u00A0')}
-
-                                        </a>
-
-                                    ))}
-
-                                </div>
-
-                            </div>
-
-                        )}
-
-    
-
-                        <!-- Tier 3: word count, read time, and date -->
-
-                        <div class:list={["text-[11px] md:text-[12px] text-black/50 dark:text-white/50 flex flex-nowrap gap-x-2 md:gap-x-4 transition relative z-10 pointer-events-none whitespace-nowrap"]}>
-
-                            <div class="flex items-center pl-2 -ml-2 shrink-0">
-
-                                <div class="meta-icon !bg-black/5 dark:!bg-white/10 !text-black/50 dark:!text-white/50 !w-6 !h-6 !mr-2 shrink-0">
-
-                                    <Icon name="material-symbols:edit-calendar-rounded" class="text-base"></Icon>
-
-                                </div>
-
-                                {formatDateToYYYYMMDD(published)}
-
-                            </div>
-
-                            <div class="flex items-center pl-2 -ml-2 shrink-0">
-
-                                <div class="meta-icon !bg-black/5 dark:!bg-white/10 !text-black/50 dark:!text-white/50 !w-6 !h-6 !mr-2 shrink-0">
-
-                                    <Icon name="material-symbols:pace-rounded" class="text-base"></Icon>
-
-                                </div>
-
-                                {remarkPluginFrontmatter.minutes} {i18n(remarkPluginFrontmatter.minutes === 1 ? I18nKey.minuteCount : I18nKey.minutesCount)}
-
-                                <span class="mx-1.5 opacity-50">/</span>
-
-                                {remarkPluginFrontmatter.words} {i18n(remarkPluginFrontmatter.words === 1 ? I18nKey.wordCount : I18nKey.wordsCount)}
-
-                            </div>
-
-                        </div>
-
-                    </>
-
-                )}
-
-            </div>
-
         </div>
 </div>
 <div class="transition border-t-[1px] border-dashed mx-6 border-black/10 dark:border-white/[0.15] last:border-t-0 md:hidden"></div>
 
 <style define:vars={{coverWidth}}>
+    .no-scrollbar::-webkit-scrollbar {
+        display: none;
+    }
+    .no-scrollbar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
     /* 바탕 링크(peer)가 호버될 때만 제목을 파란색으로 변경. */
     /* 깃허브 등 z-30 링크에 호버하면 z-20인 peer는 호버 상태가 아니게 됨. */
     .peer:hover ~ div .title-text {
