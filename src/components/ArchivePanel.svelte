@@ -150,7 +150,7 @@ function formatTag(tagList: string[]) {
 }
 </script>
 
-<div class="card-base px-4 md:px-8 py-6 onload-animation min-h-[400px] md:min-h-[600px] overflow-hidden w-full box-border">
+<div class="card-base px-4 md:px-8 pt-6 pb-[42px] onload-animation min-h-[300px] overflow-hidden w-full box-border">
     <div class="transition text-left text-50 flex items-center flex-wrap w-full">
         {#if filterCategories.length > 0 || filterTags.length > 0}
             <div class="flex flex-col items-center justify-center w-full py-6 gap-3">
@@ -226,12 +226,12 @@ function formatTag(tagList: string[]) {
 
     {#each groups as group}
         <div class="mb-8 last:mb-0">
-            <div class="flex flex-row w-full items-center h-[3.75rem]">
-                <div class="w-[15%] md:w-[10%] transition text-2xl font-semibold text-right text-75">{group.year}</div>
-                <div class="w-[15%] md:w-[10%]">
-                    <div class="h-3 w-3 bg-none rounded-full outline outline-[var(--primary)] mx-auto -outline-offset-[2px] z-50 outline-3"></div>
+            <div class="flex flex-row justify-start items-center px-2 gap-2 h-[3.75rem]">
+                <div class="w-[17%] md:w-[10%] transition text-2xl font-semibold text-right text-75">{group.year}</div>
+                <div class="w-[13%] md:w-[10%] relative flex items-center justify-center shrink-0">
+                    <span class="text-black/35 dark:text-white/35 tracking-[0.2em] font-bold select-none text-xs -translate-y-[3px]">.....</span>
                 </div>
-                <div class="w-[70%] md:w-[80%] transition text-left text-50 text-base md:text-base flex items-center">
+                <div class="flex-1 transition text-left text-50 text-base md:text-base flex items-center">
                     <span class="text-[var(--primary)] font-bold mr-1">{group.posts.length}</span>
                     <span class="opacity-60">{i18n(group.posts.length === 1 ? I18nKey.postCount : I18nKey.postsCount)}</span>
                 </div>
@@ -240,8 +240,8 @@ function formatTag(tagList: string[]) {
                 {#each group.posts as post}
                     <a href={getPostUrlBySlug(post.slug)} class="group btn-plain !block h-auto w-full rounded-lg overflow-hidden py-2.5">
                         <div class="flex flex-row justify-start items-center px-2 gap-2">
-                            <div class="w-[18%] md:w-[10%] transition text-sm text-right text-50 shrink-0 leading-none">{formatDate(post.data.published)}</div>
-                            <div class="w-[12%] md:w-[10%] relative dash-line flex items-center shrink-0">
+                            <div class="w-[17%] md:w-[10%] transition text-sm text-right text-50 shrink-0 leading-none">{formatDate(post.data.published)}</div>
+                            <div class="w-[13%] md:w-[10%] relative dash-line flex items-center shrink-0">
                                 <div class="transition-all mx-auto w-1.5 h-1.5 rounded-full group-hover:h-5 bg-[oklch(0.5_0.05_var(--hue))] group-hover:bg-[var(--primary)] outline outline-4 z-50 outline-[var(--card-bg)]"></div>
                             </div>
                             <div class="flex-1 min-w-0 text-left font-medium group-hover:translate-x-1 transition-all group-hover:text-[var(--primary)] text-75 pr-4 line-clamp-2 [text-wrap:balance] break-keep leading-tight">

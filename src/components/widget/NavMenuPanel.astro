@@ -89,21 +89,21 @@ if (isPostPage) {
 </div>
 
 <style>
-    /* 독서 모드 별표(*) 포인트 */
+    /* 독서 모드 별표(*) 포인트 (선명하게 표시) */
     .reading-active-star .category-label::after {
         content: "*";
         display: inline-block;
         color: var(--primary);
         font-weight: 900;
-        font-size: 1rem;
+        font-size: 1.25rem;
         margin-left: 2px;
         vertical-align: top;
-        line-height: 0.8;
+        line-height: 1;
         animation: pulse-opacity 1.5s ease-in-out infinite;
     }
 
     @keyframes pulse-opacity {
-        0%, 100% { opacity: 0.2; }
+        0%, 100% { opacity: 0; }
         50% { opacity: 1; }
     }
 
@@ -175,22 +175,69 @@ if (isPostPage) {
     const links = panel?.querySelectorAll("a");
 
     function updateMenuState() {
-        const pathname = window.location.pathname;
+        const path = window.location.pathname;
+        const pathname = path.endsWith('/') ? path : `${path}/`;
+        const urlParams = new URLSearchParams(window.location.search);
         const isPostPage = pathname.includes('/posts/');
-        const menuItems = document.querySelectorAll('.menu-item');
+        const menuItems = document.querySelectorAll('#nav-menu-panel .menu-item');
+        
+        // 1. [초기화] 모든 항목의 활성 상태 클래스 제거
+        menuItems.forEach(item => {
+            item.classList.remove('reading-active-star', 'bg-[var(--primary)]/[0.08]');
+            const label = item.querySelector('.category-label');
+            if (label) {
+                label.classList.remove('text-[var(--primary)]');
+                label.classList.add('text-black/70', 'dark:text-white/70');
+            }
+        });
+
+        let activeCategory = urlParams.get('category');
+
+        // 2. 포스트 페이지일 경우, 현재 본문의 카테고리 링크를 찾아 정보 추출
+        if (isPostPage) {
+            // [수정] 더 구체적인 셀렉터로 현재 포스트의 카테고리 추출
+            const postCategoryLink = document.querySelector('.prose a[href*="category="], #post-container a[href*="category="]');
+            if (postCategoryLink) {
+                const search = new URL((postCategoryLink as HTMLAnchorElement).href, window.location.origin).search;
+                activeCategory = new URLSearchParams(search).get('category');
+            }
+        }
 
         menuItems.forEach(item => {
-            // 1. 홈이나 아카이브일 경우 모든 '독서 중' 별표 제거
-            if (!isPostPage) {
-                item.classList.remove('reading-active-star');
-                const label = item.querySelector('.category-label');
-                if (label) label.classList.remove('text-[var(--primary)]');
+            const hrefAttr = item.getAttribute('href');
+            if (!hrefAttr) return;
+
+            const itemUrl = new URL(hrefAttr, window.location.origin);
+            const itemPath = itemUrl.pathname.endsWith('/') ? itemUrl.pathname : `${itemUrl.pathname}/`;
+            const itemCategory = itemUrl.searchParams.get('category');
+            const label = item.querySelector('.category-label');
+            
+            // 3. 카테고리 활성 상태 확인 (일반 카테고리 뷰 또는 포스트 읽기 중)
+            // [강화] 완전 일치(Exact Match) 확인
+            if (activeCategory && itemCategory === activeCategory) {
+                item.classList.add('bg-[var(--primary)]/[0.08]');
+                if (label) {
+                    label.classList.add('text-[var(--primary)]');
+                    label.classList.remove('text-black/70', 'dark:text-white/70');
+                }
+                if (isPostPage) {
+                    item.classList.add('reading-active-star');
+                }
             }
             
-            // 2. 현재 URL과 일치하는 항목 하이라이트 (선택 사항 - 더 정확한 피드백을 위해)
-            const href = item.getAttribute('href');
-            if (href && pathname === href) {
+            // 4. 현재 URL과 정확히 일치하는 항목 (Home, Archive 등 기본 링크)
+            if (!activeCategory && pathname === itemPath && itemPath !== '/') {
                 item.classList.add('bg-[var(--primary)]/[0.08]');
+                if (label) {
+                    label.classList.add('text-[var(--primary)]');
+                    label.classList.remove('text-black/70', 'dark:text-white/70');
+                }
+            }
+            
+            // 홈(Root) 예외 처리
+            if (!activeCategory && pathname === '/' && itemPath === '/') {
+                item.classList.add('bg-[var(--primary)]/[0.08]');
+                if (label) label.classList.add('text-[var(--primary)]');
             }
         });
     }
@@ -205,8 +252,12 @@ if (isPostPage) {
         });
     }
 
-    // Swup 전환 시마다 메뉴 상태를 다시 계산
-    document.addEventListener('swup:content:replace', updateMenuState);
+    // Swup 전환 및 페이지 로드 시마다 메뉴 상태를 다시 계산
+    document.addEventListener('swup:content:replace', () => {
+        // 컨텐츠 교체 후 DOM이 안정화될 시간을 짧게 부여
+        setTimeout(updateMenuState, 10);
+    });
+    document.addEventListener('astro:page-load', updateMenuState);
     
     // 페이지 로드 시 시작 시 메뉴를 무조건 닫음 (기존 로직 유지)
     document.addEventListener('swup:visit:start', () => {
