@@ -235,24 +235,34 @@ const { class: className, style } = Astro.props;
     }
 
     function updateActiveStates(tree: HTMLElement, firstLoad = false) {
-        // 1. [초기화] 모든 활성 상태 제거 및 모든 아코디언 닫기 (Auto-Focusing을 위해)
-        tree.querySelectorAll('.active-category-link, .reading-active-dot, .active-branch').forEach(el => {
-            el.classList.remove('active-category-link', 'reading-active-dot', 'active-branch');
-        });
+        const urlParams = new URLSearchParams(window.location.search);
+        const pathname = window.location.pathname;
+        const isHome = pathname === '/' || pathname === '/blog/' || (!urlParams.get('category') && !pathname.includes('/posts/'));
+
+        const clearStates = () => {
+            tree.querySelectorAll('.active-category-link, .reading-active-dot, .active-branch').forEach(el => {
+                el.classList.remove('active-category-link', 'reading-active-dot', 'active-branch');
+            });
+            // 모든 아이콘 상태 초기화 (색상 및 회전)
+            tree.querySelectorAll('.toggle-chevron').forEach(icon => {
+                (icon as HTMLElement).style.transform = 'rotate(0deg)';
+                icon.classList.remove('active');
+            });
+        };
+
+        // 1. [초기화] 모든 활성 상태 제거 (홈으로 이동 시에는 아코디언 닫힘과 조화되도록 지연 적용)
+        if (isHome && !firstLoad) {
+            setTimeout(clearStates, 250);
+        } else {
+            clearStates();
+        }
 
         // 모든 아코디언 닫기 (현재 경로만 열기 위해 일단 다 닫음)
         tree.querySelectorAll('.accordion-content.open').forEach(el => {
             (el as HTMLElement).style.maxHeight = '0px';
             el.classList.remove('open');
-            const icon = el.parentElement?.querySelector('.toggle-chevron') as HTMLElement;
-            if (icon) {
-                icon.style.transform = 'rotate(0deg)';
-                icon.classList.remove('active');
-            }
         });
 
-        const urlParams = new URLSearchParams(window.location.search);
-        const pathname = window.location.pathname;
         let activeCategory = urlParams.get('category');
         const isPostPage = pathname.includes('/posts/');
 
@@ -281,22 +291,24 @@ const { class: className, style } = Astro.props;
                     if (isPostPage) btn.classList.add('reading-active-dot');
                 }
                 
-                // [수정] 상위 아코디언을 모두 찾아 강제로 펼침
+                // [수정] 상위 아코디언을 모두 찾아 강제로 펼침 및 아이콘 활성화
                 let parent = item.closest('.accordion-item');
                 while (parent) {
                     parent.classList.add('active-branch');
                     const content = parent.querySelector('.accordion-content') as HTMLElement;
                     const icon = parent.querySelector('.toggle-chevron') as HTMLElement;
                     
+                    // 아이콘 상태 적용 (콘텐츠 열림 여부와 상관없이 활성 경로면 적용)
+                    if (icon) {
+                        icon.style.transform = 'rotate(90deg)';
+                        icon.classList.add('active');
+                    }
+
                     if (content) {
                         // firstLoad 여부와 상관없이, 활성화된 카테고리 경로는 무조건 엶
                         if (!content.classList.contains('open')) {
                             content.style.maxHeight = content.scrollHeight + 'px';
                             content.classList.add('open');
-                            if (icon) {
-                                icon.style.transform = 'rotate(90deg)';
-                                icon.classList.add('active');
-                            }
                         } else {
                             // 이미 열려있더라도 높이 재계산 (동적 컨텐츠 대응)
                             content.style.maxHeight = content.scrollHeight + 'px';
