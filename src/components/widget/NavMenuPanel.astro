@@ -1,39 +1,199 @@
 ---
 import { Icon } from "astro-icon/components";
 import { type NavBarLink } from "../../types/config";
-import { url } from "../../utils/url-utils";
+import { url, getCategoryUrl } from "../../utils/url-utils";
+import { getCategoryList, getSortedPosts } from "../../utils/content-utils";
 
 interface Props {
 	links: NavBarLink[];
 }
 
-const links = Astro.props.links;
+const { links } = Astro.props;
+const categories = await getCategoryList();
+const allPosts = await getSortedPosts();
+
+// 현재 경로 및 독서 중인 포스트 정보 확인
+const currentUrl = new URL(Astro.request.url);
+const activeCategory = currentUrl.searchParams.get("category");
+const isPostPage = !!Astro.params.slug;
+let postCategory = "";
+
+if (isPostPage) {
+    const currentPost = allPosts.find((p) => p.slug === Astro.params.slug);
+    postCategory = currentPost?.data.category || "";
+}
 ---
-<div id="nav-menu-panel" class:list={["float-panel float-panel-closed transition-all fixed right-4 px-2 py-2"]}>
-    {links.map((link) => (
-        <a href={link.external ? link.url : url(link.url)} class="group flex justify-between items-center py-2 pl-3 pr-1 rounded-lg gap-8
-            hover:bg-[var(--btn-plain-bg-hover)] active:bg-[var(--btn-plain-bg-active)] transition
-        "
-           target={link.external ? "_blank" : null}
-        >
-            <div class="transition text-black/75 dark:text-white/75 font-semibold group-hover:text-[var(--primary)] group-active:text-[var(--primary)]">
-                {link.name}
-            </div>
-            {!link.external && <Icon name="material-symbols:chevron-right-rounded"
-                  class="transition text-[1.25rem] text-[var(--primary)]"
+<div id="nav-menu-panel" class:list={["float-panel float-panel-closed transition-all fixed right-4 p-3 min-w-[16rem] max-h-[75vh] overflow-y-auto custom-scrollbar shadow-xl"]}>
+    {/* 상단 기본 링크 - 태블릿 이상에서는 네비바와 중복되므로 숨김 */}
+    <div class="flex flex-col mb-1 md:hidden">
+        {/* 페이지 헤더 */}
+        <div class="menu-item px-4 py-2 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.2em] text-black/45 dark:text-white/45 select-none"
+             style="--i: 0; font-feature-settings: 'case' 1, 'cpsp' 1; font-kerning: normal;">
+            <Icon name="material-symbols:layers-outline-rounded" class="text-base text-[var(--primary)] opacity-80 -translate-y-[0.5px]" />
+            <span class="leading-none">Pages</span>
+        </div>
+
+        {links.map((link, index) => (
+            <a href={link.external ? link.url : url(link.url)} 
+               class="menu-item group flex justify-between items-center py-3 pl-4 pr-2 rounded-xl gap-8 hover:bg-[var(--btn-plain-bg-hover)] active:bg-[var(--btn-plain-bg-active)] transition-all duration-300"
+               style={`--i: ${index + 1}`}
+               target={link.external ? "_blank" : null}
             >
-            </Icon>}
-            {link.external && <Icon name="material-symbols:open-in-new-rounded"
-                  class="transition text-[1rem] text-black/50 dark:text-white/50 -translate-x-1"
-            >
-            </Icon>}
-        </a>
-    ))}
+                <div class="transition text-black/75 dark:text-white/75 font-bold group-hover:text-[var(--primary)] group-active:text-[var(--primary)] text-sm">
+                    {link.name}
+                </div>
+            </a>
+        ))}
+        {/* 구분선 - 모바일에서만 노출 */}
+        <div class="mx-4 my-2 border-t border-black/[0.12] dark:border-white/[0.12]"></div>
+    </div>
+
+    {/* 카테고리 헤더 */}
+    <div class="menu-item px-4 py-2 mt-2 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.2em] text-black/45 dark:text-white/45 select-none"
+         style={`--i: ${links.length + 1}; font-feature-settings: "case" 1, "cpsp" 1; font-kerning: normal;`}>
+        <Icon name="material-symbols:folder-open-outline-rounded" class="text-base text-[var(--primary)] opacity-80 -translate-y-[0.5px]" />
+        <span class="leading-none">Categories</span>
+    </div>
+
+    {/* 카테고리 목록 */}
+    <div class="flex flex-col pb-2">
+        {categories.map((cat, index) => {
+            const isActive = activeCategory === cat.name;
+            const isReading = isPostPage && postCategory === cat.name;
+            const parts = cat.name.split('/');
+            const depth = parts.length; // 1, 2, 3 등
+            const totalIndex = links.length + 2 + index;
+            
+            return (
+                <a href={getCategoryUrl(cat.name)} 
+                   class="menu-item group flex justify-between items-center py-3 pr-2 rounded-xl transition-all duration-300"
+                   style={`--i: ${totalIndex}`}
+                   class:list={[
+                    (isActive || isReading) ? "bg-[var(--primary)]/[0.08]" : "hover:bg-[var(--btn-plain-bg-hover)]",
+                    depth === 1 ? "pl-4" : depth === 2 ? "pl-9" : "pl-14",
+                    { "reading-active-star": isReading }
+                ]}>
+                    <div class:list={[
+                        "text-sm transition-colors duration-300 flex items-center",
+                        (isActive || isReading) ? "text-[var(--primary)]" : "text-black/70 dark:text-white/70 group-hover:text-[var(--primary)]",
+                        depth === 1 ? "font-bold text-[15px]" : "font-light text-[14px]"
+                    ]}
+                    style={depth === 3 ? "font-kerning: normal;" : ""}
+                    >
+                        <span class="category-label capitalize leading-none">{parts[parts.length - 1]}</span>
+                    </div>
+                </a>
+            )
+        })}
+    </div>
 </div>
+
+<style>
+    /* 독서 모드 별표(*) 포인트 */
+    .reading-active-star .category-label::after {
+        content: "*";
+        display: inline-block;
+        color: var(--primary);
+        font-weight: 900;
+        font-size: 1rem;
+        margin-left: 2px;
+        vertical-align: top;
+        line-height: 0.8;
+        animation: pulse-opacity 1.5s ease-in-out infinite;
+    }
+
+    @keyframes pulse-opacity {
+        0%, 100% { opacity: 0.2; }
+        50% { opacity: 1; }
+    }
+
+    #nav-menu-panel {
+        /* 열기: 0.5초 동안 쫀득하게 (Back-Out) */
+        transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), 
+                    opacity 0.5s cubic-bezier(0.34, 1.56, 0.64, 1),
+                    visibility 0.5s;
+        transform: translateY(0);
+        opacity: 1;
+        visibility: visible;
+    }
+
+    :global(.float-panel-closed)#nav-menu-panel {
+        /* 닫기: 0.2초 만에 휘리릭 (Ease-In) */
+        transition: transform 0.2s ease-in, 
+                    opacity 0.2s ease-in,
+                    visibility 0.2s;
+        transform: translateY(-15px);
+        opacity: 0;
+        visibility: hidden;
+    }
+
+    /* 개별 메뉴 항목 "차르륵" 등장 효과 */
+    .menu-item {
+        opacity: 0;
+        transform: translateY(-12px);
+        /* 등장 애니메이션: opacity와 transform에만 지연 시간 적용 */
+        transition: opacity 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), 
+                    transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1),
+                    background-color 0.3s ease,
+                    color 0.3s ease;
+        transition-delay: calc(var(--i) * 0.05s), calc(var(--i) * 0.05s), 0s, 0s;
+    }
+
+    /* 호버 시에는 모든 지연 시간을 제거하여 즉시 반응 */
+    .menu-item:hover {
+        transition-delay: 0s !important;
+    }
+
+    /* 패널이 열렸을 때 */
+    #nav-menu-panel:not(.float-panel-closed) .menu-item {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    /* 패널이 닫힐 때: 지연 없이 0.2초 동안 신속하게 퇴장 */
+    :global(.float-panel-closed) .menu-item {
+        opacity: 0;
+        transform: translateY(-12px);
+        transition: opacity 0.2s ease-in, transform 0.2s ease-in;
+        transition-delay: 0s !important;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar {
+        width: 4px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: rgba(0,0,0,0.1);
+        border-radius: 10px;
+    }
+    :global(.dark) .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: rgba(255,255,255,0.1);
+    }
+</style>
 
 <script>
     const panel = document.getElementById("nav-menu-panel");
     const links = panel?.querySelectorAll("a");
+
+    function updateMenuState() {
+        const pathname = window.location.pathname;
+        const isPostPage = pathname.includes('/posts/');
+        const menuItems = document.querySelectorAll('.menu-item');
+
+        menuItems.forEach(item => {
+            // 1. 홈이나 아카이브일 경우 모든 '독서 중' 별표 제거
+            if (!isPostPage) {
+                item.classList.remove('reading-active-star');
+                const label = item.querySelector('.category-label');
+                if (label) label.classList.remove('text-[var(--primary)]');
+            }
+            
+            // 2. 현재 URL과 일치하는 항목 하이라이트 (선택 사항 - 더 정확한 피드백을 위해)
+            const href = item.getAttribute('href');
+            if (href && pathname === href) {
+                item.classList.add('bg-[var(--primary)]/[0.08]');
+            }
+        });
+    }
 
     if (panel && links) {
         links.forEach((link) => {
@@ -44,4 +204,12 @@ const links = Astro.props.links;
             });
         });
     }
+
+    // Swup 전환 시마다 메뉴 상태를 다시 계산
+    document.addEventListener('swup:content:replace', updateMenuState);
+    
+    // 페이지 로드 시 시작 시 메뉴를 무조건 닫음 (기존 로직 유지)
+    document.addEventListener('swup:visit:start', () => {
+        panel?.classList.add("float-panel-closed");
+    });
 </script>

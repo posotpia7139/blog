@@ -22,16 +22,16 @@ interface Group {
 }
 
 let {
-	tags: initialTags = [],
-	categories: initialCategories = [],
+	tags = [],
+	categories = [],
 	sortedPosts = [],
 } = $props();
 
 let mounted = $state(false);
 let displayCount = $state(0);
 let isPopping = $state(false);
-let filterTags = $state(initialTags);
-let filterCategories = $state(initialCategories);
+let filterTags = $state(untrack(() => tags));
+let filterCategories = $state(untrack(() => categories));
 
 const toDate = (d: Date | string) => {
 	const date = d instanceof Date ? d : new Date(d);
@@ -81,6 +81,11 @@ const groups = $derived.by(() => {
 });
 
 const targetCount = $derived(filteredPosts.length);
+
+const newestDate = $derived(sortedPosts.length > 0 ? toDate(sortedPosts[0].data.published) : new Date());
+const oldestDate = $derived(sortedPosts.length > 0 ? toDate(sortedPosts[sortedPosts.length - 1].data.published) : newestDate);
+
+const categorySegments = $derived(filterCategories.length > 0 ? filterCategories[0].split('/') : []);
 
 // [타임라인] 숫자 노출 시작 지연 시간
 const START_DELAY = 1550;
@@ -145,26 +150,27 @@ function formatTag(tagList: string[]) {
 }
 </script>
 
-<div class="card-base px-8 py-6 onload-animation min-h-[400px] md:min-h-[600px]">
-    <div class="transition text-left text-50 flex items-center flex-wrap">
+<div class="card-base px-4 md:px-8 py-6 onload-animation min-h-[400px] md:min-h-[600px] overflow-hidden w-full box-border">
+    <div class="transition text-left text-50 flex items-center flex-wrap w-full">
         {#if filterCategories.length > 0 || filterTags.length > 0}
-            <div class="flex flex-col items-start w-full py-4 pl-2">
-                <div class="flex flex-row items-center flex-wrap justify-start">
+            <div class="flex flex-col items-center justify-center w-full py-6 gap-3">
+                <div class="flex flex-row items-center flex-wrap justify-center px-4">
                     {#if filterCategories.length > 0}
-                        <div class="h-6 w-6 rounded-md bg-black/5 dark:bg-white/10 flex items-center justify-center mr-2">
+                        <div class="h-6 w-6 rounded-md bg-black/5 dark:bg-white/10 flex items-center justify-center mr-2 shrink-0">
                             <Icon icon="material-symbols:folder-open-outline-rounded" class="text-[var(--primary)] text-[15px]" />
                         </div>
-                        {@const segments = filterCategories[0].split('/')}
-                        {#each segments as segment, i}
-                            {#if i > 0}
-                                <span class="mx-2 opacity-30 text-[13px]">/</span>
-                            {/if}
-                            <span class="text-[13px] capitalize {i === segments.length - 1 ? 'text-[var(--primary)] font-bold' : 'text-black/75 dark:text-white/75'}">
-                                {segment}
-                            </span>
-                        {/each}
+                        <div class="flex items-center flex-wrap justify-center">
+                            {#each categorySegments as segment, i}
+                                {#if i > 0}
+                                    <span class="mx-2 opacity-30 text-[13px]">/</span>
+                                {/if}
+                                <span class="text-[13px] capitalize {i === categorySegments.length - 1 ? 'text-[var(--primary)] font-bold' : 'text-black/75 dark:text-white/75'}">
+                                    {segment}
+                                </span>
+                            {/each}
+                        </div>
                     {:else if filterTags.length > 0}
-                        <div class="h-6 w-6 rounded-md bg-black/5 dark:bg-white/10 flex items-center justify-center mr-2">
+                        <div class="h-6 w-6 rounded-md bg-black/5 dark:bg-white/10 flex items-center justify-center mr-2 shrink-0">
                             <Icon icon="material-symbols:tag-rounded" class="text-[var(--primary)] text-[15px]" />
                         </div>
                         <span class="text-[var(--primary)] font-bold text-[13px] capitalize">
@@ -172,16 +178,14 @@ function formatTag(tagList: string[]) {
                         </span>
                     {/if}
                 </div>
-                <div class="mt-1 flex items-center shrink-0">
+                <div class="flex items-center justify-center shrink-0">
                     <span class="text-[13px] opacity-60">게시물&nbsp;</span>
                     <span class="text-[var(--primary)] font-bold text-[13px]">{targetCount}</span>
                     <span class="text-[13px] opacity-60">개</span>
                 </div>
+                <div class="w-16 h-1 rounded-full bg-[var(--primary)]/10 mt-2"></div>
             </div>
         {:else}
-            {@const newestDate = sortedPosts.length > 0 ? toDate(sortedPosts[0].data.published) : new Date()}
-            {@const oldestDate = sortedPosts.length > 0 ? toDate(sortedPosts[sortedPosts.length - 1].data.published) : newestDate}
-            
             <div class="flex flex-col items-center w-full py-8 mt-2 mb-6 overflow-hidden gap-4">
                 <div class="flex flex-col items-center">
                     <div class="flex flex-row mb-2">
@@ -234,13 +238,13 @@ function formatTag(tagList: string[]) {
             </div>
             <div class="mt-2 space-y-1">
                 {#each group.posts as post}
-                    <a href={getPostUrlBySlug(post.slug)} class="group btn-plain !block h-10 w-full rounded-lg">
-                        <div class="flex flex-row justify-start items-center h-full">
-                            <div class="w-[15%] md:w-[10%] transition text-sm text-right text-50">{formatDate(post.data.published)}</div>
-                            <div class="w-[15%] md:w-[10%] relative dash-line h-full flex items-center">
-                                <div class="transition-all mx-auto w-1 h-1 rounded group-hover:h-5 bg-[oklch(0.5_0.05_var(--hue))] group-hover:bg-[var(--primary)] outline outline-4 z-50 outline-[var(--card-bg)]"></div>
+                    <a href={getPostUrlBySlug(post.slug)} class="group btn-plain !block h-auto w-full rounded-lg overflow-hidden py-2.5">
+                        <div class="flex flex-row justify-start items-center px-2 gap-2">
+                            <div class="w-[18%] md:w-[10%] transition text-sm text-right text-50 shrink-0 leading-none">{formatDate(post.data.published)}</div>
+                            <div class="w-[12%] md:w-[10%] relative dash-line flex items-center shrink-0">
+                                <div class="transition-all mx-auto w-1.5 h-1.5 rounded-full group-hover:h-5 bg-[oklch(0.5_0.05_var(--hue))] group-hover:bg-[var(--primary)] outline outline-4 z-50 outline-[var(--card-bg)]"></div>
                             </div>
-                            <div class="w-[70%] md:max-w-[65%] md:w-[65%] text-left font-medium group-hover:translate-x-1 transition-all group-hover:text-[var(--primary)] text-75 pr-8 whitespace-nowrap overflow-ellipsis overflow-hidden">
+                            <div class="flex-1 min-w-0 text-left font-medium group-hover:translate-x-1 transition-all group-hover:text-[var(--primary)] text-75 pr-4 line-clamp-2 [text-wrap:balance] break-keep leading-tight">
                                 {post.data.title}
                             </div>
                         </div>

@@ -47,8 +47,8 @@ const mainPanelTop = siteConfig.banner.enable
 
 <!-- Navbar -->
 <slot slot="head" name="head"></slot>
-<div id="top-row" class="z-50 pointer-events-none relative transition-all duration-700 max-w-[var(--page-width)] px-0 md:px-4 mx-auto" class:list={[""]}>
-    <div id="navbar-wrapper" class="pointer-events-auto sticky top-0 transition-all">
+<div id="top-row" class="z-50 pointer-events-none relative w-full max-w-[var(--page-width)] px-0 md:px-4 mx-auto">
+    <div id="navbar-wrapper" class="pointer-events-auto sticky top-0 w-full">
         <Navbar></Navbar>
     </div>
 </div>
@@ -65,9 +65,8 @@ const mainPanelTop = siteConfig.banner.enable
 <div class="absolute w-full z-30 pointer-events-none" style={`top: ${mainPanelTop}`}>
             <!-- The pointer-events-none here prevent blocking the click event of the TOC -->
             <div class="relative max-w-[var(--page-width)] mx-auto pointer-events-auto">
-                <div id="main-grid" class="w-full left-0 right-0 grid grid-cols-[auto_18.75rem] grid-rows-[auto_auto_1fr] lg:grid-rows-[1fr_auto]
+                <div id="main-grid" class="w-full left-0 right-0 grid grid-cols-1 lg:grid-cols-[auto_18.75rem] grid-rows-auto
             mx-auto gap-y-4 gap-x-4 px-0 md:px-4"
-                     style={`min-height: calc(100vh - ${mainPanelTop})`}
                 >
                     {/* Banner image credit */}
                     {hasBannerCredit && <a href={siteConfig.banner.credit.url} id="banner-credit" target="_blank" rel="noopener" aria-label="Visit image source"
@@ -82,72 +81,64 @@ const mainPanelTop = siteConfig.banner.enable
                         </Icon>
                     </a>}
         
-                    <main id="swup-container" class="transition-swup-fade col-span-2 lg:col-start-1 lg:col-span-1 row-start-1 overflow-hidden flex flex-col">
-                        <div id="content-wrapper" class="onload-animation grow">
-                            <slot></slot>
+                    <div id="swup-container" class="transition-swup-fade col-span-1 flex flex-col gap-4">
+                        <main id="main-content" class="overflow-hidden flex flex-col">
+                            <div id="content-wrapper" class="onload-animation grow">
+                                <slot></slot>
+                            </div>
+                        </main>
+            
+                        <div id="footer-wrapper" class="onload-animation mt-[28px] mb-[44px] flex flex-col justify-end">
+                            <Footer></Footer>
                         </div>
-                    </main>
-        
-                    <SideBar class:list={[
-                        "row-start-2 lg:row-start-1 col-span-2 lg:col-start-2 lg:col-span-1 lg:w-[18.75rem] onload-animation",
-                        {"block": showSidebarOnMobile, "hidden lg:block": !showSidebarOnMobile}
-                    ]} headings={headings}></SideBar>
-        
-                    <div id="footer-wrapper" class="onload-animation col-span-2 lg:col-start-1 lg:col-span-1 row-start-3 lg:row-start-2 pb-4 flex flex-col justify-end">
-                        <Footer></Footer>
                     </div>
+        
+                    <SideBar class="hidden lg:block lg:col-start-2 lg:w-[18.75rem] onload-animation" headings={headings}></SideBar>
                 </div>
             </div>    </div>
 </div>
 
 <!-- The things that should be under the banner, only the TOC for now -->
-<div class="absolute w-full z-0 hidden 2xl:block">
-    <div class="relative max-w-[var(--page-width)] mx-auto">
-        <!-- TOC component -->
-        {siteConfig.toc.enable && <div id="toc-wrapper" class:list={["hidden 2xl:block transition-all duration-500 absolute top-0 opacity-0 pointer-events-none"]}
-        >
-            <div class="fixed top-4 flex flex-col items-end w-fit"
-                 style="right: calc(50vw + var(--page-width) / 2); max-width: calc(50vw - var(--page-width) / 2 - 16px);">
-                <div id="toc" class="w-full h-full transition-swup-fade flex flex-col items-end">
-                    <TOC headings={headings} class="w-fit ml-auto" isFloating={true}></TOC>
+{siteConfig.toc.enable && (
+    <div class="absolute w-full z-0 hidden 2xl:block h-0 overflow-visible">
+        <div class="relative max-w-[var(--page-width)] mx-auto">
+            <div id="toc-wrapper" class:list={["hidden 2xl:block transition-all duration-500 absolute top-0 opacity-0 pointer-events-none"]}>
+                <div class="fixed top-4 flex flex-col items-end w-fit"
+                     style="right: calc(50vw + var(--page-width) / 2); max-width: calc(50vw - var(--page-width) / 2 - 16px);">
+                    <div id="toc" class="w-full h-full flex flex-col items-end">
+                        <TOC headings={headings} class="w-fit ml-auto" isFloating={true}></TOC>
+                    </div>
                 </div>
             </div>
-        </div>}
 
-        <script is:inline>
-            function initTOCVisibility() {
-                const topToc = document.getElementById('top-toc-container');
-                const floatingToc = document.getElementById('toc-wrapper');
-                
-                if (!topToc || !floatingToc) return;
+            <script is:inline>
+                function initTOCVisibility() {
+                    const topToc = document.getElementById('top-toc-container');
+                    const floatingToc = document.getElementById('toc-wrapper');
+                    
+                    if (!topToc || !floatingToc) return;
 
-                const observer = new IntersectionObserver((entries) => {
-                    entries.forEach(entry => {
-                        // intersectionRatio가 0.95보다 작고, 요소가 화면 상단으로 나가는 중일 때
-                        if (entry.intersectionRatio < 0.95 && entry.boundingClientRect.top < 0) {
-                            // 사이드 TOC 노출
-                            floatingToc.classList.remove('opacity-0', 'pointer-events-none');
-                            floatingToc.classList.add('opacity-100', 'pointer-events-auto');
-                        } else {
-                            // 그 외의 경우 (목차가 충분히 보이거나 아직 도달하지 않음)
-                            floatingToc.classList.add('opacity-0', 'pointer-events-none');
-                            floatingToc.classList.remove('opacity-100', 'pointer-events-auto');
-                        }
+                    const observer = new IntersectionObserver((entries) => {
+                        entries.forEach(entry => {
+                            if (entry.intersectionRatio < 0.95 && entry.boundingClientRect.top < 0) {
+                                floatingToc.classList.remove('opacity-0', 'pointer-events-none');
+                                floatingToc.classList.add('opacity-100', 'pointer-events-auto');
+                            } else {
+                                floatingToc.classList.add('opacity-0', 'pointer-events-none');
+                                floatingToc.classList.remove('opacity-100', 'pointer-events-auto');
+                            }
+                        });
+                    }, { 
+                        threshold: [0, 0.95]
                     });
-                }, { 
-                    threshold: [0, 0.95] // 0%와 95% 가시성 지점에서 감지
-                });
 
-                observer.observe(topToc);
-            }
+                    observer.observe(topToc);
+                }
 
-            // 페이지 로드 및 Swup 전환 시 실행
-            initTOCVisibility();
-            document.addEventListener('swup:content:replace', initTOCVisibility);
-        </script>
-
-        <!-- #toc needs to exist for Swup to work normally -->
-        {!siteConfig.toc.enable && <div id="toc"></div>}
+                initTOCVisibility();
+                document.addEventListener('swup:content:replace', initTOCVisibility);
+            </script>
+        </div>
     </div>
-</div>
+)}
 </Layout>

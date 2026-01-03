@@ -1,0 +1,61 @@
+---
+import { getCategoryList } from "../../utils/content-utils";
+import { getCategoryUrl } from "../../utils/url-utils";
+
+const categories = await getCategoryList();
+
+// 현재 활성화된 카테고리 확인
+const url = new URL(Astro.request.url);
+const activeCategory = url.searchParams.get("category");
+
+// 1차 카테고리만 필터링 및 정리
+const allCategories = [
+    { name: "전체", url: "/" },
+    ...categories.filter(c => !c.name.includes('/')).map(c => ({
+        name: c.name,
+        url: getCategoryUrl(c.name)
+    }))
+];
+---
+
+<div class="mobile-categories-wrapper lg:hidden w-full sticky top-[72px] z-40">
+    <div class="flex items-center px-4 h-11 overflow-x-auto no-scrollbar whitespace-nowrap gap-6 border-b border-black/[0.03] dark:border-white/[0.03]">
+        {allCategories.map((cat) => {
+            const isActive = (!activeCategory && cat.name === "전체") || activeCategory === cat.name;
+            
+            return (
+                <a href={cat.url} 
+                   class:list={[
+                       "relative h-full flex items-center text-[13px] font-medium transition-all tracking-tight",
+                       isActive 
+                        ? "text-[var(--primary)] active-tab" 
+                        : "text-black/40 dark:text-white/40"
+                   ]}
+                >
+                    {cat.name}
+                    {isActive && <div class="absolute bottom-0 left-0 right-0 h-[2px] bg-[var(--primary)] rounded-full"></div>}
+                </a>
+            )
+        })}
+    </div>
+</div>
+
+<style>
+    .no-scrollbar::-webkit-scrollbar {
+        display: none;
+    }
+    .no-scrollbar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+    .mobile-categories-wrapper {
+        /* 은은한 글래스모피즘 효과만 유지 */
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        background-color: var(--page-bg);
+        opacity: 0.95;
+    }
+    .active-tab {
+        text-shadow: 0 0 10px oklch(var(--primary) / 0.2);
+    }
+</style>

@@ -41,7 +41,8 @@ function switchScheme(newMode: LIGHT_DARK_MODE) {
 	setTheme(newMode);
 }
 
-function toggleScheme() {
+function toggleScheme(e: MouseEvent) {
+    if (e) e.stopPropagation();
 	if (mode === AUTO_MODE) {
 		if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
 			switchScheme(LIGHT_MODE);
@@ -61,7 +62,7 @@ function toggleScheme() {
     <button aria-label="Light/Dark Mode" role="menuitem" 
             class="relative btn-plain scale-animation rounded-lg h-12 w-12 active:scale-90" 
             id="scheme-switch" 
-            onclick={toggleScheme}>
+            onclick={(e) => toggleScheme(e)}>
         <div class="absolute transition-opacity duration-300" class:opacity-0={mode !== LIGHT_MODE} class:opacity-100={mode === LIGHT_MODE}>
             <Icon icon="material-symbols:wb-sunny-outline-rounded" class="text-[1.25rem]"></Icon>
         </div>

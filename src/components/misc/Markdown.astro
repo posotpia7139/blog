@@ -160,55 +160,86 @@ document.addEventListener("click", function (e: MouseEvent) {
 });
 
 // 이미지 호버 시 alt 설명 툴팁 표시 기능 구현
+let tooltipTimeout: ReturnType<typeof setTimeout> | null = null;
+
 function setupImageTooltips() {
     const images = document.querySelectorAll('.custom-md img, #post-cover img');
+    let tooltip = document.querySelector('.image-alt-tooltip') as HTMLElement;
+
+    // 전역 툴팁 요소가 없으면 하나만 생성
+    if (!tooltip) {
+        tooltip = document.createElement('div');
+        tooltip.className = 'image-alt-tooltip';
+        document.body.appendChild(tooltip);
+    }
     
     images.forEach(img => {
-        img.addEventListener('mouseenter', (e) => {
-            const altText = (img as HTMLImageElement).getAttribute('alt');
-            if (!altText || altText === "") return;
-            
-            // 기존 툴팁 제거
-            const oldTooltip = document.querySelector('.image-alt-tooltip');
-            if (oldTooltip) oldTooltip.remove();
+        const handleMouseEnter = (e: Event) => {
+            if (tooltipTimeout) clearTimeout(tooltipTimeout);
 
-            const tooltip = document.createElement('div');
-            tooltip.className = 'image-alt-tooltip';
-            tooltip.textContent = altText;
-            document.body.appendChild(tooltip);
+            // 0.3초 이상 머물 때만 실행
+            tooltipTimeout = setTimeout(() => {
+                const altText = (img as HTMLImageElement).getAttribute('alt');
+                if (!altText || altText === "") return;
+                
+                tooltip.textContent = altText;
 
-            // 위치 계산 (이미지의 우측 하단 정렬)
-            const rect = img.getBoundingClientRect();
-            const tooltipWidth = tooltip.offsetWidth;
-            
-            let left = rect.right + window.scrollX - tooltipWidth;
-            let top = rect.bottom + window.scrollY + 10;
-            
-            tooltip.style.left = `${left}px`;
-            tooltip.style.top = `${top}px`;
-            
-            // 화면 밖으로 나가지 않게 조정
-            const padding = 20;
-            if (left < padding) {
-                tooltip.style.left = `${padding}px`;
-            } else if (left + tooltipWidth > window.innerWidth - padding) {
-                tooltip.style.left = `${window.innerWidth - tooltipWidth - padding}px`;
+                // 위치 계산 (이미지의 우측 하단 "안쪽" 정렬)
+                const rect = img.getBoundingClientRect();
+                const tooltipWidth = tooltip.offsetWidth;
+                const tooltipHeight = tooltip.offsetHeight;
+                
+                // 이미지 경계 안으로 12px 여백 부여
+                let left = rect.right + window.scrollX - tooltipWidth - 12;
+                let top = rect.bottom + window.scrollY - tooltipHeight - 12;
+                
+                // 화면 밖으로 나가지 않게 최종 조정 (이미지가 작을 경우 대비)
+                const padding = 20;
+                if (left < padding) left = padding;
+                
+                tooltip.style.left = `${left}px`;
+                tooltip.style.top = `${top}px`;
+                
+                tooltip.classList.add('visible');
+            }, 300);
+        };
+
+        const handleMouseLeave = () => {
+            if (tooltipTimeout) {
+                clearTimeout(tooltipTimeout);
+                tooltipTimeout = null;
             }
-        });
+            tooltip.classList.remove('visible');
+        };
 
-        img.addEventListener('mouseleave', () => {
-            const tooltip = document.querySelector('.image-alt-tooltip');
-            if (tooltip) tooltip.remove();
-        });
+        img.addEventListener('mouseenter', handleMouseEnter);
+        img.addEventListener('mouseleave', handleMouseLeave);
     });
+}
+
+// 툴팁 잔상 및 예약된 타이머 제거 (청소부 기능)
+function cleanupTooltips() {
+    if (tooltipTimeout) {
+        clearTimeout(tooltipTimeout);
+        tooltipTimeout = null;
+    }
+    const tooltip = document.querySelector('.image-alt-tooltip');
+    if (tooltip) {
+        tooltip.classList.remove('visible');
+    }
 }
 
 setupFootnoteTooltips();
 setupImageTooltips();
+
 document.addEventListener('astro:page-load', () => {
     setupFootnoteTooltips();
     setupImageTooltips();
 });
+
+// Swup 전환 시 모든 상태에서 툴팁 숨김 강제
+document.addEventListener('swup:visit:start', cleanupTooltips);
+document.addEventListener('swup:content:replace', cleanupTooltips);
 </script>
 
 <style is:global>
@@ -250,17 +281,28 @@ document.addEventListener('astro:page-load', () => {
         position: absolute;
         z-index: 100;
         padding: 0.5rem 0.8rem;
-        background: rgba(0, 0, 0, 0.75);
+        background: rgba(0, 0, 0, 0.8);
         color: white !important;
         border-radius: 0.5rem;
         font-size: 0.8125rem;
         font-weight: 500;
         pointer-events: none;
         backdrop-filter: blur(8px);
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-        transition: opacity 0.2s ease;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35); /* 아래쪽으로 드리워지는 깊은 그림자 */
         text-align: center;
         max-width: 80vw;
+        
+        /* 트랜지션 설정: 나타나고 사라질 때 공통 적용 */
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(5px);
+        transition: opacity 0.25s ease, transform 0.25s ease, visibility 0.25s;
+    }
+
+    .image-alt-tooltip.visible {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
     }
 
     .dark .image-alt-tooltip {

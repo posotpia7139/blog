@@ -97,7 +97,7 @@ const relatedPosts = allPosts
                         
                         {/* Description Overlay */}
                         <div class="absolute inset-0 bg-black/40 backdrop-blur-[3px] flex flex-col justify-center px-4 opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-10 pointer-events-none">
-                            <p class="text-white text-[11px] leading-relaxed line-clamp-3 font-normal text-center">
+                            <p class="text-white text-[11px] leading-relaxed line-clamp-3 font-normal text-center [text-wrap:balance] break-keep">
                                 {post.data.description || "이 글의 내용을 확인해보세요."}
                             </p>
                         </div>
