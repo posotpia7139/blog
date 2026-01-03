@@ -58,6 +58,15 @@ const { remarkPluginFrontmatter } = await entry.render();
 
                     <div class="flex flex-row items-center gap-4 md:gap-9 mb-0">
 
+                {/* 프로젝트인 경우 썸네일을 왼쪽에 배치 */}
+                {isProject && hasCover && (
+                    <div class:list={["shrink-0 rounded-xl overflow-hidden active:scale-95 z-40 pointer-events-none w-28 h-28 md:w-40 md:h-40 aspect-square self-center"]}>
+                        <ImageWrapper src={image} basePath={path.join("content", entry.collection, getDir(entry.id))} alt="Cover Image of the Project"
+                                  class="w-full h-full object-cover">
+                        </ImageWrapper>
+                    </div>
+                )}
+
                 <div class="flex-1 min-w-0">
 
                     <div class:list={["relative mb-2"]}>
@@ -181,15 +190,16 @@ const { remarkPluginFrontmatter } = await entry.render();
 
                             <!-- Tier 2: Tags -->
                             {tags && tags.length > 0 && (
-                                <div class:list={["flex items-center text-[12px] text-50 w-full relative z-30 pointer-events-auto"]}>
-                                    <div class="flex items-center flex-wrap w-full gap-2 pl-2 -ml-2" 
-                                    >
-                                        <div class="meta-icon !bg-[var(--primary)]/10 !text-[var(--primary)] !w-6 !h-6 !mr-0 shrink-0 mt-0">
+                                <div class:list={["flex items-start text-[12px] text-50 w-full relative z-30 pointer-events-auto"]}>
+                                    <div class="flex items-center pl-2 -ml-2 shrink-0">
+                                        <div class="meta-icon !bg-[var(--primary)]/10 !text-[var(--primary)] !w-6 !h-6 !mr-2 shrink-0">
                                             <Icon name="material-symbols:tag-rounded" class="text-base"></Icon>
                                         </div>
+                                    </div>
+                                    <div class="flex flex-wrap flex-1 gap-2 pt-0">
                                         {tags.map((tag, i) => (
                                             <a href={getTagUrl(tag)} 
-                                               class="inline-flex items-center h-6 px-2 rounded-md bg-black/5 dark:bg-white/10 hover:bg-[var(--primary)]/10 hover:text-[var(--primary)] transition-all whitespace-nowrap shrink-0"
+                                               class="inline-flex items-center h-6 px-2 rounded-md bg-black/5 dark:bg-white/10 hover:bg-[var(--primary)]/10 hover:text-[var(--primary)] transition-all whitespace-nowrap"
                                             >
                                                 {tag.replaceAll(' ', '\u00A0')}
                                             </a>
@@ -240,27 +250,14 @@ const { remarkPluginFrontmatter } = await entry.render();
 
                 </div>
 
-    
-
-                {hasCover && <div
-
-                                class:list={[
-
-                                    "shrink-0 rounded-xl overflow-hidden active:scale-95 z-40 pointer-events-none",
-
-                                    {"w-24 h-24 md:w-32 md:h-32 aspect-square self-start mt-1": !isProject},
-
-                                    {"w-28 h-28 md:w-40 md:h-40 aspect-square self-center": isProject}
-
-                                ]} >
-
-                    <ImageWrapper src={image} basePath={path.join("content", entry.collection, getDir(entry.id))} alt="Cover Image of the Post"
-
-                              class="w-full h-full object-cover">
-
-                    </ImageWrapper>
-
-                </div>}
+                {/* 블로그인 경우 썸네일을 오른쪽에 배치 */}
+                {!isProject && hasCover && (
+                    <div class:list={["shrink-0 rounded-xl overflow-hidden active:scale-95 z-40 pointer-events-none w-24 h-24 md:w-32 md:h-32 aspect-square self-start mt-1"]}>
+                        <ImageWrapper src={image} basePath={path.join("content", entry.collection, getDir(entry.id))} alt="Cover Image of the Post"
+                                  class="w-full h-full object-cover">
+                        </ImageWrapper>
+                    </div>
+                )}
 
             </div>
 
