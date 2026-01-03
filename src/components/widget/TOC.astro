@@ -62,8 +62,7 @@ const filteredHeadings = headings.filter((heading) => {
     <div class:list={["w-full", {"toc-inner-wrapper hide-scrollbar flex flex-col pb-24": isFloating}]}>
         <div class="toc w-full h-full">
             {filteredHeadings.map((heading) =>
-                <a href={`#${heading.slug}`} class:list={["group pr-4 flex items-start gap-2 relative transition-all duration-100 ease-out w-full min-h-7 rounded-xl hover:bg-[var(--toc-btn-active)] active:bg-[var(--toc-btn-active)] py-1",
-                    {"pl-4": !className?.includes("pl-0"), "pl-0": className?.includes("pl-0")}
+                <a href={`#${heading.slug}`} class:list={["group pr-3.5 pl-3.5 flex items-start gap-2 relative transition-all duration-100 ease-out w-full min-h-7 rounded-xl hover:bg-[var(--toc-btn-active)] active:bg-[var(--toc-btn-active)] py-1"
                 ]}>
                     <div class:list={["transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold mt-0.5",
                         {

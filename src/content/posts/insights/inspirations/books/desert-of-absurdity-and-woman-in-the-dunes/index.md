@@ -3,7 +3,8 @@ title: "부조리라는 모래 속에서 추는 춤: 『모래의 여자』와 �
 published: 2025-12-30
 description: 알베르 카뮈의 '시지프 신화' 속 사막과 아베 코보의 '모래의 여자' 속 모래 구덩이를 비교하며, 부조리한 세계 속에서 인간이 어떻게 실존적 자유를 획득하는지 깊이 있게 탐구합니다.
 image: "desert-cover.png"
-tags: [Existentialism, Absurdity, Albert Camus, Kobo Abe, Philosophy, Literature]
+image_alt: "황량한 사막과 첩첩이 쌓인 모래 언덕들"
+tags: [Existentialism, Absurdity, Kobo Abe, Albert Camus, Philosophy, Literature]
 category: insights/inspirations/books
 draft: false
 ---

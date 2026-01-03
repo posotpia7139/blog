@@ -147,7 +147,7 @@ const { remarkPluginFrontmatter } = await entry.render();
 
                                 >
 
-                                    <a href={getCategoryUrl(category)} class="meta-link relative z-50 pointer-events-auto hover:text-[var(--primary)] transition-colors pl-2 pr-2 py-3 -ml-2 -my-2 flex items-center gap-2">
+                                    <a href={getCategoryUrl(category)} class="meta-link relative z-50 pointer-events-auto hover:text-[var(--primary)] transition-colors pl-2 pr-2 py-2 -ml-2 -my-2 flex items-center gap-2">
 
                                         <div class="meta-icon !bg-[var(--primary)]/10 !text-[var(--primary)] !w-6 !h-6 !mr-0 shrink-0">
 
@@ -180,56 +180,29 @@ const { remarkPluginFrontmatter } = await entry.render();
                             
 
                             <!-- Tier 2: Tags -->
-
                             {tags && tags.length > 0 && (
-
                                 <div class:list={["flex items-center text-[12px] text-50 w-full relative z-30 pointer-events-auto"]}>
-
-                                    <div class="flex items-center flex-nowrap w-full gap-2 pl-2 -ml-2" 
-
+                                    <div class="flex items-center flex-wrap w-full gap-2 pl-2 -ml-2" 
                                     >
-
                                         <div class="meta-icon !bg-[var(--primary)]/10 !text-[var(--primary)] !w-6 !h-6 !mr-0 shrink-0 mt-0">
-
                                             <Icon name="material-symbols:tag-rounded" class="text-base"></Icon>
-
                                         </div>
-
-                                        {tags.slice(0, 4).map((tag, i) => (
-
+                                        {tags.map((tag, i) => (
                                             <a href={getTagUrl(tag)} 
-
                                                class="inline-flex items-center h-6 px-2 rounded-md bg-black/5 dark:bg-white/10 hover:bg-[var(--primary)]/10 hover:text-[var(--primary)] transition-all whitespace-nowrap shrink-0"
-
                                             >
-
                                                 {tag.replaceAll(' ', '\u00A0')}
-
                                             </a>
-
                                         ))}
-
-                                        {tags.length > 4 && (
-
-                                            <div class="inline-flex items-center h-6 px-2 rounded-md bg-black/5 dark:bg-white/10 whitespace-nowrap shrink-0 text-[11px] font-medium opacity-70">
-
-                                                +{tags.length - 4}
-
-                                            </div>
-
-                                        )}
-
                                     </div>
-
                                 </div>
-
                             )}
 
         
 
-                            <!-- Tier 3: word count, read time, and date -->
+                            <!-- Tier 3: Date, word count, and read time -->
 
-                            <div class:list={["text-[11px] md:text-[12px] text-black/50 dark:text-white/50 flex flex-nowrap gap-x-2 md:gap-x-4 transition relative z-10 pointer-events-none whitespace-nowrap"]}>
+                            <div class:list={["text-[11px] md:text-[12px] text-black/50 dark:text-white/50 flex flex-wrap items-center gap-x-4 transition relative z-10 pointer-events-none whitespace-nowrap"]}>
 
                                 <div class="flex items-center pl-2 -ml-2 shrink-0">
 
@@ -307,5 +280,34 @@ const { remarkPluginFrontmatter } = await entry.render();
     /* 깃허브 등 z-30 링크에 호버하면 z-20인 peer는 호버 상태가 아니게 됨. */
     .peer:hover ~ div .title-text {
         color: var(--primary);
+    }
+
+    /* 커스텀 툴팁 스타일 */
+    .custom-tooltip {
+        position: relative;
+    }
+    .custom-tooltip::after {
+        content: attr(data-tooltip);
+        position: absolute;
+        bottom: 100%;
+        left: 50%;
+        transform: translateX(-50%) translateY(-8px);
+        padding: 0.25rem 0.5rem;
+        background-color: #000000 !important;
+        color: white;
+        font-size: 0.75rem;
+        border-radius: 0.375rem;
+        white-space: nowrap;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.2s ease, transform 0.2s ease;
+        pointer-events: none;
+        z-index: 100;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2); /* 약간의 그림자로 층 분리 강조 */
+    }
+    .custom-tooltip:hover::after {
+        opacity: 1 !important;
+        visibility: visible;
+        transform: translateX(-50%) translateY(-4px);
     }
 </style>

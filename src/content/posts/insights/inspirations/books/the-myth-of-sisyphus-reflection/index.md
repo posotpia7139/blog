@@ -3,6 +3,7 @@ title: "부조리의 언덕 위에서: 시지프의 돌과 불꽃"
 published: 2025-12-24
 description: "알베르 카뮈의 '시지프 신화'를 통해 바라본 현대인의 실존적 반항과 무의미 속에서 피어나는 진정한 자유에 대한 고찰."
 image: "cover.png"
+image_alt: "시지프가 웃으면서 돌을 위로 올리는 모습"
 tags: [Existentialism, Absurdity, Albert Camus, Philosophy, Literature]
 category: insights/inspirations/books
 draft: false
