@@ -1,0 +1,51 @@
+---
+import { dietHistory } from "../../data/dietHistory";
+
+// 데이터 계산
+const weights = dietHistory.map(d => d.weight);
+const maxWeight = Math.max(...weights); // 역대 최고 체중
+const currentWeight = dietHistory[dietHistory.length - 1].weight;
+const totalLoss = (maxWeight - currentWeight).toFixed(2); // 최고점 대비 감량치
+const goalWeight = 65;
+const remainingToGoal = (currentWeight - goalWeight).toFixed(2);
+---
+
+<div class="diet-stats-container w-full mb-10 onload-animation">
+    <div class="grid grid-cols-2 gap-4 md:gap-6">
+        {/* 최고 체중 카드 */}
+        <div class="card-base p-6 flex flex-col items-center justify-center border border-black/10 dark:border-white/10 bg-[var(--card-bg)]">
+            <span class="text-xs font-bold uppercase tracking-wider text-black/40 dark:text-white/40 mb-2">최고 체중</span>
+            <div class="flex items-baseline gap-1">
+                <span class="text-2xl md:text-3xl font-black text-red-600 dark:text-red-400">{maxWeight}</span>
+                <span class="text-sm font-bold text-black/40 dark:text-white/40">kg</span>
+            </div>
+        </div>
+
+        {/* 현재 체중 카드 */}
+        <div class="card-base p-6 flex flex-col items-center justify-center border border-black/10 dark:border-white/10 bg-[var(--card-bg)]">
+            <span class="text-xs font-bold uppercase tracking-wider text-black/40 dark:text-white/40 mb-2">현재 체중</span>
+            <div class="flex items-baseline gap-1">
+                <span class="text-2xl md:text-3xl font-black text-black/90 dark:text-white/90">{currentWeight}</span>
+                <span class="text-sm font-bold text-black/40 dark:text-white/40">kg</span>
+            </div>
+        </div>
+
+        {/* 총 감량 카드 */}
+        <div class="card-base p-6 flex flex-col items-center justify-center border border-black/10 dark:border-white/10 bg-[var(--card-bg)]">
+            <span class="text-xs font-bold uppercase tracking-wider text-black/40 dark:text-white/40 mb-2">총 감량</span>
+            <div class="flex items-baseline gap-1">
+                <span class="text-2xl md:text-3xl font-black text-blue-600 dark:text-blue-400">-{totalLoss}</span>
+                <span class="text-sm font-bold text-black/40 dark:text-white/40">kg</span>
+            </div>
+        </div>
+
+        {/* 남은 목표 카드 */}
+        <div class="card-base p-6 flex flex-col items-center justify-center border border-black/10 dark:border-white/10 bg-[var(--card-bg)]">
+            <span class="text-xs font-bold uppercase tracking-wider text-black/40 dark:text-white/40 mb-2">남은 목표</span>
+            <div class="flex items-baseline gap-1">
+                <span class="text-2xl md:text-3xl font-black text-black/90 dark:text-white/90">{remainingToGoal}</span>
+                <span class="text-sm font-bold text-black/40 dark:text-white/40">kg</span>
+            </div>
+        </div>
+    </div>
+</div>

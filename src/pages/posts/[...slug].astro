@@ -15,6 +15,8 @@ import Categories from "../../components/widget/Categories.astro";
 import Comment from "../../components/widget/Comment.astro";
 import RelatedPosts from "../../components/widget/RelatedPosts.astro";
 import TOC from "../../components/widget/TOC.astro";
+import DietChart from "../../components/widget/DietChart.astro";
+import DietStats from "../../components/widget/DietStats.astro";
 import { profileConfig, siteConfig } from "../../config";
 import { formatDateToYYYYMMDD } from "../../utils/date-utils";
 
@@ -29,6 +31,7 @@ export async function getStaticPaths() {
 }
 
 const { entry } = Astro.props;
+const hasDietTag = entry.data.tags.includes('diet');
 
 const { Content, headings } = await entry.render();
 
@@ -121,19 +124,17 @@ const jsonLd = {
                 {!entry.data.image && <div class="border-[var(--line-divider)] border-dashed border-b-[3px] mb-7"></div>}
             </div>
 
-            <!-- always show cover as long as it has one -->
-
-            {entry.data.image &&
-                <ImageWrapper id="post-cover" src={entry.data.image} basePath={path.join("content/posts/", getDir(entry.id))} alt={entry.data.image_alt || `${entry.data.title} Cover Image`} class="mb-8 rounded-xl banner-container" loading="eager" fetchPriority="high"/>
-            }
-
             {siteConfig.toc.enable && <div id="top-toc-container" class="mb-7 w-fit max-w-full md:max-w-[50%] onload-animation pb-0">
                 <TOC headings={headings} class="!pl-0" isFloating={false}></TOC>
             </div>}
 
+            {hasDietTag && <DietStats />}
+
             <Markdown class="mb-6 markdown-content onload-animation">
                 <Content />
             </Markdown>
+
+            {hasDietTag && <div class="onload-animation"><DietChart /></div>}
 
             {licenseConfig.enable && <License title={entry.data.title} slug={entry.slug} pubDate={entry.data.published} class:list={["mb-6 rounded-xl license-container onload-animation", {"mb-0": !entry.data.image}]} ></License>}
 

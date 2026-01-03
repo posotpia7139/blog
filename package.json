@@ -40,6 +40,8 @@
 		"astro-icon": "^1.1.5",
 		"astro-robots-txt": "^1.0.0",
 		"astro-seo": "^0.8.4",
+		"chart.js": "^4.5.1",
+		"chartjs-plugin-zoom": "^2.2.0",
 		"hastscript": "^9.0.1",
 		"katex": "^0.16.27",
 		"markdown-it": "^14.1.0",
