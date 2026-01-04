@@ -74,7 +74,8 @@
         @apply opacity-0 pointer-events-none
     }
 
-    #toc-inner-wrapper {
+    .toc-inner-wrapper {
+        @apply overflow-y-auto overflow-x-hidden;
     }
 
     .hide-scrollbar {

@@ -69,6 +69,24 @@ const { remarkPluginFrontmatter } = await entry.render();
 
                 <div class="flex-1 min-w-0">
 
+                    <!-- Date and Read Time (Moved Above Title) -->
+                    {!isProject && (
+                        <div class:list={["text-[11px] md:text-[12px] text-black/50 dark:text-white/50 flex flex-wrap items-center gap-x-4 transition relative z-10 pointer-events-none whitespace-nowrap mb-2"]}>
+                            <div class="flex items-center pl-2 -ml-2 shrink-0">
+                                <div class="meta-icon !bg-black/5 dark:!bg-white/10 !text-black/50 dark:!text-white/50 !w-6 !h-6 !mr-2 shrink-0">
+                                    <Icon name="material-symbols:edit-calendar-rounded" class="text-base"></Icon>
+                                </div>
+                                {formatDateToYYYYMMDD(published)}
+                            </div>
+                            <div class="flex items-center shrink-0">
+                                <div class="meta-icon !bg-black/5 dark:!bg-white/10 !text-black/50 dark:!text-white/50 !w-6 !h-6 !mr-2 shrink-0">
+                                    <Icon name="material-symbols:pace-rounded" class="text-base"></Icon>
+                                </div>
+                                {remarkPluginFrontmatter.minutes} {i18n(remarkPluginFrontmatter.minutes === 1 ? I18nKey.minuteCount : I18nKey.minutesCount)}
+                            </div>
+                        </div>
+                    )}
+
                     <div class:list={["relative mb-2"]}>
 
                         <div class="transition w-full font-semibold text-xl md:text-2xl text-90
@@ -199,7 +217,7 @@ const { remarkPluginFrontmatter } = await entry.render();
                                     <div class="flex flex-wrap flex-1 gap-2 pt-0">
                                         {tags.map((tag, i) => (
                                             <a href={getTagUrl(tag)} 
-                                               class="inline-flex items-center h-6 px-2 rounded-md bg-black/5 dark:bg-white/10 hover:bg-[var(--primary)]/10 hover:text-[var(--primary)] transition-all whitespace-nowrap"
+                                               class="inline-flex items-center h-6 px-3 rounded-md bg-black/5 dark:bg-white/10 hover:bg-[var(--primary)]/10 hover:text-[var(--primary)] transition-all whitespace-nowrap"
                                             >
                                                 {tag.replaceAll(' ', '\u00A0')}
                                             </a>
@@ -207,42 +225,6 @@ const { remarkPluginFrontmatter } = await entry.render();
                                     </div>
                                 </div>
                             )}
-
-        
-
-                            <!-- Tier 3: Date, word count, and read time -->
-
-                            <div class:list={["text-[11px] md:text-[12px] text-black/50 dark:text-white/50 flex flex-wrap items-center gap-x-4 transition relative z-10 pointer-events-none whitespace-nowrap"]}>
-
-                                <div class="flex items-center pl-2 -ml-2 shrink-0">
-
-                                    <div class="meta-icon !bg-black/5 dark:!bg-white/10 !text-black/50 dark:!text-white/50 !w-6 !h-6 !mr-2 shrink-0">
-
-                                        <Icon name="material-symbols:edit-calendar-rounded" class="text-base"></Icon>
-
-                                    </div>
-
-                                    {formatDateToYYYYMMDD(published)}
-
-                                </div>
-
-                                <div class="flex items-center pl-2 -ml-2 shrink-0">
-
-                                    <div class="meta-icon !bg-black/5 dark:!bg-white/10 !text-black/50 dark:!text-white/50 !w-6 !h-6 !mr-2 shrink-0">
-
-                                        <Icon name="material-symbols:pace-rounded" class="text-base"></Icon>
-
-                                    </div>
-
-                                    {remarkPluginFrontmatter.minutes} {i18n(remarkPluginFrontmatter.minutes === 1 ? I18nKey.minuteCount : I18nKey.minutesCount)}
-
-                                    <span class="mx-1.5 opacity-50">/</span>
-
-                                    {remarkPluginFrontmatter.words} {i18n(remarkPluginFrontmatter.words === 1 ? I18nKey.wordCount : I18nKey.wordsCount)}
-
-                                </div>
-
-                            </div>
 
                         </div>
 

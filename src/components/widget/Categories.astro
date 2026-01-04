@@ -135,8 +135,8 @@ const { class: className, style } = Astro.props;
     :global(.reading-active-star .category-label::after) {
         content: "*";
         position: absolute;
-        right: -12px;
-        top: -2px;
+        right: -15px;
+        top: -4px;
         color: var(--primary);
         font-weight: 900;
         font-size: 1.25rem;
@@ -145,8 +145,8 @@ const { class: className, style } = Astro.props;
     }
 
     @keyframes pulse-opacity {
-        0%, 100% { opacity: 0.3; }
-        50% { opacity: 1; }
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.1; }
     }
 
     .category-label {

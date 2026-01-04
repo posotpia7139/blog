@@ -52,7 +52,7 @@ const filteredHeadings = headings.filter((heading) => {
 		text.includes("footnote") ||
 		text === "각주" ||
 		text === "footnotes" ||
-		heading.depth === 100; // 일부 플러그인에서 숨김용으로 쓰는 트릭 대응
+		heading.depth === 100;
 
 	return !isTooDeep && !isFootnote;
 });
@@ -61,6 +61,7 @@ const filteredHeadings = headings.filter((heading) => {
 <table-of-contents class:list={[className, "block relative text-left"]} data-is-floating={isFloating}>
     <div class:list={["w-full", {"toc-inner-wrapper hide-scrollbar flex flex-col pb-24": isFloating}]}>
         <div class="toc w-full h-full">
+            {/* 초기 렌더링 (서버 사이드) */}
             {filteredHeadings.map((heading) =>
                 <a href={`#${heading.slug}`} class:list={["group pr-3.5 pl-3.5 flex items-start gap-2 relative transition-all duration-100 ease-out w-full min-h-7 rounded-xl hover:bg-[var(--toc-btn-active)] active:bg-[var(--toc-btn-active)] py-1"
                 ]}>
@@ -95,7 +96,6 @@ class TableOfContents extends HTMLElement {
     anchorNavTarget: HTMLElement | null = null;
     headingIdxMap = new Map<string, number>();
     headings: HTMLElement[] = [];
-    sections: HTMLElement[] = [];
     tocEntries: HTMLAnchorElement[] = [];
     active: boolean[] = [];
     activeIndicator: HTMLElement | null = null;
@@ -105,118 +105,134 @@ class TableOfContents extends HTMLElement {
     constructor() {
         super();
         this.observer = new IntersectionObserver(
-            this.markVisibleSection, { 
-                threshold: 0,
-                rootMargin: "-15% 0px 0px 0px"
-            }
+            () => { this.fallback(); this.update(); }, 
+            { threshold: 0, rootMargin: "-15% 0px 0px 0px" }
         );
     };
 
-    markVisibleSection = (entries: IntersectionObserverEntry[]) => {
-        this.fallback();
-        this.update();
+    refresh = () => {
+        // [수정] 스크롤 애니메이션과 페이지 로딩이 완전히 끝날 때까지 1초간 대기
+        setTimeout(() => {
+            this.observer.disconnect();
+            this.rebuildTOC();
+            this.init();
+        }, 1000); 
+    };
+
+    rebuildTOC = () => {
+        const tocContainer = this.querySelector(".toc");
+        if (!tocContainer) return;
+
+        tocContainer.innerHTML = '';
+
+        const contentArea = document.querySelector('.prose') || document.querySelector('.markdown-content') || document.querySelector('#post-container');
+        if (!contentArea) {
+            this.style.display = 'none';
+            return;
+        }
+
+        const rawHeadings = Array.from(contentArea.querySelectorAll('h1, h2, h3, h4'));
+        const validHeadings = rawHeadings.filter(h => {
+            const id = h.id.toLowerCase();
+            const text = h.textContent?.toLowerCase() || '';
+            return id && !id.includes('footnote') && !text.includes('각주') && !text.includes('footnote');
+        });
+
+        if (validHeadings.length === 0) {
+            this.style.display = 'none';
+            return;
+        }
+
+        this.style.display = 'block';
+        let minDepth = Math.min(...validHeadings.map(h => parseInt(h.tagName.substring(1))));
+        let h1Count = 1;
+
+        validHeadings.forEach(h => {
+            const depth = parseInt(h.tagName.substring(1));
+            const text = h.textContent || '';
+            const slug = h.id;
+            const a = document.createElement('a');
+            a.href = `#${slug}`;
+            a.className = "group pr-3.5 pl-3.5 flex items-start gap-2 relative transition-all duration-100 ease-out w-full min-h-7 rounded-xl hover:bg-[var(--toc-btn-active)] active:bg-[var(--toc-btn-active)] py-1";
+            
+            let badgeHTML = '';
+            if (depth === minDepth) {
+                badgeHTML = `<div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold mt-0.5 bg-[var(--toc-badge-bg)] text-[var(--btn-content)]">${h1Count++}</div>`;
+            } else if (depth === minDepth + 1) {
+                badgeHTML = `<div class="transition w-5 h-5 shrink-0 flex items-center justify-center mt-0.5 ml-4"><div class="transition w-2 h-2 rounded-[0.1875rem] bg-[var(--toc-badge-bg)]"></div></div>`;
+            } else {
+                badgeHTML = `<div class="transition w-5 h-5 shrink-0 flex items-center justify-center mt-0.5 ml-8"><div class="transition w-1.5 h-1.5 rounded-sm bg-black/5 dark:bg-white/10"></div></div>`;
+            }
+
+            a.innerHTML = `${badgeHTML}<div class="transition text-sm text-left break-words leading-snug py-0.5 text-black/80 dark:text-white/60 group-hover:text-[oklch(0.20_0.14_var(--hue))] dark:group-hover:text-[var(--primary)]">${text.replace(/^(\d+\.)+\s*/, "")}</div>`;
+            tocContainer.appendChild(a);
+        });
+
+        if (this.dataset.isFloating === 'true') {
+            const indicator = document.createElement('div');
+            indicator.className = "active-indicator -z-10 absolute bg-[var(--toc-btn-hover)] rounded-xl transition-all duration-100 ease-out pointer-events-none border-2 border-[var(--toc-btn-hover)] group-hover:border-[var(--toc-btn-active)] border-dashed box-border shadow-sm";
+            indicator.style.opacity = '0';
+            tocContainer.appendChild(indicator);
+        }
     };
 
     toggleActiveHeading = () => {
         let activeIdx = -1;
+        for (let i = 0; i < this.active.length; i++) {
+            if (this.active[i]) activeIdx = i;
+        }
 
-        for (let i = this.active.length - 1; i >= 0; i--) {
-            if (this.active[i]) {
-                activeIdx = i;
-                break;
-            }
+        const scrollHeight = document.documentElement.scrollHeight;
+        const scrollTop = window.scrollY;
+        const clientHeight = document.documentElement.clientHeight;
+        if (scrollTop + clientHeight >= scrollHeight - 100) {
+            activeIdx = this.active.length - 1;
         }
 
         this.tocEntries.forEach(entry => entry.classList.remove(this.visibleClass));
 
-        if (activeIdx === -1) {
-            this.activeIndicator?.setAttribute("style", `opacity: 0`);
-        } else {
+        if (activeIdx !== -1 && this.tocEntries[activeIdx]) {
             const entry = this.tocEntries[activeIdx];
             entry.classList.add(this.visibleClass);
-
             const top = entry.offsetTop;
             const left = entry.offsetLeft;
             const width = entry.offsetWidth;
             const height = entry.offsetHeight;
-            
             this.activeIndicator?.setAttribute("style", `top: ${top}px; left: ${left}px; width: ${width}px; height: ${height}px; opacity: 1`);
+        } else {
+            this.activeIndicator?.setAttribute("style", `opacity: 0`);
         }
     };
 
     scrollToActiveHeading = () => {
         if (this.anchorNavTarget || !this.tocEl) return;
-        const activeHeading =
-            this.querySelectorAll<HTMLDivElement>(`.${this.visibleClass}`);
-        if (!activeHeading.length) return;
-
-        const topmost = activeHeading[0];
-        const tocHeight = this.tocEl.clientHeight;
-
-        let top = topmost.offsetTop - 32;
-
-        this.tocEl.scrollTo({
-            top,
-            left: 0,
-            behavior: "smooth",
-        });
+        const activeHeading = this.querySelector<HTMLDivElement>(`.${this.visibleClass}`);
+        if (!activeHeading) return;
+        this.tocEl.scrollTo({ top: activeHeading.offsetTop - 32, left: 0, behavior: "smooth" });
     };
 
-    update = () => {
-        requestAnimationFrame(() => {
-            this.toggleActiveHeading();
-            this.scrollToActiveHeading();
-        });
-    };
+    update = () => { requestAnimationFrame(() => { this.toggleActiveHeading(); this.scrollToActiveHeading(); }); };
 
     fallback = () => {
         if (!this.headings.length) return;
-
         this.active.fill(false);
+        if (window.scrollY < 100) { this.active[0] = true; return; }
 
-        // 최상단일 때는 무조건 첫 번째 항목 활성화
-        if (window.scrollY < 50) {
-            this.active[0] = true;
-            return;
-        }
-
-        // 스크롤 방향에 따라 기준선을 다르게 설정하여 '지연 현상' 해결
-        const downThreshold = window.innerHeight * 0.15;
-        const upThreshold = window.innerHeight * 0.1; 
-        const thresholdLine = this.isScrollingDown ? downThreshold : upThreshold;
-
+        const thresholdLine = this.isScrollingDown ? window.innerHeight * 0.2 : window.innerHeight * 0.15;
         let currentIdx = -1;
         for (let i = 0; i < this.headings.length; i++) {
-            const rect = this.headings[i].getBoundingClientRect();
-            if (rect.top <= thresholdLine) {
-                currentIdx = i;
-            } else {
-                break;
-            }
+            if (this.headings[i].getBoundingClientRect().top <= thresholdLine) currentIdx = i;
+            else break;
         }
-
-        if (currentIdx !== -1) {
-            this.active[currentIdx] = true;
-        }
-    };
-
-    markActiveHeading = (idx: number)=> {
-        this.active[idx] = true;
+        if (currentIdx !== -1) this.active[currentIdx] = true;
     };
 
     handleAnchorClick = (event: Event) => {
-        const anchor = event
-            .composedPath()
-            .find((element) => element instanceof HTMLAnchorElement);
-
+        const anchor = event.composedPath().find((el) => el instanceof HTMLAnchorElement) as HTMLAnchorElement;
         if (anchor) {
             const id = decodeURIComponent(anchor.hash?.substring(1));
             const idx = this.headingIdxMap.get(id);
-            if (idx !== undefined) {
-                this.anchorNavTarget = this.headings[idx];
-            } else {
-                this.anchorNavTarget = null;
-            }
+            this.anchorNavTarget = idx !== undefined ? this.headings[idx] : null;
         }
     };
 
@@ -224,78 +240,60 @@ class TableOfContents extends HTMLElement {
         const currentScrollY = window.scrollY;
         this.isScrollingDown = currentScrollY > this.lastScrollY;
         this.lastScrollY = currentScrollY;
-        
         this.fallback();
         this.update();
     };
 
-    isInRange(value: number, min: number, max: number) {
-        return min < value && value < max;
-    };
-
     connectedCallback() {
         if (this.dataset.isFloating !== 'true') return;
-
-        const element = document.querySelector('.prose') || document.querySelector('.markdown-content');
-        if (element) {
-            if (getComputedStyle(element).animationName !== 'none') {
-                element.addEventListener('animationend', () => {
-                    this.init();
-                }, { once: true });
-            } else {
-                this.init();
-            }
-        } else {
-            this.init();
-        }
-
-        this.lastScrollY = window.scrollY;
+        this.init();
         window.addEventListener('scroll', this.handleScroll, { passive: true });
+        
+        // [수정] 전환 시작 시 목차 즉시 제거
+        document.addEventListener('swup:visit:start', this.clearTOC);
+        document.addEventListener('swup:content:replace', this.refresh);
+        document.addEventListener('astro:after-swap', this.refresh);
+    };
+
+    clearTOC = () => {
+        const tocContainer = this.querySelector(".toc");
+        if (tocContainer) tocContainer.innerHTML = '';
+        this.style.display = 'none';
     };
 
     init() {
+        this.headingIdxMap.clear();
+        this.headings = [];
+        this.active = [];
         this.tocEl = this.querySelector(".toc-inner-wrapper");
-
         if (!this.tocEl) return;
-
-        this.tocEl.addEventListener("click", this.handleAnchorClick, {
-            capture: true,
-        });
-
+        this.tocEl.addEventListener("click", this.handleAnchorClick, { capture: true });
         this.activeIndicator = this.querySelector(".active-indicator");
-
-        this.tocEntries = Array.from(
-            this.querySelectorAll<HTMLAnchorElement>(".toc a[href^='#']")
-        );
-
+        this.tocEntries = Array.from(this.querySelectorAll<HTMLAnchorElement>(".toc a[href^='#']"));
         if (this.tocEntries.length === 0) return;
 
         this.headings = new Array(this.tocEntries.length);
         for (let i = 0; i < this.tocEntries.length; i++) {
             const id = decodeURIComponent(this.tocEntries[i].hash?.substring(1));
             const heading = document.getElementById(id);
-            if (heading instanceof HTMLElement) {
+            if (heading) {
                 this.headings[i] = heading;
                 this.headingIdxMap.set(id, i);
+                this.observer.observe(heading);
             }
         }
         this.active = new Array(this.tocEntries.length).fill(false);
-
-        this.headings.forEach((heading) => {
-            if (heading) this.observer.observe(heading);
-        });
-
         this.fallback();
         this.update();
     };
 
     disconnectedCallback() {
-        this.headings.forEach((heading) => {
-            if (heading) this.observer.unobserve(heading);
-        });
         this.observer.disconnect();
         this.tocEl?.removeEventListener("click", this.handleAnchorClick);
         window.removeEventListener('scroll', this.handleScroll);
+        document.removeEventListener('swup:visit:start', this.clearTOC);
+        document.removeEventListener('swup:content:replace', this.refresh);
+        document.removeEventListener('astro:after-swap', this.refresh);
     };
 }
 
