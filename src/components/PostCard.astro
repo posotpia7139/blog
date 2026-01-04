@@ -56,13 +56,16 @@ const { remarkPluginFrontmatter } = await entry.render();
 
                     {/* 상단 영역: 제목, 설명글, 썸네일 */}
 
-                    <div class="flex flex-row items-center gap-4 md:gap-9 mb-0">
+                    <div class="flex-row flex items-center gap-4 mb-0 md:gap-9">
 
-                {/* 프로젝트인 경우 썸네일을 왼쪽에 배치 */}
-                {isProject && hasCover && (
-                    <div class:list={["shrink-0 rounded-xl overflow-hidden active:scale-95 z-40 pointer-events-none w-28 h-28 md:w-40 md:h-40 aspect-square self-center"]}>
-                        <ImageWrapper src={image} basePath={path.join("content", entry.collection, getDir(entry.id))} alt="Cover Image of the Project"
-                                  class="w-full h-full object-cover">
+                {/* 썸네일을 왼쪽에 배치 (프로젝트 및 블로그 포스트 모두) */}
+                {hasCover && (
+                    <div class:list={[
+                        "shrink-0 rounded-xl overflow-hidden active:scale-95 z-40 pointer-events-none aspect-square",
+                        isProject ? "w-28 h-28 md:w-40 md:h-40 self-center" : "w-24 h-24 md:w-32 md:h-32 self-start mt-1"
+                    ]}>
+                        <ImageWrapper src={image} basePath={path.join("content", entry.collection, getDir(entry.id))} alt={isProject ? "Cover Image of the Project" : "Cover Image of the Post"}
+                                  class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
                         </ImageWrapper>
                     </div>
                 )}
@@ -108,8 +111,8 @@ const { remarkPluginFrontmatter } = await entry.render();
                     </div>
 
 
-                    <!-- description -->
-
+                    {/* description */}
+                    
                     <div class:list={["relative z-10 pointer-events-none"]}>
 
                         <div class:list={["transition text-75 [text-wrap:balance] break-keep text-sm md:text-base line-clamp-2", {"mb-2": isProject, "mb-3": !isProject}]}
@@ -121,11 +124,12 @@ const { remarkPluginFrontmatter } = await entry.render();
                         </div>
 
                     </div>
+                    
 
 
                     {isProject && (
 
-                        <div class="flex items-center text-base md:text-lg meta-content w-fit pointer-events-auto text-90 mb-1 relative z-30">
+                        <div class="flex items-center text-base md:text-lg meta-content w-fit pointer-events-auto text-90 mb-1 mt-3 relative z-30">
 
                             {github_url && (
 
@@ -176,7 +180,7 @@ const { remarkPluginFrontmatter } = await entry.render();
 
                                     <a href={getCategoryUrl(category)} class="meta-link relative z-50 pointer-events-auto hover:text-[var(--primary)] transition-colors pl-2 pr-2 py-2 -ml-2 -my-2 flex items-center gap-2">
 
-                                        <div class="meta-icon !bg-[var(--primary)]/10 !text-[var(--primary)] !w-6 !h-6 !mr-0 shrink-0">
+                                        <div class="meta-icon !bg-black/5 dark:!bg-white/10 !text-black/50 dark:!text-white/50 !w-6 !h-6 !mr-0 shrink-0">
 
                                             <Icon name="material-symbols:folder-open-outline-rounded" class="text-base"></Icon>
 
@@ -210,18 +214,34 @@ const { remarkPluginFrontmatter } = await entry.render();
                             {tags && tags.length > 0 && (
                                 <div class:list={["flex items-start text-[12px] text-50 w-full relative z-30 pointer-events-auto"]}>
                                     <div class="flex items-center pl-2 -ml-2 shrink-0">
-                                        <div class="meta-icon !bg-[var(--primary)]/10 !text-[var(--primary)] !w-6 !h-6 !mr-2 shrink-0">
+                                        <div class="meta-icon !bg-black/5 dark:!bg-white/10 !text-black/50 dark:!text-white/50 !w-6 !h-6 !mr-2 shrink-0">
                                             <Icon name="material-symbols:tag-rounded" class="text-base"></Icon>
                                         </div>
                                     </div>
-                                    <div class="flex flex-wrap flex-1 gap-2 pt-0">
+                                    <div class="flex flex-wrap flex-1 gap-2 pt-0 tag-container">
                                         {tags.map((tag, i) => (
                                             <a href={getTagUrl(tag)} 
-                                               class="inline-flex items-center h-6 px-2.5 rounded-md bg-black/5 dark:bg-white/10 hover:bg-[var(--primary)]/10 hover:text-[var(--primary)] transition-all whitespace-nowrap"
+                                               class:list={[
+                                                   "inline-flex items-center h-6 px-2.5 rounded-md bg-black/5 dark:bg-white/10 hover:bg-[var(--primary)]/10 hover:text-[var(--primary)] transition-all whitespace-nowrap",
+                                                   {"hidden": i >= 3}
+                                               ]}
                                             >
                                                 {tag.replaceAll(' ', '\u00A0')}
                                             </a>
                                         ))}
+                                        {tags.length > 0 && (
+                                            <button 
+                                                class:list={["inline-flex items-center h-6 px-2.5 rounded-md bg-black/5 dark:bg-white/10 hover:bg-black/10 dark:hover:bg-white/20 transition-all whitespace-nowrap text-[11px] font-bold show-more-tags-btn", {"hidden": tags.length <= 3}]}
+                                                onclick="
+                                                    const container = this.parentElement;
+                                                    container.classList.add('expanded');
+                                                    container.querySelectorAll('.hidden').forEach(el => el.classList.remove('hidden'));
+                                                    this.style.display = 'none';
+                                                "
+                                            >
+                                                +{tags.length - 3}
+                                            </button>
+                                        )}
                                     </div>
                                 </div>
                             )}
@@ -232,20 +252,81 @@ const { remarkPluginFrontmatter } = await entry.render();
 
                 </div>
 
-                {/* 블로그인 경우 썸네일을 오른쪽에 배치 */}
-                {!isProject && hasCover && (
-                    <div class:list={["shrink-0 rounded-xl overflow-hidden active:scale-95 z-40 pointer-events-none w-24 h-24 md:w-32 md:h-32 aspect-square self-start mt-1"]}>
-                        <ImageWrapper src={image} basePath={path.join("content", entry.collection, getDir(entry.id))} alt="Cover Image of the Post"
-                                  class="w-full h-full object-cover">
-                        </ImageWrapper>
-                    </div>
-                )}
-
             </div>
 
         </div>
 </div>
 <div class="transition border-t-[1px] border-dashed mx-6 border-black/10 dark:border-white/[0.15] last:border-t-0 md:hidden"></div>
+
+<script>
+    function setupTagTruncation() {
+        const containers = document.querySelectorAll('.tag-container');
+        containers.forEach(container => {
+            if (container.classList.contains('expanded')) return;
+
+            const tags = Array.from(container.querySelectorAll('a'));
+            const btn = container.querySelector('.show-more-tags-btn');
+            const totalTags = tags.length;
+            
+            if (totalTags === 0) return;
+
+            // 1. Reset: 먼저 3개까지 보이고 나머지는 숨김 (서버 사이드 상태 복원)
+            tags.forEach((tag, i) => {
+                tag.classList.toggle('hidden', i >= 3);
+            });
+            if (btn) {
+                btn.style.display = '';
+                btn.classList.toggle('hidden', totalTags <= 3);
+                btn.innerText = `+${Math.max(0, totalTags - 3)}`;
+            }
+
+            // 2. 줄바꿈 감지 및 추가 숨김 로직
+            // 첫 번째 태그의 위치를 기준으로 라인 오버플로우를 감지
+            const firstTag = tags[0];
+            if (!firstTag) return;
+            
+            const firstTop = firstTag.offsetTop;
+            let visibleCount = Math.min(3, totalTags); // 시작은 최대 3개
+
+            // 반복적으로 체크하며 줄바꿈이 발생하지 않을 때까지 visibleCount를 줄임
+            while (visibleCount > 0) {
+                let hasWrap = false;
+                
+                // 현재 보이는 마지막 태그
+                const lastVisibleTag = tags[visibleCount - 1];
+                
+                // 버튼이 필요한 상황인가? (전체 태그 > 현재 보이는 태그)
+                const needButton = totalTags > visibleCount;
+
+                // 버튼 상태 업데이트
+                if (btn) {
+                    btn.classList.toggle('hidden', !needButton);
+                    if (needButton) {
+                        btn.innerText = `+${totalTags - visibleCount}`;
+                    }
+                }
+
+                // 줄바꿈 체크 (태그가 내려갔거나, 버튼이 내려갔거나)
+                if (lastVisibleTag.offsetTop > firstTop) hasWrap = true;
+                if (needButton && btn && !btn.classList.contains('hidden') && btn.offsetTop > firstTop) hasWrap = true;
+
+                if (hasWrap && visibleCount > 1) {
+                    // 줄바꿈 발생 시 보이는 태그 개수 하나 줄이고 숨김 처리
+                    tags[visibleCount - 1].classList.add('hidden');
+                    visibleCount--;
+                } else {
+                    // 더 이상 줄바꿈이 없거나 1개만 남았을 때 종료 (1개는 줄바꿈 되더라도 표시)
+                    break;
+                }
+            }
+        });
+    }
+
+    // 초기 로드, 리사이즈, Astro 페이지 이동 시 실행
+    setupTagTruncation();
+    window.addEventListener('resize', setupTagTruncation);
+    document.addEventListener('astro:page-load', setupTagTruncation);
+</script>
 
 <style define:vars={{coverWidth}}>
     .no-scrollbar::-webkit-scrollbar {
