@@ -234,7 +234,7 @@ $effect(() => {
     <div 
         onclick={() => desktopInput?.focus()}
         role="presentation"
-        class="hidden lg:flex relative items-center h-10 px-3 rounded-lg bg-black/[0.04] dark:bg-white/[0.06] w-56 cursor-text"
+        class="hidden lg:flex relative items-center h-10 px-3 rounded-lg bg-black/[0.04] dark:bg-white/[0.06] w-[235px] cursor-text"
     >
         <Icon icon="material-symbols:search" class="text-[1.2rem] text-black/60 dark:text-white/60" />
         <input 

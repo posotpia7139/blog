@@ -57,19 +57,18 @@ function toggleScheme(e: MouseEvent) {
 }
 </script>
 
-<!-- z-50 make the panel higher than other float panels -->
 <div class="relative z-50" role="menu" tabindex="-1">
     <button aria-label="Light/Dark Mode" role="menuitem" 
-            class="relative btn-plain scale-animation rounded-lg h-12 w-12 active:scale-90" 
+            class="relative btn-plain scale-animation rounded-lg h-12 w-12 active:scale-90 flex items-center justify-center" 
             id="scheme-switch" 
             onclick={(e) => toggleScheme(e)}>
-        <div class="absolute transition-opacity duration-300" class:opacity-0={mode !== LIGHT_MODE} class:opacity-100={mode === LIGHT_MODE}>
+        <div class="absolute inset-0 flex items-center justify-center transition-opacity duration-300" class:opacity-0={mode !== LIGHT_MODE} class:opacity-100={mode === LIGHT_MODE}>
             <Icon icon="material-symbols:wb-sunny-outline-rounded" class="text-[1.5rem]"></Icon>
         </div>
-        <div class="absolute transition-opacity duration-300" class:opacity-0={mode !== DARK_MODE} class:opacity-100={mode === DARK_MODE}>
+        <div class="absolute inset-0 flex items-center justify-center transition-opacity duration-300" class:opacity-0={mode !== DARK_MODE} class:opacity-100={mode === DARK_MODE}>
             <Icon icon="material-symbols:dark-mode-outline-rounded" class="text-[1.5rem]"></Icon>
         </div>
-        <div class="absolute transition-opacity duration-300" class:opacity-0={mode !== AUTO_MODE} class:opacity-100={mode === AUTO_MODE}>
+        <div class="absolute inset-0 flex items-center justify-center transition-opacity duration-300" class:opacity-0={mode !== AUTO_MODE} class:opacity-100={mode === AUTO_MODE}>
             <Icon icon="material-symbols:radio-button-partial-outline" class="text-[1.5rem]"></Icon>
         </div>
     </button>
