@@ -108,7 +108,8 @@ const relatedPosts = allPosts
                         {/* Tag (Unified Badge Style) */}
                         {post.data.tags && post.data.tags.length > 0 && (
                             <div class="flex mb-1 md:mb-1.5 h-5 md:h-6 overflow-hidden">
-                                <span class="inline-flex items-center h-5 md:h-6 px-2 rounded-md bg-black/5 dark:bg-white/10 !text-[var(--primary)] text-[10px] md:text-[11px] font-bold uppercase tracking-wider whitespace-nowrap">
+                                <span class="inline-flex items-center h-5 md:h-6 px-2 rounded-md bg-black/5 dark:bg-white/10 !text-[var(--primary)] text-[10px] md:text-[11px] font-bold uppercase tracking-wider whitespace-nowrap"
+                                      style="font-kerning: normal;">
                                     <Icon name="material-symbols:tag-rounded" class="mr-0.5 text-[11px] md:text-[13px]" />
                                     {post.data.tags[0].replaceAll(' ', '\u00A0')}
                                 </span>

@@ -161,25 +161,25 @@
 
 /* 스타일이 적용된 인용구 스타일 */
 .stylized-quote {
-    @apply relative inline mx-0.5;
+    @apply relative inline mx-0.5 px-1;
     color: inherit;
-    font-style: normal; /* 🚀 기울임 제거 */
+    font-style: normal;
 }
 
-.stylized-quote::before,
-.stylized-quote::after {
-    @apply inline-block transition-all;
+.quote-double::before, .quote-double::after,
+.quote-single::before, .quote-single::after {
+    font-family: 'Georgia', 'Times New Roman', serif;
     color: inherit;
-    opacity: 0.8;
-    font-size: 0.8em;
     font-weight: 100;
+    display: inline-block;
+    vertical-align: 0.1em;
 }
 
-.quote-double::before { content: '❝'; @apply mr-0.5; vertical-align: 0.35em; }
-.quote-double::after { content: '❞'; @apply ml-0.5; vertical-align: 0.35em; }
+.quote-double::before { content: '“'; font-size: 1.2em; }
+.quote-double::after { content: '”'; font-size: 1.2em; margin-left: -0.05em; }
 
-.quote-single::before { content: '❛'; @apply mr-0.5; vertical-align: 0.35em; }
-.quote-single::after { content: '❜'; @apply ml-0.5; vertical-align: 0.35em; }
+.quote-single::before { content: '‘'; font-size: 1.1em; }
+.quote-single::after { content: '’'; font-size: 1.1em; margin-left: -0.05em; }
 
 @layer components {
 	.enable-banner.is-home #banner-wrapper {
