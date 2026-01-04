@@ -5,7 +5,6 @@ description: 알베르 카뮈의 '시지프 신화' 속 사막과 아베 코보�
 image: "desert-cover.png"
 image_alt: "황량한 사막과 첩첩이 쌓인 모래 언덕들"
 tags: [Existentialism, Absurdity, Kobo Abe, Albert Camus, Philosophy, Literature]
-category: insights/inspirations/books
 draft: false
 ---
 

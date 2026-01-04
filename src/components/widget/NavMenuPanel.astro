@@ -23,7 +23,7 @@ if (isPostPage) {
     postCategory = currentPost?.data.category || "";
 }
 ---
-<div id="nav-menu-panel" class:list={["float-panel float-panel-closed transition-all fixed right-4 p-3 min-w-[16rem] max-h-[75vh] overflow-y-auto custom-scrollbar shadow-xl"]}>
+<div id="nav-menu-panel" class:list={["float-panel float-panel-closed transition-all fixed right-0 top-[72px] p-3 min-w-[16rem] max-h-[calc(100vh-72px)] overflow-y-auto custom-scrollbar shadow-2xl rounded-l-2xl border-l border-b border-black/5 dark:border-white/5 bg-[var(--card-bg)]/95 backdrop-blur-md"]}>
     {/* 상단 기본 링크 - 태블릿 이상에서는 네비바와 중복되므로 숨김 */}
     <div class="flex flex-col mb-1 md:hidden">
         {/* 페이지 헤더 */}

@@ -88,7 +88,7 @@ const { class: className, style } = Astro.props;
                 class={className} style={style}
                 data-id="categories"
 >
-    <div class="category-tree">
+    <div class="category-tree" data-active={activeCategory}>
         <ul class="root-list">
             {categoryTree.map((node) => {
                 const isActive = activeCategory === node.fullPath;
@@ -259,15 +259,23 @@ const { class: className, style } = Astro.props;
             el.classList.remove('open');
         });
 
-        let activeCategory = urlParams.get('category');
         const isPostPage = pathname.includes('/posts/');
-
-        // 포스트 페이지일 경우, 메타 데이터에서 카테고리 정보 추출
+        
+        // [개선] SPA 전환 대응: #post-container의 data-category를 최우선 소스로 사용
+        let activeCategory = urlParams.get('category');
+        
         if (!activeCategory && isPostPage) {
-            const postMetaLink = document.querySelector('#post-container a[href*="category="]');
-            if (postMetaLink) {
-                const search = new URL((postMetaLink as HTMLAnchorElement).href, window.location.origin).search;
-                activeCategory = new URLSearchParams(search).get('category');
+            const postContainer = document.querySelector('#post-container') as HTMLElement;
+            if (postContainer?.dataset.category) {
+                activeCategory = postContainer.dataset.category;
+            } else {
+                // 백업: 이전 방식인 링크 탐색 (일반 페이지 대응)
+                const contentArea = document.querySelector('#swup-container') || document.querySelector('main');
+                const postMetaLink = contentArea?.querySelector('a[href*="category="]');
+                if (postMetaLink) {
+                    const search = new URL((postMetaLink as HTMLAnchorElement).href, window.location.origin).search;
+                    activeCategory = new URLSearchParams(search).get('category');
+                }
             }
         }
 
@@ -289,27 +297,29 @@ const { class: className, style } = Astro.props;
                 
                 // [수정] 상위 아코디언을 모두 찾아 강제로 펼침 및 아이콘 활성화
                 let parent = item.closest('.accordion-item');
+                if (!parent && item.classList.contains('accordion-item')) parent = item;
+
                 while (parent) {
                     parent.classList.add('active-branch');
                     const content = parent.querySelector('.accordion-content') as HTMLElement;
                     const icon = parent.querySelector('.toggle-chevron') as HTMLElement;
                     
-                    // 아이콘 상태 적용 (콘텐츠 열림 여부와 상관없이 활성 경로면 적용)
+                    // 아이콘 상태 즉시 적용
                     if (icon) {
                         icon.style.transform = 'rotate(90deg)';
                         icon.classList.add('active');
                     }
 
                     if (content) {
-                        // firstLoad 여부와 상관없이, 활성화된 카테고리 경로는 무조건 엶
-                        if (!content.classList.contains('open')) {
-                            content.style.maxHeight = content.scrollHeight + 'px';
-                            content.classList.add('open');
+                        content.classList.add('open');
+                        // 초기 로드 시에는 애니메이션 없이 즉시 펼침 (max-height: none)
+                        if (firstLoad) {
+                            content.style.maxHeight = 'none';
                         } else {
-                            // 이미 열려있더라도 높이 재계산 (동적 컨텐츠 대응)
                             content.style.maxHeight = content.scrollHeight + 'px';
                         }
                     }
+                    // 상위로 이동 시 현재 parent의 부모 중에서 다시 accordion-item을 찾음
                     parent = parent.parentElement?.closest('.accordion-item') || null;
                 }
             });
@@ -318,6 +328,7 @@ const { class: className, style } = Astro.props;
 
     setupAccordion();
     document.addEventListener('astro:page-load', setupAccordion);
+    document.addEventListener('astro:after-swap', setupAccordion); // Astro 내장 전환 대응
     document.addEventListener('swup:content:replace', setupAccordion); // Swup 전환 시 상태 갱신 필수
 </script>
 

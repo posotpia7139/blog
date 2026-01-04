@@ -5,7 +5,7 @@ description: 시작 체중 110.2kg, 목표 체중 65kg. 특별한 이유 없이,
 tags: [diet]
 draft: false
 ---
-## 🎯 목표
+## 목표
 - **목표 체중**: 65kg  
 - **시작 체중**: 110.2kg  
 

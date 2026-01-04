@@ -31,8 +31,11 @@ let showNoResults = $state(false);
 let index: any = null;
 let rawData: SearchData[] = [];
 let isInitialized = $state(false);
+let isFocused = $state(false); // 데스크톱 입력창 포커스 상태 추적
+let desktopInput: HTMLInputElement | undefined = $state(); // 데스크톱 입력창 바인딩
 let mobileInput: HTMLInputElement | undefined = $state();
 let noResultsTimeout: any;
+let timer: any; // 타이머 변수를 상위 스코프로 이동
 
 const highlight = (text: string, query: string) => {
     if (!text || !query) return text;
@@ -52,7 +55,30 @@ const highlight = (text: string, query: string) => {
 
 const formatPath = (category: string) => {
     if (!category) return "";
-    return category.split('/').join(' > ');
+    return category.replace(/\.md$/, "").split('/').join(' > ');
+};
+
+const getDisplaySnippet = (item: SearchData, query: string) => {
+    if (!query.trim()) return "";
+    const q = query.trim().toLowerCase();
+    
+    // 오직 본문(Content)에 키워드가 포함되어 있을 때만 스니펫 추출
+    const contentLower = item.content.toLowerCase();
+    const matchIndex = contentLower.indexOf(q);
+    
+    if (matchIndex !== -1) {
+        const start = Math.max(0, matchIndex - 40);
+        const end = Math.min(item.content.length, matchIndex + 70);
+        let snippet = item.content.substring(start, end);
+        
+        if (start > 0) snippet = "..." + snippet;
+        if (end < item.content.length) snippet += "...";
+        
+        return highlight(snippet, query);
+    }
+    
+    // 제목 매칭 등 기본 상황에서는 아무것도 표시하지 않음 (설명 숨김)
+    return "";
 };
 
 const initSearch = async () => {
@@ -92,7 +118,12 @@ const performSearch = (kw: string) => {
     }
     isSearching = true;
     showNoResults = false;
-    isDesktopPanelVisible = true;
+    
+    // 포커스가 있거나 모바일인 경우에만 패널 노출
+    if (isFocused || isMobileInputVisible) {
+        isDesktopPanelVisible = true;
+    }
+    
     try {
         const results = index.search(trimmed, { limit: 10, enrich: true });
         const matchedItems: SearchData[] = [];
@@ -125,6 +156,7 @@ const closeSearch = (e?: MouseEvent) => {
     keyword = "";
     searchResults = [];
     showNoResults = false;
+    clearTimeout(timer); // 닫을 때 타이머 취소 추가
     document.body.style.overflow = "";
     if (mobileInput) mobileInput.blur();
 };
@@ -146,23 +178,40 @@ onMount(() => {
         const target = e.target as HTMLElement;
         const wrapper = document.getElementById("search-wrapper");
         if (wrapper && !wrapper.contains(target)) {
-            if (isMobileInputVisible) {
+            // 외부 클릭 시 지연된 검색 실행이 있다면 즉시 취소
+            clearTimeout(timer);
+            
+            if (showNoResults) {
+                // 결과가 없는 상태(No results)에서 외부 클릭 시 필드 초기화
                 closeSearch();
+            } else if (isMobileInputVisible) {
+                // 결과가 있는 상태에서 모바일 백드롭 클릭 시 텍스트 유지하고 창만 닫음
+                isMobileInputVisible = false;
+                document.body.style.overflow = "";
             } else {
-                // 데스크톱: 결과가 없는 상태였다면 키워드도 같이 지워줌
-                if (showNoResults) {
-                    keyword = "";
-                    showNoResults = false;
-                }
+                // 결과가 있는 상태에서 데스크톱 외부 클릭 시 텍스트 유지하고 패널만 닫음
                 isDesktopPanelVisible = false;
             }
         }
     };
+
+    // 페이지 이동 시 검색 상태 초기화
+    const handleNavigateAway = () => {
+        closeSearch();
+    };
+
     document.addEventListener("click", handleGlobalClick);
-    return () => document.removeEventListener("click", handleGlobalClick);
+    document.addEventListener("swup:content:replace", handleNavigateAway);
+    document.addEventListener("astro:after-swap", handleNavigateAway);
+
+    return () => {
+        document.removeEventListener("click", handleGlobalClick);
+        document.removeEventListener("swup:content:replace", handleNavigateAway);
+        document.removeEventListener("astro:after-swap", handleNavigateAway);
+        clearTimeout(timer);
+    };
 });
 
-let timer: any;
 $effect(() => {
     const kw = keyword;
     if (!isInitialized) return;
@@ -182,14 +231,20 @@ $effect(() => {
 
 <div id="search-wrapper" class="flex items-center">
     <!-- 1. 데스크탑 검색바 -->
-    <div class="hidden lg:flex relative items-center h-10 px-3 rounded-lg bg-black/[0.04] dark:bg-white/[0.06] 
-                w-56 focus-within:w-72 transition-all duration-300">
+    <div 
+        onclick={() => desktopInput?.focus()}
+        role="presentation"
+        class="hidden lg:flex relative items-center h-10 px-3 rounded-lg bg-black/[0.04] dark:bg-white/[0.06] w-56 cursor-text"
+    >
         <Icon icon="material-symbols:search" class="text-[1.2rem] text-black/60 dark:text-white/60" />
         <input 
+            bind:this={desktopInput}
             type="text"
             placeholder="{i18n(I18nKey.search)}" 
             bind:value={keyword}
-            onfocus={() => { if (keyword.trim()) isDesktopPanelVisible = true; }}
+            onfocus={() => { isFocused = true; if (keyword.trim()) isDesktopPanelVisible = true; }}
+            onblur={() => { isFocused = false; }}
+            onclick={(e) => { e.stopPropagation(); if (keyword.trim()) isDesktopPanelVisible = true; }}
             class="ml-2 w-full bg-transparent outline-none text-sm font-medium text-black/90 dark:text-white/90 placeholder:text-black/50 dark:placeholder:text-white/50"
         />
     </div>
@@ -203,9 +258,16 @@ $effect(() => {
 
     <!-- 3. 모바일 패널 -->
     {#if isMobileInputVisible}
-        <div id="search-backdrop" class="lg:hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-[1000] animate-fade-in" onclick={closeSearch}></div>
+        <div id="search-backdrop" 
+             class="lg:hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-[1000] animate-fade-in" 
+             onclick={closeSearch}
+             onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') closeSearch(); }}
+             role="button"
+             tabindex="0"
+             aria-label="Close Search"></div>
         <div class="lg:hidden fixed top-[80px] left-4 right-4 bg-[var(--card-bg)] border border-[var(--line-color)] z-[1001] shadow-2xl animate-slide-down rounded-xl overflow-hidden"
-             onclick={(e) => e.stopPropagation()}>
+             onclick={(e) => e.stopPropagation()}
+             role="presentation">
             <div class="flex items-center p-4">
                 <div class="w-full flex items-center h-12 px-4 rounded-xl bg-black/[0.05] dark:bg-white/[0.08]">
                     <Icon icon="material-symbols:search" class="text-[1.2rem] text-black/60 dark:text-white/60" />
@@ -224,12 +286,14 @@ $effect(() => {
                             {#each searchResults as item}
                                 <a href={item.url} onclick={(e) => handleNavigate(e, item.url)}
                                    class="block p-4 px-4 rounded-xl bg-black/[0.03] dark:bg-white/[0.03] active:bg-[var(--btn-plain-bg-hover)] transition-colors">
-                                    <div class="text-[10px] text-50 font-bold uppercase tracking-wider mb-1">
+                                    <div class="text-[10px] text-50 font-semibold uppercase tracking-wider mb-1">
                                         {formatPath(item.category)}
                                     </div>
                                     <div class="text-90 font-bold text-sm leading-tight">{@html highlight(item.title, keyword)}</div>
-                                    {#if item.description}
-                                        <div class="text-[11px] text-50 line-clamp-2 mt-2 leading-relaxed">{@html highlight(item.description, keyword)}</div>
+                                    {#if getDisplaySnippet(item, keyword)}
+                                        <div class="text-[11px] text-50 line-clamp-2 mt-2 leading-relaxed">
+                                            {@html getDisplaySnippet(item, keyword)}
+                                        </div>
                                     {/if}
                                 </a>
                             {/each}
@@ -256,7 +320,7 @@ $effect(() => {
                         {#each searchResults as item}
                             <a href={item.url} onclick={(e) => handleNavigate(e, item.url)}
                                class="group block p-3 px-4 rounded-xl hover:bg-[var(--btn-plain-bg-hover)] transition-all">
-                                <div class="text-[9px] text-50 font-bold uppercase tracking-tight mb-1 opacity-70">
+                                <div class="text-[9px] text-50 font-semibold uppercase tracking-tight mb-1 opacity-70">
                                     {formatPath(item.category)}
                                 </div>
                                 <div class="flex justify-between items-center">
@@ -265,8 +329,10 @@ $effect(() => {
                                         <Icon icon="fa6-solid:chevron-right" class="text-[0.6rem] text-[var(--primary)] opacity-0 group-hover:opacity-100 transition-all ml-2" />
                                     </div>
                                 </div>
-                                {#if item.description}
-                                    <div class="text-[11px] text-50 line-clamp-1 mt-1 font-medium">{@html highlight(item.description, keyword)}</div>
+                                {#if getDisplaySnippet(item, keyword)}
+                                    <div class="text-[11px] text-50 line-clamp-1 mt-1 font-medium">
+                                        {@html getDisplaySnippet(item, keyword)}
+                                    </div>
                                 {/if}
                             </a>
                         {/each}

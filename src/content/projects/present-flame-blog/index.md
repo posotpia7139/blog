@@ -4,7 +4,6 @@ published: 2025-12-25
 description: "Astro 5와 Svelte 5를 기반으로 구축한 독립적인 디지털 사유의 공간. 플랫폼 종속성에서 벗어나, 내면의 불꽃을 기록하고 공유하는 개인화된 미디어 허브입니다."
 image: "static-blog.png"
 tags: ["Web Dev", "Astro", "Svelte", "Tailwind"]
-category: "projects"
 github_url: "https://github.com/posotpia7139/blog"
 demo_url: "https://presentflame.com/"
 draft: false
