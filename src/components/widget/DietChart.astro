@@ -141,7 +141,7 @@ const maxWeight = Math.max(...weights);
 
         const backgroundPlugin = {
             id: 'customBackground',
-            beforeDraw: (chart) => {
+            beforeDraw: (chart: any) => {
                 const { ctx, chartArea: { top, bottom, left, right }, scales: { y } } = chart;
                 ctx.save();
 
@@ -234,7 +234,7 @@ const maxWeight = Math.max(...weights);
                                 if (note) {
                                     return '\n💡 ' + note;
                                 }
-                                return null;
+                                return undefined;
                             }
                         }
                     },
