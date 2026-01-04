@@ -27,9 +27,9 @@ if (isPostPage) {
     {/* 상단 기본 링크 - 태블릿 이상에서는 네비바와 중복되므로 숨김 */}
     <div class="flex flex-col mb-1 md:hidden">
         {/* 페이지 헤더 */}
-        <div class="menu-item px-4 py-2 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.2em] text-black/45 dark:text-white/45 select-none"
+        <div class="menu-item px-4 py-2 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.2em] text-black/60 dark:text-white/60 select-none"
              style="--i: 0; font-feature-settings: 'case' 1, 'cpsp' 1; font-kerning: normal;">
-            <Icon name="material-symbols:layers-outline-rounded" class="text-base text-[var(--primary)] opacity-80 -translate-y-[0.5px]" />
+            <Icon name="material-symbols:layers-outline-rounded" class="text-[1.15rem] text-[var(--primary)] opacity-100 -translate-y-[0.5px]" />
             <span class="leading-none">Pages</span>
         </div>
 
@@ -49,9 +49,9 @@ if (isPostPage) {
     </div>
 
     {/* 카테고리 헤더 */}
-    <div class="menu-item px-4 py-2 mt-2 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.2em] text-black/45 dark:text-white/45 select-none"
+    <div class="menu-item px-4 py-2 mt-2 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.2em] text-black/60 dark:text-white/60 select-none"
          style={`--i: ${links.length + 1}; font-feature-settings: "case" 1, "cpsp" 1; font-kerning: normal;`}>
-        <Icon name="material-symbols:folder-open-outline-rounded" class="text-base text-[var(--primary)] opacity-80 -translate-y-[0.5px]" />
+        <Icon name="material-symbols:folder-open-outline-rounded" class="text-base text-[var(--primary)] opacity-100 -translate-y-[0.5px]" />
         <span class="leading-none">Categories</span>
     </div>
 
@@ -99,12 +99,15 @@ if (isPostPage) {
         margin-left: 2px;
         vertical-align: top;
         line-height: 1;
+        opacity: 0; /* 초기 상태: 투명 */
         animation: pulse-opacity 1.5s ease-in-out infinite;
+        animation-delay: 0.5s; /* 0.5초 대기 후 시작 */
     }
 
     @keyframes pulse-opacity {
-        0%, 100% { opacity: 0; }
+        0% { opacity: 0; }
         50% { opacity: 1; }
+        100% { opacity: 0; }
     }
 
     #nav-menu-panel {

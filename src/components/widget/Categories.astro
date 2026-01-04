@@ -36,9 +36,9 @@ const { class: className, style } = Astro.props;
 >
     <div class="category-tree">
         {/* 헤더 디자인 (모바일 메뉴와 통일) */}
-        <div class="px-4 py-2 mb-2 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.2em] text-black/45 dark:text-white/45 select-none"
+        <div class="px-4 py-2 mb-2 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.2em] text-black/60 dark:text-white/60 select-none"
              style="font-feature-settings: 'case' 1, 'cpsp' 1; font-kerning: normal;">
-            <Icon name="material-symbols:folder-open-outline-rounded" class="text-base text-[var(--primary)] opacity-80 -translate-y-[0.5px]" />
+            <Icon name="material-symbols:folder-open-outline-rounded" class="text-base text-[var(--primary)] opacity-100 -translate-y-[0.5px]" />
             <span class="leading-none">Categories</span>
         </div>
 
@@ -141,12 +141,15 @@ const { class: className, style } = Astro.props;
         font-weight: 900;
         font-size: 1.25rem;
         line-height: 1;
+        opacity: 0; /* 초기 상태: 투명 */
         animation: pulse-opacity 1.5s ease-in-out infinite;
+        animation-delay: 0.5s; /* 0.5초 대기 후 시작 */
     }
 
     @keyframes pulse-opacity {
-        0%, 100% { opacity: 1; }
-        50% { opacity: 0.1; }
+        0% { opacity: 0; }
+        50% { opacity: 1; }
+        100% { opacity: 0; }
     }
 
     .category-label {

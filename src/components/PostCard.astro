@@ -62,7 +62,7 @@ const { remarkPluginFrontmatter } = await entry.render();
                 {hasCover && (
                     <div class:list={[
                         "shrink-0 rounded-xl overflow-hidden active:scale-95 z-40 pointer-events-none aspect-square",
-                        isProject ? "w-28 h-28 md:w-40 md:h-40 self-center" : "w-24 h-24 md:w-32 md:h-32 self-start mt-1"
+                        isProject ? "w-28 h-28 md:w-40 md:h-40 self-center" : "w-28 h-28 sm:w-40 sm:h-40 self-start"
                     ]}>
                         <ImageWrapper src={image} basePath={path.join("content", entry.collection, getDir(entry.id))} alt={isProject ? "Cover Image of the Project" : "Cover Image of the Post"}
                                   class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
@@ -74,7 +74,7 @@ const { remarkPluginFrontmatter } = await entry.render();
 
                     <!-- Date and Read Time (Moved Above Title) -->
                     {!isProject && (
-                        <div class:list={["text-[11px] md:text-[12px] text-black/50 dark:text-white/50 flex flex-wrap items-center gap-x-4 transition relative z-10 pointer-events-none whitespace-nowrap mb-2"]}>
+                        <div class:list={["hidden text-[11px] md:text-[12px] text-black/50 dark:text-white/50 flex flex-wrap items-center gap-x-4 transition relative z-10 pointer-events-none whitespace-nowrap mb-2"]}>
                             <div class="flex items-center pl-2 -ml-2 shrink-0">
                                 <div class="meta-icon !bg-black/5 dark:!bg-white/10 !text-black/50 dark:!text-white/50 !w-6 !h-6 !mr-2 shrink-0">
                                     <Icon name="material-symbols:edit-calendar-rounded" class="text-base"></Icon>
@@ -92,7 +92,7 @@ const { remarkPluginFrontmatter } = await entry.render();
 
                     <div class:list={["relative mb-2"]}>
 
-                        <div class="transition w-full font-semibold text-xl md:text-2xl text-90
+                        <div class="transition w-full font-semibold text-lg md:text-xl text-90
 
                         title-text
 
@@ -174,7 +174,7 @@ const { remarkPluginFrontmatter } = await entry.render();
 
                             {category && (
 
-                                <div class:list={["flex items-center text-[13px] text-50 relative z-50"]}
+                                <div class:list={["hidden items-center text-[13px] text-50 relative z-50"]}
 
                                 >
 
@@ -212,8 +212,8 @@ const { remarkPluginFrontmatter } = await entry.render();
 
                             <!-- Tier 2: Tags -->
                             {tags && tags.length > 0 && (
-                                <div class:list={["flex items-start text-[12px] text-50 w-full relative z-30 pointer-events-auto"]}>
-                                    <div class="flex items-center pl-2 -ml-2 shrink-0">
+                                <div class:list={["hidden sm:flex items-start text-[12px] text-50 w-full relative z-30 pointer-events-auto"]}>
+                                    <div class="hidden items-center pl-2 -ml-2 shrink-0">
                                         <div class="meta-icon !bg-black/5 dark:!bg-white/10 !text-black/50 dark:!text-white/50 !w-6 !h-6 !mr-2 shrink-0">
                                             <Icon name="material-symbols:tag-rounded" class="text-base"></Icon>
                                         </div>
