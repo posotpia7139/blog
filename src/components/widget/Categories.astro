@@ -250,12 +250,8 @@ const { class: className, style } = Astro.props;
             });
         };
 
-        // 1. [초기화] 모든 활성 상태 제거 (홈으로 이동 시에는 아코디언 닫힘과 조화되도록 지연 적용)
-        if (isHome && !firstLoad) {
-            setTimeout(clearStates, 250);
-        } else {
-            clearStates();
-        }
+        // 1. [초기화] 모든 활성 상태 제거
+        clearStates();
 
         // 모든 아코디언 닫기 (현재 경로만 열기 위해 일단 다 닫음)
         tree.querySelectorAll('.accordion-content.open').forEach(el => {

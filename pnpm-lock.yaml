@@ -86,6 +86,9 @@ importers:
       chartjs-plugin-zoom:
         specifier: ^2.2.0
         version: 2.2.0(chart.js@4.5.1)
+      flexsearch:
+        specifier: ^0.8.212
+        version: 0.8.212
       hastscript:
         specifier: ^9.0.1
         version: 9.0.1
@@ -2793,6 +2796,9 @@ packages:
   flattie@1.1.1:
     resolution: {integrity: sha512-9UbaD6XdAL97+k/n+N7JwX46K/M6Zc6KcFYskrYL8wbBV/Uyk0CTAMY0VT+qiK5PM7AIc9aTWYtq65U7T+aCNQ==}
     engines: {node: '>=8'}
+
+  flexsearch@0.8.212:
+    resolution: {integrity: sha512-wSyJr1GUWoOOIISRu+X2IXiOcVfg9qqBRyCPRUdLMIGJqPzMo+jMRlvE83t14v1j0dRMEaBbER/adQjp6Du2pw==}
 
   focus-options-polyfill@1.6.0:
     resolution: {integrity: sha512-uyrAmLZrPnUItQY5wTdg31TO9GGZRGsh/jmohUg9oLmLi/sw5y7LlTV/mwyd6rvbxIOGwmRiv6LcTS8w7Bk9NQ==}
@@ -8426,6 +8432,8 @@ snapshots:
       path-exists: 4.0.0
 
   flattie@1.1.1: {}
+
+  flexsearch@0.8.212: {}
 
   focus-options-polyfill@1.6.0: {}
 

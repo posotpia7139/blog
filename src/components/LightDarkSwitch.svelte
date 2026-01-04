@@ -64,13 +64,13 @@ function toggleScheme(e: MouseEvent) {
             id="scheme-switch" 
             onclick={(e) => toggleScheme(e)}>
         <div class="absolute transition-opacity duration-300" class:opacity-0={mode !== LIGHT_MODE} class:opacity-100={mode === LIGHT_MODE}>
-            <Icon icon="material-symbols:wb-sunny-outline-rounded" class="text-[1.25rem]"></Icon>
+            <Icon icon="material-symbols:wb-sunny-outline-rounded" class="text-[1.5rem]"></Icon>
         </div>
         <div class="absolute transition-opacity duration-300" class:opacity-0={mode !== DARK_MODE} class:opacity-100={mode === DARK_MODE}>
-            <Icon icon="material-symbols:dark-mode-outline-rounded" class="text-[1.25rem]"></Icon>
+            <Icon icon="material-symbols:dark-mode-outline-rounded" class="text-[1.5rem]"></Icon>
         </div>
         <div class="absolute transition-opacity duration-300" class:opacity-0={mode !== AUTO_MODE} class:opacity-100={mode === AUTO_MODE}>
-            <Icon icon="material-symbols:radio-button-partial-outline" class="text-[1.25rem]"></Icon>
+            <Icon icon="material-symbols:radio-button-partial-outline" class="text-[1.5rem]"></Icon>
         </div>
     </button>
 </div>
