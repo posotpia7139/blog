@@ -29,6 +29,7 @@ import { rehypeMidlineEllipsis } from "./src/plugins/rehype-midline-ellipsis.mjs
 import { rehypeStylizedQuote } from "./src/plugins/rehype-stylized-quote.mjs";
 import { parseDirectiveNode } from "./src/plugins/remark-directive-rehype.js";
 import { remarkExcerpt } from "./src/plugins/remark-excerpt.js";
+import { remarkFixBoldParentheses } from "./src/plugins/remark-fix-bold-parentheses.mjs";
 // import { remarkMidlineEllipsis } from "./src/plugins/remark-midline-ellipsis.mjs"; // Removed
 import { remarkReadingTime } from "./src/plugins/remark-reading-time.mjs";
 
@@ -130,6 +131,7 @@ export default defineConfig({
 	],
 	markdown: {
 		remarkPlugins: [
+			remarkFixBoldParentheses,
 			remarkMath,
 			remarkReadingTime,
 			remarkExcerpt,

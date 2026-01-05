@@ -177,25 +177,20 @@ function setupImageTooltips() {
         const handleMouseEnter = (e: Event) => {
             if (tooltipTimeout) clearTimeout(tooltipTimeout);
 
-            // 0.3초 이상 머물 때만 실행
+            // 0.3초 이상 머물 때만 실행 (응답성 상향)
             tooltipTimeout = setTimeout(() => {
-                const altText = (img as HTMLImageElement).getAttribute('alt');
+                const rawAlt = (img as HTMLImageElement).getAttribute('alt') || "";
+                const altText = rawAlt.trim();
                 if (!altText || altText === "") return;
                 
                 tooltip.textContent = altText;
 
-                // 위치 계산 (이미지의 우측 하단 "안쪽" 정렬)
+                // 위치 계산 (이미지의 중앙 하단 "안쪽" 정렬)
                 const rect = img.getBoundingClientRect();
-                const tooltipWidth = tooltip.offsetWidth;
-                const tooltipHeight = tooltip.offsetHeight;
                 
-                // 이미지 경계 안으로 12px 여백 부여
-                let left = rect.right + window.scrollX - tooltipWidth - 12;
-                let top = rect.bottom + window.scrollY - tooltipHeight - 12;
-                
-                // 화면 밖으로 나가지 않게 최종 조정 (이미지가 작을 경우 대비)
-                const padding = 20;
-                if (left < padding) left = padding;
+                // 가로 중앙, 세로 하단(안쪽 12px 여백) 계산
+                let left = rect.left + window.scrollX + (rect.width / 2);
+                let top = rect.bottom + window.scrollY - tooltip.offsetHeight - 12;
                 
                 tooltip.style.left = `${left}px`;
                 tooltip.style.top = `${top}px`;
@@ -276,33 +271,42 @@ document.addEventListener('swup:content:replace', cleanupTooltips);
         color: #f1f1f1 !important;
     }
 
-    /* 이미지 alt 툴팁 스타일 */
+    /* 이미지 alt 툴팁 스타일 (세련된 미니멀 디자인) */
     .image-alt-tooltip {
         position: absolute;
         z-index: 100;
-        padding: 0.5rem 0.8rem;
-        background: rgba(0, 0, 0, 0.8);
-        color: white !important;
+        padding: 0.3rem 0.5rem;
+        background: rgba(15, 15, 15, 0.75);
+        color: rgba(255, 255, 255, 0.95) !important;
+        border: 1px solid rgba(255, 255, 255, 0.1);
         border-radius: 0.5rem;
-        font-size: 0.8125rem;
-        font-weight: 500;
+        font-size: 0.7rem;
+        font-weight: 600;
+        letter-spacing: -0.02em;
         pointer-events: none;
-        backdrop-filter: blur(8px);
-        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35); /* 아래쪽으로 드리워지는 깊은 그림자 */
-        text-align: center;
-        max-width: 80vw;
+        backdrop-filter: blur(4px) saturate(120%);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
         
-        /* 트랜지션 설정: 나타나고 사라질 때 공통 적용 */
+        /* 텍스트 크기에 딱 맞는 박스 형성 */
+        max-width: 18rem;
+        width: max-content;
+        display: block;
+        text-wrap: balance;
+        word-break: keep-all;
+        line-height: 1.45;
+        text-align: center;
+        
+        /* 트랜지션 및 가로 중앙 정렬 설정 */
         opacity: 0;
         visibility: hidden;
-        transform: translateY(5px);
-        transition: opacity 0.25s ease, transform 0.25s ease, visibility 0.25s;
+        transform: translate(-50%, 6px);
+        transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     .image-alt-tooltip.visible {
         opacity: 1;
         visibility: visible;
-        transform: translateY(0);
+        transform: translate(-50%, 0);
     }
 
     .dark .image-alt-tooltip {
