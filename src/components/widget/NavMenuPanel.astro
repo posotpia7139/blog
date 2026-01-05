@@ -266,7 +266,7 @@ if (isPostPage) {
             }
             
             // 4. 현재 URL과 정확히 일치하는 항목 (Home, Archive 등 기본 링크)
-            if (!activeCategory && pathname === itemPath && itemPath !== '/') {
+            if (!activeCategory && !itemCategory && pathname === itemPath && itemPath !== '/') {
                 item.classList.add('bg-[var(--primary)]/[0.08]');
                 if (label) {
                     label.classList.add('text-[var(--primary)]');
