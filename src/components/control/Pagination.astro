@@ -1,7 +1,5 @@
 ---
 import type { Page } from "astro";
-import { Icon } from "astro-icon/components";
-import { url } from "../../utils/url-utils";
 
 interface Props {
 	page: Page;
@@ -10,75 +8,113 @@ interface Props {
 }
 
 const { page, style } = Astro.props;
-
-const HIDDEN = -1;
-
 const className = Astro.props.class;
 
-const ADJ_DIST = 2;
-const VISIBLE = ADJ_DIST * 2 + 1;
-
-// for test
-let count = 1;
-let l = page.currentPage;
-let r = page.currentPage;
-while (0 < l - 1 && r + 1 <= page.lastPage && count + 2 <= VISIBLE) {
-	count += 2;
-	l--;
-	r++;
-}
-while (0 < l - 1 && count < VISIBLE) {
-	count++;
-	l--;
-}
-while (r + 1 <= page.lastPage && count < VISIBLE) {
-	count++;
-	r++;
-}
-
-let pages: number[] = [];
-if (l > 1) pages.push(1);
-if (l === 3) pages.push(2);
-if (l > 3) pages.push(HIDDEN);
-for (let i = l; i <= r; i++) pages.push(i);
-if (r < page.lastPage - 2) pages.push(HIDDEN);
-if (r === page.lastPage - 2) pages.push(page.lastPage - 1);
-if (r < page.lastPage) pages.push(page.lastPage);
-
-const getPageUrl = (p: number) => {
-	if (p === 1) return "/";
-	return `/${p}/`;
-};
+const hasNextPage = page.url.next;
 ---
 
 <div class:list={[className, "flex flex-row gap-3 justify-center"]} style={style}>
-    <a href={page.url.prev || ""} aria-label="Previous Page"
-       class:list={["btn-card overflow-hidden rounded-lg text-[var(--primary)] w-11 h-11",
-           {"disabled": page.url.prev == undefined}
-       ]}
-    >
-        <Icon name="material-symbols:chevron-left-rounded" class="text-[1.75rem]"></Icon>
-    </a>
-    <div class="bg-[var(--card-bg)] flex flex-row rounded-lg items-center text-neutral-700 dark:text-neutral-300 font-semibold">
-        {pages.map((p) => {
-            if (p == HIDDEN)
-                return <Icon name="material-symbols:more-horiz" class="mx-1"/>;
-            if (p == page.currentPage)
-                return <div class="h-11 w-11 rounded-lg bg-[var(--primary)] flex items-center justify-center
-                    font-semibold text-white dark:text-black/70"
-                >
-                    {p}
-                </div>
-            return <a href={url(getPageUrl(p))} aria-label={`Page ${p}`}
-                class="btn-card w-11 h-11 rounded-lg overflow-hidden active:scale-[0.85]"
-            >{p}</a>
-        })}
-    </div>
-    <a href={page.url.next || ""} aria-label="Next Page"
-       class:list={["btn-card overflow-hidden rounded-lg text-[var(--primary)] w-11 h-11",
-           {"disabled": page.url.next == undefined}
-       ]}
-    >
-        <Icon name="material-symbols:chevron-right-rounded" class="text-[1.75rem]"></Icon>
-    </a>
+    {hasNextPage && (
+        <a href={page.url.next} aria-label="Load More Posts" id="load-more-btn" data-no-swup
+           class="btn-card w-full h-14 rounded-[var(--radius-large)] text-[var(--primary)] font-bold overflow-hidden active:scale-[0.98] flex items-center justify-center transition-all duration-300"
+        >
+            <span>More Posts</span>
+        </a>
+    )}
 </div>
+
+<script>
+    function setupLoadMore() {
+        const btn = document.getElementById('load-more-btn');
+        if (!btn) return;
+
+        btn.addEventListener('click', async (e) => {
+            e.preventDefault();
+            const nextUrl = btn.getAttribute('href');
+            if (!nextUrl || btn.classList.contains('loading')) return;
+
+            btn.classList.add('loading');
+            const originalContent = btn.innerHTML;
+            
+            // 로딩 애니메이션: 투명도 변화 제거, 속도 업
+            btn.innerHTML = `
+                <div class="flex gap-1">
+                    <div class="w-1.5 h-1.5 rounded-full bg-[var(--primary)] animate-bounce-fast [animation-delay:-0.3s]"></div>
+                    <div class="w-1.5 h-1.5 rounded-full bg-[var(--primary)] animate-bounce-fast [animation-delay:-0.15s]"></div>
+                    <div class="w-1.5 h-1.5 rounded-full bg-[var(--primary)] animate-bounce-fast"></div>
+                </div>
+            `;
+
+            // 최소 로딩 시간 보장을 위한 타이머 시작
+            const minLoadingTime = 500; // 0.5초
+            const startTime = Date.now();
+
+            try {
+                const response = await fetch(nextUrl);
+                const html = await response.text();
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+
+                const newPostsContainer = doc.getElementById('post-list-container');
+                const newPosts = newPostsContainer ? Array.from(newPostsContainer.children) : [];
+                const currentContainer = document.getElementById('post-list-container');
+
+                // 최소 시간 대기
+                const elapsedTime = Date.now() - startTime;
+                if (elapsedTime < minLoadingTime) {
+                    await new Promise(resolve => setTimeout(resolve, minLoadingTime - elapsedTime));
+                }
+
+                if (newPosts.length > 0 && currentContainer) {
+                    newPosts.forEach((post, index) => {
+                        if (post instanceof HTMLElement) {
+                            post.style.animationDelay = `${index * 50}ms`;
+                            post.classList.remove('onload-animation');
+                            void post.offsetWidth;
+                            post.classList.add('onload-animation');
+                        }
+                        currentContainer.appendChild(post);
+                    });
+                }
+
+                const nextBtn = doc.getElementById('load-more-btn');
+                if (nextBtn) {
+                    btn.setAttribute('href', nextBtn.getAttribute('href') || '');
+                    // 페이드 아웃 효과 후 원복하면 더 좋겠지만, 일단 즉시 복구
+                    btn.innerHTML = originalContent;
+                    btn.classList.remove('loading');
+                } else {
+                    btn.remove();
+                }
+
+            } catch (err) {
+                console.error('Failed to load more posts:', err);
+                btn.innerHTML = 'Error';
+                setTimeout(() => {
+                    btn.innerHTML = originalContent;
+                    btn.classList.remove('loading');
+                }, 2000);
+            }
+        });
+    }
+
+    setupLoadMore();
+    document.addEventListener('astro:page-load', setupLoadMore);
+    document.addEventListener('swup:content:replace', setupLoadMore);
+</script>
+
+<style is:global>
+    @keyframes bounceFast {
+        0%, 100% {
+            transform: translateY(-25%);
+            animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
+        }
+        50% {
+            transform: none;
+            animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+        }
+    }
+    .animate-bounce-fast {
+        animation: bounceFast 0.6s infinite;
+    }
+</style>
