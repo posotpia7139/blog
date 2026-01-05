@@ -20,8 +20,6 @@ import { defaultFavicons } from "../constants/icon";
 import type { Favicon } from "../types/config";
 import { pathsEqual, url } from "../utils/url-utils";
 import "../styles/main.css";
-import "photoswipe/style.css";
-import "../styles/photoswipe.css";
 import "overlayscrollbars/overlayscrollbars.css";
 import { SEO } from "astro-seo";
 
@@ -100,7 +98,7 @@ const bannerOffset =
 			extend={{
 				meta: [
 					{ name: 'author', content: profileConfig.name },
-					{ name: 'viewport', content: 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no' },
+					{ name: 'viewport', content: 'width=device-width, initial-scale=1.0' },
 					{ name: 'generator', content: Astro.generator },
 					{ name: 'naver-site-verification', content: '74995f86fc463a9a7b1f0d2f669c8c76a2184cbd' },
 					{ name: 'google-adsense-account', content: 'ca-pub-3632254045012910' },

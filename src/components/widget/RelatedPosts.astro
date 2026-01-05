@@ -84,6 +84,8 @@ const relatedPosts = allPosts
                                     src={post.data.image} 
                                     basePath={path.join("content", post.collection, post.id.substring(0, post.id.lastIndexOf("/")))} 
                                     alt={post.data.title}
+                                    widths={[400, 800]}
+                                    sizes="(max-width: 768px) 50vw, 400px"
                                     class="w-full h-full object-cover group-hover:scale-110 md:group-hover:blur-[1px] transition-all duration-700"
                                 />
                             ) : (
