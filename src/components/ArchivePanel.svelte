@@ -229,7 +229,7 @@ function formatTag(tagList: string[]) {
             <div class="flex flex-row justify-start items-center px-2 gap-2 h-[3.75rem]">
                 <div class="w-[17%] md:w-[10%] transition text-2xl font-semibold text-right text-75">{group.year}</div>
                 <div class="w-[13%] md:w-[10%] relative flex items-center justify-center shrink-0">
-                    <span class="text-black/35 dark:text-white/35 tracking-[0.2em] font-bold select-none text-xs -translate-y-[3px]">.....</span>
+                    <span class="text-black/60 dark:text-white/60 tracking-[0.2em] font-bold select-none text-xs -translate-y-[3px]">.....</span>
                 </div>
                 <div class="flex-1 transition text-left text-50 text-base md:text-base flex items-center">
                     <span class="text-[var(--primary)] font-bold mr-1">{group.posts.length}</span>
@@ -242,7 +242,7 @@ function formatTag(tagList: string[]) {
                         <div class="flex flex-row justify-start items-center px-2 gap-2">
                             <div class="w-[17%] md:w-[10%] transition text-sm text-right text-50 shrink-0 leading-none">{formatDate(post.data.published)}</div>
                             <div class="w-[13%] md:w-[10%] relative dash-line flex items-center shrink-0">
-                                <div class="transition-all mx-auto w-1.5 h-1.5 rounded-full group-hover:h-5 bg-[oklch(0.5_0.05_var(--hue))] group-hover:bg-[var(--primary)] outline outline-4 z-50 outline-[var(--card-bg)]"></div>
+                                <div class="transition-all mx-auto w-1.5 h-1.5 rounded-full group-hover:h-5 bg-[oklch(0.5_0.05_var(--hue))] group-hover:bg-[var(--primary)] z-50"></div>
                             </div>
                             <div class="flex-1 min-w-0 text-left font-medium group-hover:translate-x-1 transition-all group-hover:text-[var(--primary)] text-75 pr-4 line-clamp-2 [text-wrap:balance] break-keep leading-tight">
                                 {post.data.title}

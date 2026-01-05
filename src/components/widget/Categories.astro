@@ -62,7 +62,7 @@ const { class: className, style } = Astro.props;
                             <div class:list={[
                                 "text-sm transition-colors duration-300 flex items-center",
                                 (isActive || isReading) ? "text-[var(--primary)]" : "text-black/70 dark:text-white/70 group-hover:text-[var(--primary)]",
-                                depth === 1 ? "font-bold text-[15px]" : "font-light text-[14px]"
+                                depth === 1 ? "font-extrabold text-[15px]" : "font-normal text-[15px]"
                             ]}>
                                 <span class="category-label capitalize leading-none">{parts[parts.length - 1]}</span>
                             </div>
