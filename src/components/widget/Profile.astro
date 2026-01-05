@@ -10,7 +10,7 @@ const config = profileConfig;
     <div class="flex flex-col items-center gap-3 mb-3 w-full"> <!-- Gap reduced to 3 -->
         <div
            class="block shrink-0 w-[5rem] h-[5rem] overflow-hidden rounded-xl"> <!-- Size reduced to 5rem -->
-            <ImageWrapper src={config.avatar || ""} alt="Profile Image of the Author" class="w-full h-full object-cover" widths={[80, 160]} sizes="80px" loading="eager" fetchPriority="high"></ImageWrapper>
+            <ImageWrapper src={config.avatar || ""} alt="Profile of the Author" class="w-full h-full object-cover" widths={[80, 160]} sizes="80px" loading="eager" fetchPriority="high"></ImageWrapper>
         </div>
         <div class="w-full"> 
             <div class="font-bold text-lg dark:text-neutral-50 transition">{config.name}</div>
