@@ -1,5 +1,8 @@
 ---
-import { dietHistory } from "../../data/dietHistory";
+import { getDietHistoryFromPosts } from "../../utils/dietParser";
+
+// 마크다운 파일에서 데이터 파싱
+const dietHistory = await getDietHistoryFromPosts();
 
 // 최저 및 최고 몸무게 계산
 const weights = dietHistory.map(d => d.weight);
@@ -7,7 +10,7 @@ const minWeight = Math.min(...weights);
 const maxWeight = Math.max(...weights);
 ---
 
-<div class="diet-chart-container w-full mt-12 mb-6">
+<div class="diet-chart-container w-full mt-12 mb-6" data-history={JSON.stringify(dietHistory)}>
     <div class="overflow-hidden rounded-lg border border-black/10 dark:border-white/10 bg-[var(--card-bg)] mb-6 p-4">
         <div class="flex items-center justify-between mb-4 px-2">
             <div class="text-lg font-bold text-black/90 dark:text-white/90">
@@ -27,7 +30,7 @@ const maxWeight = Math.max(...weights);
             <table class="w-full text-sm text-left border-collapse">
                 <thead class="sticky top-0 z-20 bg-[var(--card-bg)] shadow-[0_1px_0_rgba(0,0,0,0.1)] dark:shadow-[0_1px_0_rgba(255,255,255,0.1)]">
                     <tr class="bg-black/5 dark:bg-white/5 text-black/90 dark:text-white/90">
-                        <th colspan="4" class="px-4 py-4 text-center text-lg font-bold">
+                        <th colspan="3" class="px-4 py-4 text-center text-lg font-bold">
                             전체 체중 변화 기록표
                         </th>
                     </tr>
@@ -35,7 +38,6 @@ const maxWeight = Math.max(...weights);
                         <th scope="col" class="px-4 py-3 text-center whitespace-nowrap font-bold">날짜</th>
                         <th scope="col" class="px-4 py-3 text-center whitespace-nowrap font-bold">체중 (kg)</th>
                         <th scope="col" class="px-4 py-3 text-center whitespace-nowrap font-bold">누적 변화</th>
-                        <th scope="col" class="px-4 py-3 text-left whitespace-nowrap font-bold">비고</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-black/10 dark:divide-white/10">
@@ -65,7 +67,6 @@ const maxWeight = Math.max(...weights);
                                 ]}>
                                     {record.change}
                                 </td>
-                                <td class="px-4 py-3 text-left text-black/60 dark:text-white/60 text-xs">{record.note || '-'}</td>
                             </tr>
                         )
                     })}
@@ -98,13 +99,18 @@ const maxWeight = Math.max(...weights);
 <script>
     import Chart from 'chart.js/auto';
     import zoomPlugin from 'chartjs-plugin-zoom';
-    import { dietHistory } from "../../data/dietHistory";
+    import type { DietRecord } from "../../utils/dietParser";
 
     Chart.register(zoomPlugin);
 
     function initChart() {
         const ctx = document.getElementById('weightChart') as HTMLCanvasElement;
         if (!ctx) return;
+        
+        const container = document.querySelector('.diet-chart-container') as HTMLElement;
+        if (!container || !container.dataset.history) return;
+        
+        const dietHistory: DietRecord[] = JSON.parse(container.dataset.history);
 
         const existingChart = Chart.getChart(ctx);
         if (existingChart) existingChart.destroy();
@@ -114,20 +120,14 @@ const maxWeight = Math.max(...weights);
         const textColor = isDark ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.7)';
         const primaryColor = getComputedStyle(document.documentElement).getPropertyValue('--primary').trim() || '#3b82f6';
 
-        const labels = dietHistory.map(d => d.date.substring(5));
-        const data = dietHistory.map(d => d.weight);
-        const notes = dietHistory.map(d => d.note); // 비고 데이터
+        const labels = dietHistory.map((d: DietRecord) => d.date);
+        const data = dietHistory.map((d: DietRecord) => d.weight);
         const targetData = new Array(dietHistory.length).fill(65);
 
         // 초기 뷰 범위 설정 (최근 15개 데이터만 보여줌)
         const initialRange = 15;
         const xMin = Math.max(0, labels.length - initialRange);
         const xMax = labels.length - 1;
-
-        // 비고가 있는 데이터 포인트 강조 설정
-        const pointRadii = notes.map(note => note ? 6 : 3);
-        const pointHoverRadii = notes.map(note => note ? 9 : 6);
-        const pointColors = notes.map(note => note ? '#f59e0b' : primaryColor); // Amber 500 for notes
 
         // 몸무게 구간별 배경색 설정
         const zones = [
@@ -191,9 +191,9 @@ const maxWeight = Math.max(...weights);
                         backgroundColor: isDark ? 'rgba(59, 130, 246, 0.1)' : 'rgba(59, 130, 246, 0.1)',
                         borderWidth: 2,
                         tension: 0.3,
-                        pointRadius: pointRadii,
-                        pointHoverRadius: pointHoverRadii,
-                        pointBackgroundColor: pointColors,
+                        pointRadius: 3,
+                        pointHoverRadius: 6,
+                        pointBackgroundColor: primaryColor,
                         pointBorderColor: isDark ? '#1a1a1a' : '#ffffff',
                         fill: true
                     },
@@ -213,8 +213,8 @@ const maxWeight = Math.max(...weights);
                 responsive: true,
                 maintainAspectRatio: false,
                 interaction: {
-                    mode: 'nearest',
-                    intersect: true,
+                    mode: 'index',
+                    intersect: false,
                 },
                 plugins: {
                     legend: {
@@ -226,17 +226,7 @@ const maxWeight = Math.max(...weights);
                         bodyColor: isDark ? '#ccc' : '#333',
                         borderColor: gridColor,
                         borderWidth: 1,
-                        padding: 10,
-                        callbacks: {
-                            afterLabel: function(context) {
-                                const index = context.dataIndex;
-                                const note = notes[index];
-                                if (note) {
-                                    return '\n💡 ' + note;
-                                }
-                                return undefined;
-                            }
-                        }
+                        padding: 10
                     },
                     zoom: {
                         pan: {
