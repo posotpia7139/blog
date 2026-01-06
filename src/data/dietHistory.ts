@@ -40,6 +40,7 @@ export const dietHistory: DietRecord[] = [
     { date: '2025-07-15', weight: 93.9, change: '-16.6' },
     { date: '2025-07-23', weight: 93.5, change: '-17.0', note: '다이어트가 고통이 아닌 선택의 영역이 됨' },
     { date: '2025-08-27', weight: 93.85, change: '-16.65' },
+    { date: '2025-09-18', weight: 97.15, change: '-13.35', note: '폭식과 자괴감, 그러나 딜레마' },
     { date: '2025-09-19', weight: 98.5, change: '-12.0', note: '이유 없는 폭식과 배달 음식으로 요요 (+5kg)' },
     { date: '2025-11-05', weight: 99.6, change: '-10.9', note: '다시 다이어트 욕구 확인 및 재시작' },
     { date: '2025-11-26', weight: 94.9, change: '-15.6', note: '참회의 48시간 단식으로 급속 복구' },
