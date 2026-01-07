@@ -6,6 +6,11 @@ category: Game/Guide
 tags: [League of Legends, Update, Guide]
 ---
 
+:::warning[경고]
+실제 게임 내 적용 시 패치 내용이나 세부 변경점은 공식 공지 및 본문 설명과 일부 다를 수 있음에 유의해 주시기 바랍니다. - [리그 오브 레전드 공식 패치 노트](https://www.leagueoflegends.com/ko-kr/news/tags/patch-notes/)
+
+:::
+
 ## 시스템 주요 변경 사항
 
 | 항목 | 상세 내용 |

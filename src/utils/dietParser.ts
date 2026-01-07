@@ -6,7 +6,7 @@ export interface DietRecord {
 
 export async function getDietHistoryFromPosts(): Promise<DietRecord[]> {
     // 1. 해당 경로의 모든 마크다운 파일을 가져옴
-    const matches = import.meta.glob('/src/content/posts/life/body/**/*.md', { eager: true, as: 'raw' });
+    const matches = import.meta.glob('/src/content/posts/life/body/**/*.md', { eager: true, query: '?raw', import: 'default' });
     
     const records: DietRecord[] = [];
 
