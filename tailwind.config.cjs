@@ -7,7 +7,22 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        sans: ["Pretendard Variable", "Roboto", "sans-serif", ...defaultTheme.fontFamily.sans],
+        sans: [
+          "Pretendard",
+          "-apple-system",
+          "BlinkMacSystemFont",
+          "system-ui",
+          "Roboto",
+          "Helvetica Neue",
+          "Segoe UI",
+          "Apple SD Gothic Neo",
+          "Noto Sans KR",
+          "Malgun Gothic",
+          "Apple Color Emoji",
+          "Segoe UI Emoji",
+          "Segoe UI Symbol",
+          "sans-serif",
+        ],
       },
     },
   },
