@@ -1,3 +1,28 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    html {
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        text-rendering: optimizeLegibility;
+    }
+    
+    /* 본문 텍스트 선명도 강화 및 투명도 제거 */
+    .prose {
+        --tw-prose-body: #1a1a1a; /* 투명도 없는 아주 짙은 회색 */
+        --tw-prose-headings: #000000;
+        opacity: 1 !important;
+    }
+    
+    .dark .prose {
+        --tw-prose-body: #f8f8f8; /* 투명도 없는 순백색 계열 */
+        --tw-prose-headings: #ffffff;
+        opacity: 1 !important;
+    }
+}
+
 /* 중간 생략 부호 스타일 */
 .midline-ellipsis {
     @apply opacity-80;
@@ -7,8 +32,6 @@
     content: "";
     @apply inline-block w-[0.4em];
 }
-
-@tailwind components;
 
 @layer components {
     .card-base {
@@ -161,7 +184,7 @@
 
 /* 스타일이 적용된 인용구 스타일 */
 .stylized-quote {
-    @apply relative inline mx-0.5 px-1;
+    @apply relative inline mx-0.5 px-0.5;
     color: inherit;
     font-style: normal;
 }
@@ -172,8 +195,19 @@
     color: inherit;
     font-weight: 100;
     display: inline-block;
-    vertical-align: 0.1em;
+    /* 줄 높이에 영향을 주지 않도록 높이와 줄 간격을 0으로 고정함. */
+    height: 0;
+    line-height: 0;
+    vertical-align: baseline;
+    /* 위치 조정은 레이아웃에 영향을 주지 않는 상대 좌표를 사용함. */
+    position: relative;
 }
+
+.quote-double::before { content: '“'; font-size: 1.2em; top: 0.05em; }
+.quote-double::after { content: '”'; font-size: 1.2em; top: 0.05em; margin-left: -0.05em; }
+
+.quote-single::before { content: '‘'; font-size: 1.1em; top: 0.05em; }
+.quote-single::after { content: '’'; font-size: 1.1em; top: 0.05em; margin-left: -0.05em; }
 
 .quote-double::before { content: '“'; font-size: 1.2em; }
 .quote-double::after { content: '”'; font-size: 1.2em; margin-left: -0.05em; }

@@ -7,26 +7,27 @@ import Tag from "./Tags.astro";
 interface Props {
 	class?: string;
 	headings?: MarkdownHeading[];
+    onlyAd?: boolean;
+    onlyCategories?: boolean;
 }
 
-const className = Astro.props.class;
-const pathname = Astro.url.pathname;
-const isPostPage = pathname.includes("/posts/");
+const { class: className, headings, onlyAd, onlyCategories } = Astro.props;
 ---
-<div id="sidebar" class:list={[className, "w-full"]}>
-    {/* 카테고리: 항상 상단에 위치하며 어디서든 스크롤 시 위로 사라짐 */}
-    <div class="flex flex-col w-full gap-4 mb-4">
-        <Categories class="onload-animation" style="animation-delay: 100ms"></Categories>
-    </div>
-    
-    <div id="sidebar-sticky" class="sticky flex flex-col w-full gap-4 top-4">
-        {/* Ad Space: 데스크탑(lg)에서만 노출 (sticky 적용) */}
-        <div id="sidebar-ad" class="hidden lg:flex w-[300px] h-[600px] bg-gray-200 dark:bg-gray-800 items-center justify-center text-sm text-gray-500 rounded-lg overflow-hidden">
-            
+<div class:list={[className, "w-full"]}>
+    {/* 카테고리 영역 */}
+    {!onlyAd && (
+        <div class="flex flex-col w-full gap-4">
+            <Categories class="onload-animation" style="animation-delay: 100ms"></Categories>
         </div>
-    </div>
+    )}
+    
+    {/* 광고 영역 */}
+    {!onlyCategories && (
+        <div class="sticky top-4 flex flex-col w-full gap-4">
+            <div class="flex onload-animation w-full h-[600px] bg-gray-200 dark:bg-gray-800 items-center justify-center text-sm text-gray-500 rounded-lg overflow-hidden" style="animation-delay: 100ms">
+                {/* 광고 콘텐츠 */}
+                SideBar Ad
+            </div>
+        </div>
+    )}
 </div>
-
-<script>
-    // 모든 페이지에서 광고를 항상 보여주므로 별도의 제어 스크립트가 필요 없음
-</script>
