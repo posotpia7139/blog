@@ -1,8 +1,8 @@
 ---
-title: 다이어트 일지 (2)
+title: 다이어트 초기의 막막함과 식탐 조절의 어려움 | 다이어트 일지 2
 published: 2024-08-31
 description: 110kg에서 시작한 장기 다이어트 기록, 목표 체중 65kg까지의 솔직한 일지.
-tags: [diet]
+tags: [diet, 식탐관리, 가짜배고픔, 심리다이어트]
 draft: false
 ---
 
