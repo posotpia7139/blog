@@ -16,7 +16,7 @@ const hasNextPage = page.url.next;
 <div class:list={[className, "flex flex-row gap-3 justify-center"]} style={style}>
     {hasNextPage && (
         <a href={page.url.next} aria-label="Load More Posts" id="load-more-btn" data-no-swup
-           class="btn-card w-full h-14 rounded-[var(--radius-large)] text-[var(--primary)] font-bold overflow-hidden active:scale-[0.98] flex items-center justify-center transition-all duration-300"
+           class="btn-card w-full h-14 rounded-[var(--radius-large)] text-[oklch(0.45_0.14_var(--hue))] dark:text-[var(--primary)] font-bold overflow-hidden active:scale-[0.98] flex items-center justify-center transition-all duration-300"
         >
             <span>More Posts</span>
         </a>
@@ -39,9 +39,9 @@ const hasNextPage = page.url.next;
             // 로딩 애니메이션: 투명도 변화 제거, 속도 업
             btn.innerHTML = `
                 <div class="flex gap-1">
-                    <div class="w-1.5 h-1.5 rounded-full bg-[var(--primary)] animate-bounce-fast [animation-delay:-0.3s]"></div>
-                    <div class="w-1.5 h-1.5 rounded-full bg-[var(--primary)] animate-bounce-fast [animation-delay:-0.15s]"></div>
-                    <div class="w-1.5 h-1.5 rounded-full bg-[var(--primary)] animate-bounce-fast"></div>
+                    <div class="w-1.5 h-1.5 rounded-full bg-[oklch(0.45_0.14_var(--hue))] dark:bg-[var(--primary)] animate-bounce-fast [animation-delay:-0.3s]"></div>
+                    <div class="w-1.5 h-1.5 rounded-full bg-[oklch(0.45_0.14_var(--hue))] dark:bg-[var(--primary)] animate-bounce-fast [animation-delay:-0.15s]"></div>
+                    <div class="w-1.5 h-1.5 rounded-full bg-[oklch(0.45_0.14_var(--hue))] dark:bg-[var(--primary)] animate-bounce-fast"></div>
                 </div>
             `;
 
