@@ -34,14 +34,13 @@ const { class: className, style } = Astro.props;
                 class={className} style={style}
                 data-id="categories"
 >
-    <div class="category-tree">
-        {/* 헤더 디자인 (모바일 메뉴와 통일) */}
-        <div class="px-4 py-2 mb-2 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.2em] text-black/60 dark:text-white/60 select-none"
-             style="font-feature-settings: 'case' 1, 'cpsp' 1; font-kerning: normal;">
-            <Icon name="material-symbols:folder-open-outline-rounded" class="text-base text-[var(--primary)] opacity-100 -translate-y-[0.5px]" />
-            <span class="leading-none">Categories</span>
-        </div>
-
+        <div class="category-tree">
+            {/* 헤더 디자인 (모바일 메뉴와 통일) */}
+            <div class="pr-4 pl-0 py-2 mb-2 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.2em] text-black/60 dark:text-white/60 select-none"
+                 style="font-feature-settings: 'case' 1, 'cpsp' 1; font-kerning: normal;">
+                <Icon name="material-symbols:folder-open-outline-rounded" class="text-base text-[var(--primary)] opacity-100 -translate-y-[0.5px]" />
+                <span class="leading-none">Categories</span>
+            </div>
         <ul class="root-list flex flex-col pb-2">
             {categories.map((cat) => {
                 const isActive = activeCategory === cat.name;
@@ -55,7 +54,7 @@ const { class: className, style } = Astro.props;
                            class:list={[
                                 "group flex justify-between items-center py-2.5 pr-2 rounded-xl transition-all duration-300",
                                 (isActive || isReading) ? "bg-[var(--primary)]/[0.08]" : "hover:bg-[var(--btn-plain-bg-hover)]",
-                                depth === 1 ? "pl-4" : depth === 2 ? "pl-9" : "pl-14",
+                                depth === 1 ? "pl-[26px]" : depth === 2 ? "pl-[46px]" : "pl-[66px]",
                                 { "reading-active-star": isReading }
                            ]}
                         >
@@ -143,7 +142,7 @@ const { class: className, style } = Astro.props;
         line-height: 1;
         opacity: 0; /* 초기 상태: 투명 */
         animation: pulse-opacity 1.5s ease-in-out infinite;
-        animation-delay: 0.5s; /* 0.5초 대기 후 시작 */
+        animation-delay: 0.2s; /* 0.2초 대기 후 시작 */
     }
 
     @keyframes pulse-opacity {

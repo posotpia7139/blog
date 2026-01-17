@@ -40,7 +40,7 @@ const hasBannerLink = !!siteConfig.banner.credit.url;
 
 const mainPanelTop = siteConfig.banner.enable
 	? `calc(${BANNER_HEIGHT}vh - ${MAIN_PANEL_OVERLAPS_BANNER_HEIGHT}rem)`
-	: "5.5rem";
+	: "calc(72px + 1rem)";
 ---
 
 <Layout title={title} banner={banner} description={description} lang={lang} setOGTypeArticle={setOGTypeArticle}>
@@ -73,8 +73,10 @@ const mainPanelTop = siteConfig.banner.enable
                         <slot></slot>
                     </div>
                 </main>
-                <div id="footer-wrapper" class="onload-animation mt-[28px] mb-[44px]">
-                    <Footer></Footer>
+                <div id="footer-wrapper" class="transition-swup-fade mt-[28px] mb-[44px]">
+                    <div class="onload-animation">
+                        <Footer></Footer>
+                    </div>
                 </div>
             </div>
 
@@ -84,7 +86,7 @@ const mainPanelTop = siteConfig.banner.enable
                 <SideBar headings={headings} onlyCategories={true}></SideBar>
                 
                 {/* 광고 영역 (새로고침 대상) */}
-                <div id="sidebar-ad" class="transition-swup-fade sticky top-4">
+                <div id="sidebar-ad" class="sticky top-4">
                     <SideBar headings={headings} onlyAd={true}></SideBar>
                 </div>
             </aside>

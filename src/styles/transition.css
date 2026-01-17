@@ -67,7 +67,7 @@ html.is-animating .transition-swup-fade {
 #sidebar { animation-delay: 200ms }
 #swup-container { outline: none; }
 #content-wrapper { animation-delay: calc(var(--content-delay) + 100ms); }
-.footer { animation-delay: 350ms; }
+#footer-wrapper .onload-animation { animation-delay: calc(var(--content-delay) + 100ms); }
 #banner-credit { animation-delay: 500ms; }
 
 /* Post content 시퀀스 */
