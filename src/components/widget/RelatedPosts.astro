@@ -90,7 +90,7 @@ const relatedPosts = allPosts
                                 />
                             ) : (
                                 <div class="w-full h-full bg-black/5 dark:bg-white/5 flex items-center justify-center group-hover:bg-[var(--primary)]/10 transition-colors px-4">
-                                    <span class="text-base md:text-lg font-black text-black/25 dark:text-white/25 group-hover:text-[var(--primary)]/40 transition-colors uppercase tracking-wider text-center line-clamp-1">
+                                    <span class="text-base md:text-lg font-black text-black/25 dark:text-white/25 group-hover:opacity-0 transition-all duration-500 uppercase tracking-wider text-center line-clamp-1">
                                         {post.data.tags && post.data.tags.length > 0 ? post.data.tags[0] : "POST"}
                                     </span>
                                 </div>
@@ -99,7 +99,7 @@ const relatedPosts = allPosts
                         
                         {/* Description Overlay */}
                         <div class="absolute inset-0 bg-black/40 backdrop-blur-[3px] flex flex-col justify-center px-4 opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-10 pointer-events-none">
-                            <p class="text-white text-[11px] leading-relaxed line-clamp-3 font-normal text-center [text-wrap:balance] break-keep">
+                            <p class="text-white text-[14.3px] leading-relaxed line-clamp-3 font-normal text-center [text-wrap:balance] break-keep">
                                 {post.data.description || "이 글의 내용을 확인해보세요."}
                             </p>
                         </div>

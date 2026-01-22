@@ -32,6 +32,7 @@ import { remarkExcerpt } from "./src/plugins/remark-excerpt.js";
 import { remarkFixBoldParentheses } from "./src/plugins/remark-fix-bold-parentheses.mjs";
 // import { remarkMidlineEllipsis } from "./src/plugins/remark-midline-ellipsis.mjs"; // Removed
 import { remarkReadingTime } from "./src/plugins/remark-reading-time.mjs";
+import { rehypeImageCaption } from "./src/plugins/rehype-image-caption.mjs";
 
 // https://astro.build/config
 export default defineConfig({
@@ -144,6 +145,7 @@ export default defineConfig({
 			rehypeHeaderNumbering,
 			rehypeStylizedQuote,
 			rehypeMidlineEllipsis,
+			rehypeImageCaption,
 			rehypeKatex,
 			rehypeSlug,
 			[

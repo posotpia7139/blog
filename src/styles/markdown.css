@@ -258,5 +258,18 @@
     .footnote-title {
         display: none !important;
     }
+
+    /* 이미지 캡션 스타일 */
+    figure {
+        @apply my-4 flex flex-col items-center;
+    }
+    
+    figcaption {
+        @apply mt-2 text-center text-sm text-[var(--deep-text)] opacity-75 font-medium;
+        /* 애니메이션 제거 */
+        animation: none !important;
+        transform: none !important;
+        opacity: 0.75 !important;
+    }
     
 }
