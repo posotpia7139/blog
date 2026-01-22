@@ -16,7 +16,7 @@ const hasNextPage = page.url.next;
 <div class:list={[className, "flex flex-row gap-3 justify-center"]} style={style}>
     {hasNextPage && (
         <a href={page.url.next} aria-label="Load More Posts" id="load-more-btn" data-no-swup
-           class="btn-card w-full h-14 rounded-[var(--radius-large)] text-[oklch(0.45_0.14_var(--hue))] dark:text-[var(--primary)] font-bold overflow-hidden active:scale-[0.98] flex items-center justify-center transition-all duration-300"
+           class="btn-card w-full h-14 rounded-none md:rounded-[var(--radius-large)] text-[oklch(0.45_0.14_var(--hue))] dark:text-[var(--primary)] font-bold overflow-hidden active:scale-[0.98] flex items-center justify-center transition-all duration-300"
         >
             <span>More Posts</span>
         </a>

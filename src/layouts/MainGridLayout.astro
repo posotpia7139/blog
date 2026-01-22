@@ -41,6 +41,10 @@ const hasBannerLink = !!siteConfig.banner.credit.url;
 const mainPanelTop = siteConfig.banner.enable
 	? `calc(${BANNER_HEIGHT}vh - ${MAIN_PANEL_OVERLAPS_BANNER_HEIGHT}rem)`
 	: "calc(72px + 1rem)";
+
+const mainPanelTopMobile = siteConfig.banner.enable
+	? `calc(${BANNER_HEIGHT}vh - ${MAIN_PANEL_OVERLAPS_BANNER_HEIGHT}rem)`
+	: "calc(72px + 0.5rem)";
 ---
 
 <Layout title={title} banner={banner} description={description} lang={lang} setOGTypeArticle={setOGTypeArticle}>
@@ -62,18 +66,18 @@ const mainPanelTop = siteConfig.banner.enable
 </div>}
 
 <!-- Main content grid -->
-<div class="absolute w-full z-30 pointer-events-none" style={`top: ${mainPanelTop}`}>
+<div class="absolute w-full z-30 pointer-events-none" style={`--main-panel-top: ${mainPanelTopMobile}; @media (min-width: 768px) { --main-panel-top: ${mainPanelTop}; } top: var(--main-panel-top)`}>
     <div class="relative max-w-[var(--page-width)] mx-auto pointer-events-auto">
-        <div id="main-grid" class="w-full grid grid-cols-1 lg:grid-cols-[1fr_18.75rem] gap-4 px-0 md:px-4">
+        <div id="main-grid" class="w-full grid grid-cols-1 lg:grid-cols-[1fr_18.75rem] gap-2 md:gap-4 px-0 md:px-4">
             
             {/* 1. 본문 영역 (Left Column) */}
-            <div class="flex flex-col gap-4">
+            <div class="flex flex-col gap-2 md:gap-4">
                 <main id="main-content" class="transition-swup-fade overflow-hidden flex flex-col">
                     <div id="content-wrapper" class="onload-animation grow">
                         <slot></slot>
                     </div>
                 </main>
-                <div id="footer-wrapper" class="transition-swup-fade mt-[28px] mb-[44px]">
+                <div id="footer-wrapper" class="transition-swup-fade mt-[14px] md:mt-[28px] mb-[22px] md:mb-[44px]">
                     <div class="onload-animation">
                         <Footer></Footer>
                     </div>

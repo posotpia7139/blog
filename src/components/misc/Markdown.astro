@@ -106,10 +106,10 @@ document.addEventListener("click", function (e: MouseEvent) {
         
         if (topToc) {
             // 1. 가변값: 본문 컨테이너의 실제 패딩을 실시간으로 읽어옴
-            let basePadding = 36;
+            let basePadding = 28;
             const postContainer = document.getElementById('post-container');
             if (postContainer) {
-                basePadding = parseInt(window.getComputedStyle(postContainer).paddingLeft) || 36;
+                basePadding = parseInt(window.getComputedStyle(postContainer).paddingLeft) || 28;
             }
 
             // 2. 조정값: 여기에 원하는 만큼의 추가 여백을 입력 (예: -15)
