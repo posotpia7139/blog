@@ -153,37 +153,31 @@ function formatTag(tagList: string[]) {
 <div class="card-base px-4 md:px-8 pt-6 pb-[42px] onload-animation min-h-[300px] overflow-hidden w-full box-border">
     <div class="transition text-left text-50 flex items-center flex-wrap w-full">
         {#if filterCategories.length > 0 || filterTags.length > 0}
-            <div class="flex flex-col items-center justify-center w-full py-6 gap-3">
-                <div class="flex flex-row items-center flex-wrap justify-center px-4">
+            <div class="flex flex-col items-start justify-start w-full py-6 md:py-12 gap-2">
+                <div class="flex flex-row items-center flex-wrap justify-start px-4">
                     {#if filterCategories.length > 0}
-                        <div class="h-6 w-6 rounded-md bg-black/5 dark:bg-white/10 flex items-center justify-center mr-2 shrink-0">
-                            <Icon icon="material-symbols:folder-open-outline-rounded" class="text-[var(--primary)] text-[15px]" />
-                        </div>
-                        <div class="flex items-center flex-wrap justify-center">
-                            {#each categorySegments as segment, i}
-                                {#if i > 0}
-                                    <span class="mx-2 opacity-30 text-[13px]">/</span>
-                                {/if}
-                                <span class="text-[13px] capitalize {i === categorySegments.length - 1 ? 'text-[var(--primary)] font-bold' : 'text-black/75 dark:text-white/75'}">
-                                    {segment}
-                                </span>
-                            {/each}
-                        </div>
+                        <Icon icon="material-symbols:folder-open-outline-rounded" class="text-[var(--primary)] text-[15px] md:text-[20px] mr-2 md:mr-3" />
+                        {#each categorySegments as segment, i}
+                            {#if i > 0}
+                                <span class="mx-2 opacity-30 text-[13px] md:text-[17px] translate-y-[0.5px] md:translate-y-[1px]">/</span>
+                            {/if}
+                            <span class="text-[13px] md:text-[17px] translate-y-[0.5px] md:translate-y-[1px] capitalize {i === categorySegments.length - 1 ? 'text-[var(--primary)] font-bold' : 'text-black/75 dark:text-white/75'}">
+                                {segment}
+                            </span>
+                        {/each}
                     {:else if filterTags.length > 0}
-                        <div class="h-6 w-6 rounded-md bg-black/5 dark:bg-white/10 flex items-center justify-center mr-2 shrink-0">
-                            <Icon icon="material-symbols:tag-rounded" class="text-[var(--primary)] text-[15px]" />
-                        </div>
-                        <span class="text-[var(--primary)] font-bold text-[13px] capitalize">
+                        <Icon icon="material-symbols:tag-rounded" class="text-[var(--primary)] text-[15px] md:text-[20px] mr-2 md:mr-3" />
+                        <span class="text-[var(--primary)] font-bold text-[13px] md:text-[17px] translate-y-[0.5px] md:translate-y-[1px] capitalize">
                             {filterTags[0]}
                         </span>
                     {/if}
                 </div>
-                <div class="flex items-center justify-center shrink-0">
-                    <span class="text-[13px] opacity-60">게시물&nbsp;</span>
-                    <span class="text-[var(--primary)] font-bold text-[13px]">{targetCount}</span>
-                    <span class="text-[13px] opacity-60">개</span>
+                <div class="flex items-center justify-start shrink-0 px-4">
+                    <span class="text-[13px] md:text-[17px] opacity-60">게시물&nbsp;</span>
+                    <span class="text-[var(--primary)] font-bold text-[13px] md:text-[17px]">{targetCount}</span>
+                    <span class="text-[13px] md:text-[17px] opacity-60">개</span>
                 </div>
-                <div class="w-16 h-1 rounded-full bg-[var(--primary)]/10 mt-2"></div>
+                <div class="w-16 md:w-24 h-1 md:h-1.5 rounded-full bg-[var(--primary)]/10 mt-2 ml-4"></div>
             </div>
         {:else}
             <div class="flex flex-col items-center w-full py-8 mt-2 mb-6 overflow-hidden gap-4">
