@@ -1,51 +1,86 @@
-﻿---
+---
 import { getDietHistoryFromPosts } from "../../utils/dietParser";
+import { Icon } from "astro-icon/components";
 
 const dietHistory = await getDietHistoryFromPosts();
+
+if (dietHistory.length === 0) return null;
 
 const weights = dietHistory.map(d => d.weight);
 const maxWeight = Math.max(...weights); // 역대 최고 체중
 const currentWeight = dietHistory[dietHistory.length - 1].weight;
-const totalLoss = (maxWeight - currentWeight).toFixed(2); // 최고점 대비 감량치
 const goalWeight = 65;
-const remainingToGoal = (currentWeight - goalWeight).toFixed(2);
+
+const totalLoss = (maxWeight - currentWeight).toFixed(1);
+const remainingToGoal = (currentWeight - goalWeight).toFixed(1);
+
+// 진행률 계산 (최고점 -> 현재 -> 목표)
+const totalJourney = maxWeight - goalWeight;
+const progress = Math.min(Math.max(((maxWeight - currentWeight) / totalJourney) * 100, 0), 100).toFixed(1);
+
+const startDate = new Date(dietHistory[0].date);
+const today = new Date();
+const daysDiff = Math.floor((today.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
 ---
 
-<div class="diet-stats-container w-full mb-10 onload-animation">
-    <div class="grid grid-cols-2 gap-4 md:gap-6">
-        {/* 역대 최고 체중 위젯 */}
-        <div class="card-base p-6 flex flex-col items-center justify-center border border-black/10 dark:border-white/10 bg-[var(--card-bg)]">
-            <span class="text-xs font-bold uppercase tracking-wider text-black/40 dark:text-white/40 mb-2">역대 최고</span>
-            <div class="flex items-baseline gap-1">
-                <span class="text-2xl md:text-3xl font-black text-red-600 dark:text-red-400">{maxWeight}</span>
-                <span class="text-sm font-bold text-black/40 dark:text-white/40">kg</span>
-            </div>
+<div class="diet-dashboard w-full onload-animation">
+    {/* 메인 성취 카드 (통합 레이아웃) */}
+    <div class="card-base p-6 md:p-8 mb-0 flex flex-col items-center justify-center relative overflow-hidden border border-blue-100 dark:border-blue-900/30 bg-gradient-to-br from-blue-50/50 to-transparent dark:from-blue-900/10 shadow-sm">
+        
+        {/* 히어로 성취 정보 */}
+        <span class="text-sm font-bold uppercase tracking-widest text-blue-600/80 dark:text-blue-400/80 mb-3 flex items-center gap-2">
+            총 감량
+        </span>
+        
+        <div class="flex items-baseline gap-2 mb-2">
+            <span class="text-5xl md:text-6xl font-black text-blue-600 dark:text-blue-400 leading-none">-{totalLoss}</span>
+            <span class="text-xl font-bold text-blue-600/60 dark:text-blue-400/60">kg</span>
         </div>
+        
+        <p class="text-sm text-black/50 dark:text-white/50 font-medium mb-6">
+            <span class="text-blue-600 dark:text-blue-400 font-bold">{daysDiff}일째</span> 도전
+        </p>
 
-        {/* 현재 체중 위젯 */}
-        <div class="card-base p-6 flex flex-col items-center justify-center border border-black/10 dark:border-white/10 bg-[var(--card-bg)]">
-            <span class="text-xs font-bold uppercase tracking-wider text-black/40 dark:text-white/40 mb-2">현재 체중</span>
-            <div class="flex items-baseline gap-1">
-                <span class="text-2xl md:text-3xl font-black text-black/90 dark:text-white/90">{currentWeight}</span>
-                <span class="text-sm font-bold text-black/40 dark:text-white/40">kg</span>
-            </div>
-        </div>
+        {/* 상세 대시보드 (통합 구조) */}
+        <div class="w-full flex flex-col gap-8">
+            {/* 진행 바 섹션 */}
+            <div>
+                <div class="relative w-full h-16 mb-4">
+                    {/* 진행 바 배경 */}
+                    <div class="absolute bottom-2 w-full h-4 bg-black/5 dark:bg-white/10 rounded-full p-1">
+                        {/* 실제 진행 막대 */}
+                        <div class="h-full bg-gradient-to-r from-blue-400 to-blue-600 rounded-full transition-all duration-1000 ease-out shadow-[0_0_12px_rgba(37,99,235,0.4)]" style={`width: ${progress}%`}></div>
+                    </div>
+                    
+                    {/* 막대 끝 원 포인트 (정중앙 배치) */}
+                    <div class="absolute bottom-4 transition-all duration-1000 ease-out w-3 h-3 bg-white rounded-full border-2 border-blue-600 shadow-[0_0_8px_rgba(37,99,235,0.5)] z-20" style={`left: ${progress}%; transform: translate(-50%, 50%);`}></div>
 
-        {/* 총 감량치 위젯 */}
-        <div class="card-base p-6 flex flex-col items-center justify-center border border-black/10 dark:border-white/10 bg-[var(--card-bg)]">
-            <span class="text-xs font-bold uppercase tracking-wider text-black/40 dark:text-white/40 mb-2">총 감량</span>
-            <div class="flex items-baseline gap-1">
-                <span class="text-2xl md:text-3xl font-black text-blue-600 dark:text-blue-400">-{totalLoss}</span>
-                <span class="text-sm font-bold text-black/40 dark:text-white/40">kg</span>
-            </div>
-        </div>
+                    {/* 현재 체중 표시 핀 */}
+                    <div class="absolute bottom-4 transition-all duration-1000 ease-out flex flex-col items-center scale-90 md:scale-100 z-10" style={`left: ${progress}%; transform: translateX(-50%);`}>
+                        <div class="bg-blue-600 text-white px-2 py-1 rounded-md mb-0 shadow-md whitespace-nowrap flex flex-col items-center leading-tight">
+                            <span class="text-[9px] md:text-[10px] font-bold opacity-80 uppercase">현재 체중</span>
+                            <span class="text-[12px] md:text-[14px] font-black">{currentWeight}kg</span>
+                        </div>
+                        <div class="w-0.5 h-4 bg-blue-600/70"></div>
+                    </div>
 
-        {/* 목표 체중까지 남은 양 위젯 */}
-        <div class="card-base p-6 flex flex-col items-center justify-center border border-black/10 dark:border-white/10 bg-[var(--card-bg)]">
-            <span class="text-xs font-bold uppercase tracking-wider text-black/40 dark:text-white/40 mb-2">최종 목표</span>
-            <div class="flex items-baseline gap-1">
-                <span class="text-2xl md:text-3xl font-black text-black/90 dark:text-white/90">{remainingToGoal}</span>
-                <span class="text-sm font-bold text-black/40 dark:text-white/40">kg</span>
+                    {/* 달성률 표시 (막대 바로 아래) */}
+                    <div class="absolute bottom-[-10px] transition-all duration-1000 ease-out text-[11px] font-black text-blue-600/60 dark:text-blue-400/60 whitespace-nowrap" style={`left: ${progress}%; transform: translateX(-50%);`}>
+                        {progress}%
+                    </div>
+                </div>
+                
+                {/* 수치 정보 (세로 배치) */}
+                <div class="flex justify-between px-2">
+                    <div class="flex flex-col items-start gap-0.5">
+                        <span class="text-[11px] font-bold text-black/30 dark:text-white/30 uppercase">역대 최고</span>
+                        <span class="text-[14px] font-black text-black/60 dark:text-white/60">{maxWeight}kg</span>
+                    </div>
+                    <div class="flex flex-col items-end gap-0.5">
+                        <span class="text-[11px] font-bold text-black/30 dark:text-white/30 uppercase">남은 목표</span>
+                        <span class="text-[14px] font-black text-black/60 dark:text-white/60">{remainingToGoal}kg</span>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
