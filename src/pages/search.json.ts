@@ -1,7 +1,8 @@
 import { getCollection } from 'astro:content';
 
 export async function GET() {
-  const posts = await getCollection('posts');
+  const allPosts = await getCollection('posts');
+  const posts = allPosts.filter(post => !post.id.startsWith('privacy/'));
   
   const searchData = posts.map(post => {
     // 1. 명시적인 category가 있으면 사용

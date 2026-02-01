@@ -38,12 +38,18 @@ async function getPosts() {
 async function getRawSortedPosts() {
 	const allBlogPosts = await getPosts();
 
-	const sorted = allBlogPosts.sort((a, b) => {
-		const dateA = new Date(a.data.published);
-		const dateB = new Date(b.data.published);
-		return dateA > dateB ? -1 : 1;
-	});
+	const sorted = allBlogPosts
+		.filter((post) => !post.id.startsWith("privacy/"))
+		.sort((a, b) => {
+			const dateA = new Date(a.data.published);
+			const dateB = new Date(b.data.published);
+			return dateA > dateB ? -1 : 1;
+		});
 	return sorted;
+}
+
+export async function getAllPosts() {
+	return await getPosts();
 }
 
 export async function getSortedPosts() {
@@ -105,7 +111,8 @@ export type Tag = {
 };
 
 export async function getTagList(): Promise<Tag[]> {
-	const allBlogPosts = await getPosts();
+	const allPosts = await getPosts();
+	const allBlogPosts = allPosts.filter((post) => !post.id.startsWith("privacy/"));
 
 	const countMap: { [key: string]: number } = {};
 	allBlogPosts.forEach((post: { data: { tags: string[] } }) => {
@@ -130,7 +137,8 @@ export type Category = {
 };
 
 export async function getCategoryList(): Promise<Category[]> {
-	const allBlogPosts = await getPosts();
+	const allPosts = await getPosts();
+	const allBlogPosts = allPosts.filter((post) => !post.id.startsWith("privacy/"));
 	const count: { [key: string]: number } = {};
 	allBlogPosts.forEach((post) => {
 		if (!post.data.category) {

@@ -5,7 +5,7 @@ import Markdown from "@components/misc/Markdown.astro";
 import I18nKey from "@i18n/i18nKey";
 import { i18n } from "@i18n/translation";
 import MainGridLayout from "@layouts/MainGridLayout.astro";
-import { getSortedPosts } from "@utils/content-utils";
+import { getAllPosts, getSortedPosts } from "@utils/content-utils";
 import { getDir, getPostUrlBySlug } from "@utils/url-utils";
 import { Icon } from "astro-icon/components";
 import { licenseConfig } from "src/config";
@@ -23,7 +23,7 @@ import { formatDateToYYYYMMDD } from "../../utils/date-utils";
 import "katex/dist/katex.css";
 
 export async function getStaticPaths() {
-	const blogEntries = await getSortedPosts();
+	const blogEntries = await getAllPosts();
 	return blogEntries.map((entry) => ({
 		params: { slug: entry.slug },
 		props: { entry },
@@ -60,6 +60,7 @@ const jsonLd = {
     <div class="flex w-full rounded-[var(--radius-large)] overflow-hidden relative mb-2 md:mb-4">
         <div id="post-container" 
              data-category={entry.data.category}
+             data-pagefind-ignore={entry.id.startsWith("privacy/") ? true : null}
              class:list={["card-base z-10 px-7 md:px-9 pt-6 pb-4 relative w-full ",
             {}
         ]}>

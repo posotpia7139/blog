@@ -256,7 +256,7 @@ function initCustomScrollbar() {
 		}, {
 		scrollbars: {
 			theme: 'scrollbar-base scrollbar-auto py-1',
-			autoHide: 'move',
+			autoHide: 'never',
 			autoHideDelay: 500,
 			autoHideSuspend: false,
 		},
@@ -270,7 +270,7 @@ function initCustomScrollbar() {
 		element.parentNode.insertBefore(container, element);
 		container.appendChild(element);
 		OverlayScrollbars(container, {
-			scrollbars: { theme: 'scrollbar-base scrollbar-auto', autoHide: 'leave', autoHideDelay: 500, autoHideSuspend: false }
+			scrollbars: { theme: 'scrollbar-base scrollbar-auto', autoHide: 'never', autoHideDelay: 500, autoHideSuspend: false }
 		});
 		element.setAttribute('data-scrollbar-initialized', 'true');
 	};

@@ -11,7 +11,8 @@ const currentYear = new Date().getFullYear();
     <div class="transition text-50 text-sm text-center flex flex-col gap-2">
         <div>
             <a class="transition link hover:text-[var(--primary)] text-75 font-bold" target="_blank" href={url('rss.xml')}>RSS</a> /
-            <a class="transition link hover:text-[var(--primary)] text-75 font-bold" target="_blank" href={url('sitemap-index.xml')}>Sitemap</a>
+            <a class="transition link hover:text-[var(--primary)] text-75 font-bold" target="_blank" href={url('sitemap-index.xml')}>Sitemap</a> /
+            <a class="transition link hover:text-[var(--primary)] text-75 font-bold" href={url('posts/privacy/')}>개인정보처리방침</a>
         </div>
         <div>
             Powered by
@@ -19,5 +20,8 @@ const currentYear = new Date().getFullYear();
             <a class="transition link hover:text-[var(--primary)] text-75 font-bold" target="_blank" href="https://github.com/saicaca/fuwari">Fuwari</a>
         </div>
         <div>&copy; <span id="copyright-year">{currentYear}</span> {profileConfig.name}. All Rights Reserved.</div>
+        <div>
+            <a href="mailto:contact@presentflame.com" class="transition link hover:text-[var(--primary)] text-75 font-bold">contact@presentflame.com</a>
+        </div>
     </div>
 </div>
