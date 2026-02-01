@@ -24,7 +24,7 @@ const daysDiff = Math.floor((today.getTime() - startDate.getTime()) / (1000 * 60
 ---
 
 <div class="diet-dashboard w-full onload-animation">
-    {/* 메인 성취 카드 (통합 레이아웃) */}
+    {/* 메인 성취 카드 */}
     <div class="card-base p-6 md:p-8 mb-0 flex flex-col items-center justify-center relative overflow-hidden border border-blue-100 dark:border-blue-900/30 bg-gradient-to-br from-blue-50/50 to-transparent dark:from-blue-900/10 shadow-sm">
         
         {/* 히어로 성취 정보 */}
@@ -41,22 +41,22 @@ const daysDiff = Math.floor((today.getTime() - startDate.getTime()) / (1000 * 60
             <span class="text-blue-600 dark:text-blue-400 font-bold">{daysDiff}일째</span> 도전
         </p>
 
-        {/* 상세 대시보드 (통합 구조) */}
+        {/* 상세 대시보드 */}
         <div class="w-full flex flex-col gap-8">
             {/* 진행 바 섹션 */}
             <div>
                 <div class="relative w-full h-16 mb-4">
                     {/* 진행 바 배경 */}
-                    <div class="absolute bottom-2 w-full h-4 bg-black/5 dark:bg-white/10 rounded-full p-1">
-                        {/* 실제 진행 막대 */}
-                        <div class="h-full bg-gradient-to-r from-blue-400 to-blue-600 rounded-full transition-all duration-1000 ease-out shadow-[0_0_12px_rgba(37,99,235,0.4)]" style={`width: ${progress}%`}></div>
+                    <div class="absolute bottom-2 w-full h-4 bg-black/5 dark:bg-white/10 rounded-full p-1 overflow-hidden">
+                        {/* 실제 진행 막대 (순환 효과 유지) */}
+                        <div class="h-full bg-[length:200%_100%] bg-gradient-to-r from-blue-400 via-blue-600 to-blue-400 rounded-full shadow-[0_0_12px_rgba(37,99,235,0.4)] animate-gradient-loop" style={`width: ${progress}%`}></div>
                     </div>
                     
-                    {/* 막대 끝 원 포인트 (정중앙 배치) */}
-                    <div class="absolute bottom-4 transition-all duration-1000 ease-out w-3 h-3 bg-white rounded-full border-2 border-blue-600 shadow-[0_0_8px_rgba(37,99,235,0.5)] z-20" style={`left: ${progress}%; transform: translate(-50%, 50%);`}></div>
+                    {/* 막대 끝 원 포인트 */}
+                    <div class="absolute bottom-4 w-3 h-3 bg-white rounded-full border-2 border-blue-600 shadow-[0_0_8px_rgba(37,99,235,0.5)] z-20" style={`left: ${progress}%; transform: translate(-50%, 50%);`}></div>
 
                     {/* 현재 체중 표시 핀 */}
-                    <div class="absolute bottom-4 transition-all duration-1000 ease-out flex flex-col items-center scale-90 md:scale-100 z-10" style={`left: ${progress}%; transform: translateX(-50%);`}>
+                    <div class="absolute bottom-4 flex flex-col items-center scale-90 md:scale-100 z-10" style={`left: ${progress}%; transform: translateX(-50%);`}>
                         <div class="bg-blue-600 text-white px-2 py-1 rounded-md mb-0 shadow-md whitespace-nowrap flex flex-col items-center leading-tight">
                             <span class="text-[9px] md:text-[10px] font-bold opacity-80 uppercase">현재 체중</span>
                             <span class="text-[12px] md:text-[14px] font-black">{currentWeight}kg</span>
@@ -64,24 +64,34 @@ const daysDiff = Math.floor((today.getTime() - startDate.getTime()) / (1000 * 60
                         <div class="w-0.5 h-4 bg-blue-600/70"></div>
                     </div>
 
-                    {/* 달성률 표시 (막대 바로 아래) */}
-                    <div class="absolute bottom-[-10px] transition-all duration-1000 ease-out text-[11px] font-black text-blue-600/60 dark:text-blue-400/60 whitespace-nowrap" style={`left: ${progress}%; transform: translateX(-50%);`}>
+                    {/* 달성률 표시 */}
+                    <div class="absolute bottom-[-16px] text-[0.9rem] font-black text-blue-700 dark:text-blue-400 whitespace-nowrap" style={`left: ${progress}%; transform: translateX(-50%);`}>
                         {progress}%
                     </div>
                 </div>
                 
-                {/* 수치 정보 (세로 배치) */}
+                {/* 수치 정보 */}
                 <div class="flex justify-between px-2">
                     <div class="flex flex-col items-start gap-0.5">
-                        <span class="text-[11px] font-bold text-black/30 dark:text-white/30 uppercase">역대 최고</span>
-                        <span class="text-[14px] font-black text-black/60 dark:text-white/60">{maxWeight}kg</span>
+                        <span class="text-[13px] font-bold text-black/50 dark:text-white/50 uppercase">역대 최고</span>
+                        <span class="text-base font-black text-black/80 dark:text-white/80">{maxWeight}kg</span>
                     </div>
                     <div class="flex flex-col items-end gap-0.5">
-                        <span class="text-[11px] font-bold text-black/30 dark:text-white/30 uppercase">남은 목표</span>
-                        <span class="text-[14px] font-black text-black/60 dark:text-white/60">{remainingToGoal}kg</span>
+                        <span class="text-[13px] font-bold text-black/50 dark:text-white/50 uppercase">남은 목표</span>
+                        <span class="text-base font-black text-black/80 dark:text-white/80">{remainingToGoal}kg</span>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<style>
+    @keyframes gradient-loop {
+        0% { background-position: 0% 50%; }
+        100% { background-position: 200% 50%; }
+    }
+    .animate-gradient-loop {
+        animation: gradient-loop 2.5s linear infinite;
+    }
+</style>
