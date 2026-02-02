@@ -9,6 +9,9 @@ export async function getDietHistoryFromPosts(): Promise<DietRecord[]> {
     const records: DietRecord[] = [];
 
     for (const path in matches) {
+        // '다이어트 일지 0'은 데이터 집계에서 제외함.
+        if (path.includes('diet-journal-0')) continue;
+
         const content = matches[path] as string;
         const dateRegex = /(?:^|\n)###\s+(\d{4})[-.\s](\d{1,2})[-.\s](\d{1,2})(?:[\s]*)/g;
 
