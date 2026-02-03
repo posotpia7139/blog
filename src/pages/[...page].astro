@@ -21,7 +21,7 @@ const homeDescription =
 const description = page.currentPage === 1 ? homeDescription : undefined;
 ---
 
-<MainGridLayout showSidebarOnMobile={true} description={description}>
+<MainGridLayout description={description}>
     <div class="mb-2 md:mb-4">
         <PostPage page={page}></PostPage>
     </div>
