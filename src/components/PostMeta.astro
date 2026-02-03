@@ -1,7 +1,5 @@
 ---
 import { Icon } from "astro-icon/components";
-import I18nKey from "../i18n/i18nKey";
-import { i18n } from "../i18n/translation";
 import { formatDateToYYYYMMDD } from "../utils/date-utils";
 import { getCategoryUrl, getTagUrl } from "../utils/url-utils";
 
@@ -12,7 +10,6 @@ interface Props {
 	tags: string[];
 	category: string | null;
 	hideTagsForMobile?: boolean;
-	hideUpdateDate?: boolean;
 	hideDate?: boolean;
 }
 const {
@@ -21,7 +18,6 @@ const {
 	tags,
 	category,
 	hideTagsForMobile = false,
-	hideUpdateDate = false,
 	hideDate = false,
 } = Astro.props;
 const className = Astro.props.class;
@@ -79,7 +75,7 @@ const className = Astro.props.class;
                         <Icon name="material-symbols:tag-rounded" class="text-base"></Icon>
                     </div>
                     <div class="flex flex-wrap items-center gap-1.5">
-                        {tags.map((tag, i) => (
+                        {tags.map((tag) => (
                             <a href={getTagUrl(tag)} aria-label={`View all posts with the ${tag} tag`}
                                class="inline-flex items-center h-6 px-2.5 rounded-md bg-black/5 dark:bg-white/10 text-50 text-sm font-medium hover:bg-[var(--primary)]/10 hover:text-[var(--primary)] transition-all whitespace-nowrap"
                             >

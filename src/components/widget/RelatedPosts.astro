@@ -3,7 +3,7 @@ import type { CollectionEntry } from "astro:content";
 import path from "node:path";
 import { getSortedPosts } from "@utils/content-utils";
 import { formatDateToYYYYMMDD } from "@utils/date-utils";
-import { getDir, getPostUrlBySlug } from "@utils/url-utils";
+import { getPostUrlBySlug } from "@utils/url-utils";
 import { Icon } from "astro-icon/components";
 import ImageWrapper from "../misc/ImageWrapper.astro";
 
@@ -70,7 +70,7 @@ const relatedPosts = allPosts
 {relatedPosts.length > 0 && (
     <div class="card-base p-3 md:p-6 mb-2 md:mb-4 onload-animation">
         <div class="grid grid-cols-2 gap-3 md:gap-6">
-            {relatedPosts.map(({ post }, i) => (
+            {relatedPosts.map(({ post }) => (
                 <a 
                     href={getPostUrlBySlug(post.slug)} 
                     class="group flex flex-col transition-all duration-300 active:scale-[0.98]"

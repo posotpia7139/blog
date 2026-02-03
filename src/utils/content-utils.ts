@@ -112,7 +112,9 @@ export type Tag = {
 
 export async function getTagList(): Promise<Tag[]> {
 	const allPosts = await getPosts();
-	const allBlogPosts = allPosts.filter((post) => !post.id.startsWith("privacy/"));
+	const allBlogPosts = allPosts.filter(
+		(post) => !post.id.startsWith("privacy/"),
+	);
 
 	const countMap: { [key: string]: number } = {};
 	allBlogPosts.forEach((post: { data: { tags: string[] } }) => {
@@ -138,7 +140,9 @@ export type Category = {
 
 export async function getCategoryList(): Promise<Category[]> {
 	const allPosts = await getPosts();
-	const allBlogPosts = allPosts.filter((post) => !post.id.startsWith("privacy/"));
+	const allBlogPosts = allPosts.filter(
+		(post) => !post.id.startsWith("privacy/"),
+	);
 	const count: { [key: string]: number } = {};
 	allBlogPosts.forEach((post) => {
 		if (!post.data.category) {

@@ -10,11 +10,13 @@ const activeCategory = url.searchParams.get("category");
 
 // 1차 카테고리만 필터링 및 정리
 const allCategories = [
-    { name: "전체", url: "/" },
-    ...categories.filter(c => !c.name.includes('/')).map(c => ({
-        name: c.name,
-        url: getCategoryUrl(c.name)
-    }))
+	{ name: "전체", url: "/" },
+	...categories
+		.filter((c) => !c.name.includes("/"))
+		.map((c) => ({
+			name: c.name,
+			url: getCategoryUrl(c.name),
+		})),
 ];
 ---
 

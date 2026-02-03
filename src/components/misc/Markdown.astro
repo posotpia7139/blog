@@ -21,7 +21,7 @@ function setupFootnoteTooltips() {
     const footnoteRefs = document.querySelectorAll('a[id^="user-content-fnref-"]');
     
     footnoteRefs.forEach(ref => {
-        ref.addEventListener('mouseenter', (e) => {
+        ref.addEventListener('mouseenter', () => {
             const href = (ref as HTMLAnchorElement).getAttribute('href');
             if (!href) return;
             
@@ -75,7 +75,7 @@ function setupFootnoteTooltips() {
         });
 
         // 팝업 내부로 마우스 이동 시 유지되도록 개선 (선택 사항이나 UX 향상)
-        ref.addEventListener('mouseleave', (e) => {
+        ref.addEventListener('mouseleave', () => {
             const tooltip = document.querySelector('.footnote-tooltip');
             if (tooltip) {
                 // 약간의 유예 시간을 주어 팝업으로 마우스를 옮길 수 있게 함
@@ -102,7 +102,6 @@ document.addEventListener("click", function (e: MouseEvent) {
         e.stopImmediatePropagation();
         
         const topToc = document.getElementById('top-toc-container');
-        const postContainer = document.getElementById('post-container');
         
         if (topToc) {
             // 1. 가변값: 본문 컨테이너의 실제 패딩을 실시간으로 읽어옴
@@ -176,7 +175,7 @@ function setupImageTooltips() {
     }
     
     images.forEach(img => {
-        const handleMouseEnter = (e: Event) => {
+        const handleMouseEnter = () => {
             if (tooltipTimeout) clearTimeout(tooltipTimeout);
 
             // 0.3초 이상 머물 때만 실행 (응답성 상향)

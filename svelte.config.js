@@ -1,10 +1,10 @@
 import { vitePreprocess } from "@astrojs/svelte";
 
 export default {
-  preprocess: [vitePreprocess({ script: true })],
-  compilerOptions: {
-    experimental: {
-      async: true,
-    },
-  },
+	preprocess: [vitePreprocess({ script: true })],
+	compilerOptions: {
+		experimental: {
+			async: true,
+		},
+	},
 };

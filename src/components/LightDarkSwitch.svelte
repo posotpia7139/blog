@@ -42,7 +42,7 @@ function switchScheme(newMode: LIGHT_DARK_MODE) {
 }
 
 function toggleScheme(e: MouseEvent) {
-    if (e) e.stopPropagation();
+	if (e) e.stopPropagation();
 	if (mode === AUTO_MODE) {
 		if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
 			switchScheme(LIGHT_MODE);

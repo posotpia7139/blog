@@ -21,11 +21,7 @@ interface Group {
 	posts: Post[];
 }
 
-let {
-	tags = [],
-	categories = [],
-	sortedPosts = [],
-} = $props();
+let { tags = [], categories = [], sortedPosts = [] } = $props();
 
 let mounted = $state(false);
 let displayCount = $state(0);
@@ -82,10 +78,18 @@ const groups = $derived.by(() => {
 
 const targetCount = $derived(filteredPosts.length);
 
-const newestDate = $derived(sortedPosts.length > 0 ? toDate(sortedPosts[0].data.published) : new Date());
-const oldestDate = $derived(sortedPosts.length > 0 ? toDate(sortedPosts[sortedPosts.length - 1].data.published) : newestDate);
+const newestDate = $derived(
+	sortedPosts.length > 0 ? toDate(sortedPosts[0].data.published) : new Date(),
+);
+const oldestDate = $derived(
+	sortedPosts.length > 0
+		? toDate(sortedPosts[sortedPosts.length - 1].data.published)
+		: newestDate,
+);
 
-const categorySegments = $derived(filterCategories.length > 0 ? filterCategories[0].split('/') : []);
+const categorySegments = $derived(
+	filterCategories.length > 0 ? filterCategories[0].split("/") : [],
+);
 
 // [타임라인] 숫자 노출 시작 지연 시간
 const START_DELAY = 1550;

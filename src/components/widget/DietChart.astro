@@ -5,7 +5,7 @@ import { getDietHistoryFromPosts } from "../../utils/dietParser";
 const dietHistory = await getDietHistoryFromPosts();
 
 // 최저 및 최고 몸무게 계산
-const weights = dietHistory.map(d => d.weight);
+const weights = dietHistory.map((d) => d.weight);
 const minWeight = Math.min(...weights);
 const maxWeight = Math.max(...weights);
 ---

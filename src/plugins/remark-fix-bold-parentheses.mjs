@@ -14,9 +14,9 @@ export function remarkFixBoldParentheses() {
 			const value = node.value;
 			const children = [];
 			let lastIndex = 0;
-			let match;
+			let match = regex.exec(value);
 
-			while ((match = regex.exec(value)) !== null) {
+			while (match !== null) {
 				if (match.index > lastIndex) {
 					children.push({
 						type: "text",
@@ -30,6 +30,7 @@ export function remarkFixBoldParentheses() {
 				});
 
 				lastIndex = regex.lastIndex;
+				match = regex.exec(value);
 			}
 
 			if (lastIndex < value.length) {

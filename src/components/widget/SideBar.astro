@@ -1,17 +1,15 @@
 ---
 import type { MarkdownHeading } from "astro";
 import Categories from "./Categories.astro";
-import Profile from "./Profile.astro";
-import Tag from "./Tags.astro";
 
 interface Props {
 	class?: string;
 	headings?: MarkdownHeading[];
-    onlyAd?: boolean;
-    onlyCategories?: boolean;
+	onlyAd?: boolean;
+	onlyCategories?: boolean;
 }
 
-const { class: className, headings, onlyAd, onlyCategories } = Astro.props;
+const { class: className, onlyAd, onlyCategories } = Astro.props;
 ---
 <div class:list={[className, "w-full"]}>
     {/* 카테고리 영역 */}

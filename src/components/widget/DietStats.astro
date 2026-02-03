@@ -1,12 +1,13 @@
 ---
+import I18nKey from "../../i18n/i18nKey";
+import { i18n } from "../../i18n/translation";
 import { getDietHistoryFromPosts } from "../../utils/dietParser";
-import { Icon } from "astro-icon/components";
 
 const dietHistory = await getDietHistoryFromPosts();
 
 if (dietHistory.length === 0) return null;
 
-const weights = dietHistory.map(d => d.weight);
+const weights = dietHistory.map((d) => d.weight);
 const maxWeight = Math.max(...weights); // 역대 최고 체중
 const currentWeight = dietHistory[dietHistory.length - 1].weight;
 const goalWeight = 65;
@@ -16,11 +17,16 @@ const remainingToGoal = (currentWeight - goalWeight).toFixed(1);
 
 // 진행률 계산 (최고점 -> 현재 -> 목표)
 const totalJourney = maxWeight - goalWeight;
-const progress = Math.min(Math.max(((maxWeight - currentWeight) / totalJourney) * 100, 0), 100).toFixed(1);
+const progress = Math.min(
+	Math.max(((maxWeight - currentWeight) / totalJourney) * 100, 0),
+	100,
+).toFixed(1);
 
 const startDate = new Date(dietHistory[0].date);
 const today = new Date();
-const daysDiff = Math.floor((today.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+const daysDiff = Math.floor(
+	(today.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24),
+);
 ---
 
 <div class="diet-dashboard w-full onload-animation">

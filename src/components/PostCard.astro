@@ -7,7 +7,6 @@ import { i18n } from "../i18n/translation";
 import { formatDateToYYYYMMDD } from "../utils/date-utils";
 import { getCategoryUrl, getDir, getTagUrl } from "../utils/url-utils";
 import ImageWrapper from "./misc/ImageWrapper.astro";
-import PostMetadata from "./PostMeta.astro";
 
 interface Props {
 	class?: string;
@@ -30,7 +29,6 @@ const {
 	title,
 	url,
 	published,
-	updated,
 	tags,
 	category,
 	image,
@@ -56,7 +54,7 @@ const { remarkPluginFrontmatter } = await entry.render();
 
                     {/* 상단 영역: 제목, 설명글, 썸네일 */}
 
-                    <div class="flex-row flex items-center gap-4 mb-0 md:gap-9">
+                    <div class:list={["flex-row flex items-center mb-0 md:gap-9", hasCover ? "gap-4" : "gap-0"]}>
 
                 {/* 썸네일을 왼쪽에 배치 (프로젝트 및 블로그 포스트 모두) */}
                 {hasCover && (
@@ -71,7 +69,7 @@ const { remarkPluginFrontmatter } = await entry.render();
                     </div>
                 )}
 
-                <div class="flex-1 min-w-0">
+                <div class:list={["flex-1 min-w-0 flex flex-col justify-center", !hasCover && "min-h-[112px] sm:min-h-0"]}>
 
                     <!-- Date and Read Time (Moved Above Title) -->
                     {!isProject && (
@@ -257,7 +255,7 @@ const { remarkPluginFrontmatter } = await entry.render();
 
         </div>
 </div>
-<div class="transition border-t-[1px] border-dashed mx-6 border-black/10 dark:border-white/[0.15] last:border-t-0 md:hidden"></div>
+<div class="transition border-t-[1px] border-dashed mx-6 border-black/10 dark:border-white/[0.15] last:border-t-0 first:border-t-0 md:hidden"></div>
 
 <script>
     function setupTagTruncation() {
@@ -265,8 +263,8 @@ const { remarkPluginFrontmatter } = await entry.render();
         containers.forEach(container => {
             if (container.classList.contains('expanded')) return;
 
-            const tags = Array.from(container.querySelectorAll('a'));
-            const btn = container.querySelector('.show-more-tags-btn');
+            const tags = Array.from(container.querySelectorAll('a')) as HTMLElement[];
+            const btn = container.querySelector('.show-more-tags-btn') as HTMLElement | null;
             const totalTags = tags.length;
             
             if (totalTags === 0) return;
@@ -294,7 +292,7 @@ const { remarkPluginFrontmatter } = await entry.render();
                 let hasWrap = false;
                 
                 // 현재 보이는 마지막 태그
-                const lastVisibleTag = tags[visibleCount - 1];
+                const lastVisibleTag = tags[visibleCount - 1] as HTMLElement;
                 
                 // 버튼이 필요한 상황인가? (전체 태그 > 현재 보이는 태그)
                 const needButton = totalTags > visibleCount;
@@ -309,7 +307,7 @@ const { remarkPluginFrontmatter } = await entry.render();
 
                 // 줄바꿈 체크 (태그가 내려갔거나, 버튼이 내려갔거나)
                 if (lastVisibleTag.offsetTop > firstTop) hasWrap = true;
-                if (needButton && btn && !btn.classList.contains('hidden') && btn.offsetTop > firstTop) hasWrap = true;
+                if (needButton && btn && !btn.classList.contains('hidden') && (btn as HTMLElement).offsetTop > firstTop) hasWrap = true;
 
                 if (hasWrap && visibleCount > 1) {
                     // 줄바꿈 발생 시 보이는 태그 개수 하나 줄이고 숨김 처리

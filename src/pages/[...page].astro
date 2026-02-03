@@ -16,7 +16,8 @@ const { page } = Astro.props;
 
 const len = page.data.length;
 
-const homeDescription = "제임스(James)의 블로그 'Present Flame'. MERN 스택 개발과 실존주의 철학 에세이, 110kg에서 65kg를 향한 다이어트 일지까지. 내면의 '불꽃'을 지키며 진정한 자유와 성장을 추구하는 1인 개발자의 여정을 담았습니다. 단순한 기록을 넘어 삶의 주인이 되는 과정을 공유합니다.";
+const homeDescription =
+	"제임스(James)의 블로그 'Present Flame'. MERN 스택 개발과 실존주의 철학 에세이, 110kg에서 65kg를 향한 다이어트 일지까지. 내면의 '불꽃'을 지키며 진정한 자유와 성장을 추구하는 1인 개발자의 여정을 담았습니다. 단순한 기록을 넘어 삶의 주인이 되는 과정을 공유합니다.";
 const description = page.currentPage === 1 ? homeDescription : undefined;
 ---
 

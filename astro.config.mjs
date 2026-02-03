@@ -25,6 +25,7 @@ import { pluginLanguageBadge } from "./src/plugins/expressive-code/language-badg
 import { AdmonitionComponent } from "./src/plugins/rehype-component-admonition.mjs";
 import { GithubCardComponent } from "./src/plugins/rehype-component-github-card.mjs";
 import { rehypeHeaderNumbering } from "./src/plugins/rehype-header-numbering.mjs";
+import { rehypeImageCaption } from "./src/plugins/rehype-image-caption.mjs";
 import { rehypeMidlineEllipsis } from "./src/plugins/rehype-midline-ellipsis.mjs";
 import { rehypeStylizedQuote } from "./src/plugins/rehype-stylized-quote.mjs";
 import { parseDirectiveNode } from "./src/plugins/remark-directive-rehype.js";
@@ -32,7 +33,6 @@ import { remarkExcerpt } from "./src/plugins/remark-excerpt.js";
 import { remarkFixBoldParentheses } from "./src/plugins/remark-fix-bold-parentheses.mjs";
 // import { remarkMidlineEllipsis } from "./src/plugins/remark-midline-ellipsis.mjs"; // Removed
 import { remarkReadingTime } from "./src/plugins/remark-reading-time.mjs";
-import { rehypeImageCaption } from "./src/plugins/rehype-image-caption.mjs";
 
 // https://astro.build/config
 export default defineConfig({

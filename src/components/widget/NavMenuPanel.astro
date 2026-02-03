@@ -1,8 +1,8 @@
 ---
 import { Icon } from "astro-icon/components";
 import { type NavBarLink } from "../../types/config";
-import { url, getCategoryUrl } from "../../utils/url-utils";
 import { getCategoryList, getSortedPosts } from "../../utils/content-utils";
+import { getCategoryUrl, url } from "../../utils/url-utils";
 
 interface Props {
 	links: NavBarLink[];
@@ -19,8 +19,8 @@ const isPostPage = !!Astro.params.slug;
 let postCategory = "";
 
 if (isPostPage) {
-    const currentPost = allPosts.find((p) => p.slug === Astro.params.slug);
-    postCategory = currentPost?.data.category || "";
+	const currentPost = allPosts.find((p) => p.slug === Astro.params.slug);
+	postCategory = currentPost?.data.category || "";
 }
 ---
 <div id="nav-menu-panel" class:list={["float-panel float-panel-closed transition-all fixed right-0 top-[72px] p-3 min-w-[16rem] max-h-[calc(100vh-72px)] overflow-y-auto custom-scrollbar shadow-2xl rounded-l-2xl border-l border-b border-black/5 dark:border-white/5 bg-[var(--card-bg)]/95 backdrop-blur-md"]}>

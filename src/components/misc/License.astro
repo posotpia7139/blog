@@ -7,13 +7,12 @@ import { formatDateToYYYYMMDD } from "../../utils/date-utils";
 
 interface Props {
 	title: string;
-	slug: string;
 	pubDate: Date;
-	class: string;
+	class?: string;
 }
 
 const { title, pubDate } = Astro.props;
-const className = Astro.props.class;
+const className = Astro.props.class || "";
 const profileConf = profileConfig;
 const licenseConf = licenseConfig;
 const postUrl = decodeURIComponent(Astro.url.toString());

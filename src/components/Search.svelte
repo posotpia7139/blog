@@ -3,8 +3,8 @@ import I18nKey from "@i18n/i18nKey";
 import { i18n } from "@i18n/translation";
 import Icon from "@iconify/svelte";
 import { url } from "@utils/url-utils.ts";
-import { onMount, untrack } from "svelte";
 import FlexSearch from "flexsearch";
+import { onMount, untrack } from "svelte";
 
 /**
  * [FlexSearch 검색 시스템 - 경로 집중형 버전]
@@ -14,218 +14,252 @@ import FlexSearch from "flexsearch";
  */
 
 interface SearchData {
-    title: string;
-    description: string;
-    category: string;
-    tags: string[];
-    url: string;
-    content: string;
+	title: string;
+	description: string;
+	category: string;
+	tags: string[];
+	url: string;
+	content: string;
+}
+
+interface IndexResult {
+	field: string;
+	result: (string | { id: string })[];
 }
 
 let keyword = $state("");
 let searchResults = $state<SearchData[]>([]);
 let isSearching = $state(false);
-let isMobileInputVisible = $state(false); 
+let isMobileInputVisible = $state(false);
 let isDesktopPanelVisible = $state(false);
-let showNoResults = $state(false); 
+let showNoResults = $state(false);
+// biome-ignore lint/suspicious/noExplicitAny: FlexSearch Document instance is hard to type
 let index: any = null;
 let rawData: SearchData[] = [];
 let isInitialized = $state(false);
 let isFocused = $state(false); // 데스크톱 입력창 포커스 상태 추적
 let desktopInput: HTMLInputElement | undefined = $state(); // 데스크톱 입력창 바인딩
 let mobileInput: HTMLInputElement | undefined = $state();
-let noResultsTimeout: any;
-let timer: any; // 타이머 변수를 상위 스코프로 이동
+let noResultsTimeout: ReturnType<typeof setTimeout> | undefined;
+let timer: ReturnType<typeof setTimeout> | undefined; // 타이머 변수를 상위 스코프로 이동
 
 const highlight = (text: string, query: string) => {
-    if (!text || !query) return text;
-    const q = query.trim();
-    if (!q) return text;
+	if (!text || !query) return text;
+	const q = query.trim();
+	if (!q) return text;
 
-    try {
-        const cleanText = text.split(/\s+/).join(' ').trim();
-        const specialChars = ['.', '*', '+', '?', '^', '$', '{', '}', '(', ')', '|', '[', ']', '\\'];
-        const escaped = q.split('').map(c => specialChars.includes(c) ? '\\' + c : c).join('');
-        const regex = new RegExp('(' + escaped + ')', "gi");
-        return cleanText.replace(regex, '<span class="text-[var(--primary)] font-bold">$1</span>');
-    } catch (e) {
-        return text;
-    }
+	try {
+		const cleanText = text.split(/\s+/).join(" ").trim();
+		const specialChars = [
+			".",
+			"*",
+			"+",
+			"?",
+			"^",
+			"$",
+			"{",
+			"}",
+			"(",
+			")",
+			"|",
+			"[",
+			"]",
+			"\\",
+		];
+		const escaped = q
+			.split("")
+			.map((c) => (specialChars.includes(c) ? `\\${c}` : c))
+			.join("");
+		const regex = new RegExp(`(${escaped})`, "gi");
+		return cleanText.replace(
+			regex,
+			'<span class="text-[var(--primary)] font-bold">$1</span>',
+		);
+	} catch (e) {
+		return text;
+	}
 };
 
 const formatPath = (category: string) => {
-    if (!category) return "";
-    return category.replace(/\.md$/, "").split('/').join(' > ');
+	if (!category) return "";
+	return category.replace(/\.md$/, "").split("/").join(" > ");
 };
 
 const getDisplaySnippet = (item: SearchData, query: string) => {
-    if (!query.trim()) return "";
-    const q = query.trim().toLowerCase();
-    
-    // 오직 본문(Content)에 키워드가 포함되어 있을 때만 스니펫 추출
-    const contentLower = item.content.toLowerCase();
-    const matchIndex = contentLower.indexOf(q);
-    
-    if (matchIndex !== -1) {
-        const start = Math.max(0, matchIndex - 40);
-        const end = Math.min(item.content.length, matchIndex + 70);
-        let snippet = item.content.substring(start, end);
-        
-        if (start > 0) snippet = "..." + snippet;
-        if (end < item.content.length) snippet += "...";
-        
-        return highlight(snippet, query);
-    }
-    
-    // 제목 매칭 등 기본 상황에서는 아무것도 표시하지 않음 (설명 숨김)
-    return "";
+	if (!query.trim()) return "";
+	const q = query.trim().toLowerCase();
+
+	// 오직 본문(Content)에 키워드가 포함되어 있을 때만 스니펫 추출
+	const contentLower = item.content.toLowerCase();
+	const matchIndex = contentLower.indexOf(q);
+
+	if (matchIndex !== -1) {
+		const start = Math.max(0, matchIndex - 40);
+		const end = Math.min(item.content.length, matchIndex + 70);
+		let snippet = item.content.substring(start, end);
+
+		if (start > 0) snippet = `...${snippet}`;
+		if (end < item.content.length) snippet += "...";
+
+		return highlight(snippet, query);
+	}
+
+	// 제목 매칭 등 기본 상황에서는 아무것도 표시하지 않음 (설명 숨김)
+	return "";
 };
 
 const initSearch = async () => {
-    if (isInitialized) return;
-    try {
-        let dataPath = url("/search.json");
-        if (dataPath.includes("//")) {
-            dataPath = dataPath.split('/').filter(Boolean).join('/');
-            if (url("/").startsWith("/")) dataPath = "/" + dataPath;
-        }
-        const response = await fetch(dataPath);
-        rawData = await response.json();
-        const FlexSearchLib = (FlexSearch as any).default || FlexSearch;
-        index = new FlexSearchLib.Document({
-            tokenize: "full",
-            document: {
-                id: "url",
-                store: ["title", "description", "category", "url"],
-                index: ["title", "description", "category", "tags", "content"]
-            }
-        });
-        rawData.forEach(item => index.add(item));
-        isInitialized = true;
-    } catch (e) {
-        console.error("[Search] Init failed:", e);
-    }
+	if (isInitialized) return;
+	try {
+		let dataPath = url("/search.json");
+		if (dataPath.includes("//")) {
+			dataPath = dataPath.split("/").filter(Boolean).join("/");
+			if (url("/").startsWith("/")) dataPath = `/${dataPath}`;
+		}
+		const response = await fetch(dataPath);
+		rawData = await response.json();
+		const FlexSearchLib =
+			(FlexSearch as unknown as { default: typeof FlexSearch }).default ||
+			FlexSearch;
+		index = new FlexSearchLib.Document({
+			tokenize: "full",
+			document: {
+				id: "url",
+				store: ["title", "description", "category", "url"],
+				index: ["title", "description", "category", "tags", "content"],
+			},
+		});
+		rawData.forEach((item) => {
+			index.add(item);
+		});
+		isInitialized = true;
+	} catch (e) {
+		console.error("[Search] Init failed:", e);
+	}
 };
 
 const performSearch = (kw: string) => {
-    const trimmed = kw.trim();
-    clearTimeout(noResultsTimeout);
-    if (!trimmed || !index) {
-        searchResults = [];
-        showNoResults = false;
-        isDesktopPanelVisible = false;
-        return;
-    }
-    isSearching = true;
-    showNoResults = false;
-    
-    // 포커스가 있거나 모바일인 경우에만 패널 노출
-    if (isFocused || isMobileInputVisible) {
-        isDesktopPanelVisible = true;
-    }
-    
-    try {
-        const results = index.search(trimmed, { limit: 10, enrich: true });
-        const matchedItems: SearchData[] = [];
-        const seenUrls = new Set();
-        if (results) {
-            results.forEach((categoryResult: any) => {
-                categoryResult.result.forEach((res: any) => {
-                    const id = typeof res === 'object' ? res.id : res;
-                    if (!seenUrls.has(id)) {
-                        const item = rawData.find(d => d.url === id);
-                        if (item) matchedItems.push(item);
-                        seenUrls.add(id);
-                    }
-                });
-            });
-        }
-        searchResults = matchedItems;
-        if (searchResults.length === 0) {
-            noResultsTimeout = setTimeout(() => { showNoResults = true; }, 500);
-        }
-    } finally {
-        isSearching = false;
-    }
+	const trimmed = kw.trim();
+	clearTimeout(noResultsTimeout);
+	if (!trimmed || !index) {
+		searchResults = [];
+		showNoResults = false;
+		isDesktopPanelVisible = false;
+		return;
+	}
+	isSearching = true;
+	showNoResults = false;
+
+	// 포커스가 있거나 모바일인 경우에만 패널 노출
+	if (isFocused || isMobileInputVisible) {
+		isDesktopPanelVisible = true;
+	}
+
+	try {
+		const results = index.search(trimmed, { limit: 10, enrich: true });
+		const matchedItems: SearchData[] = [];
+		const seenUrls = new Set();
+		if (results) {
+			results.forEach((categoryResult: IndexResult) => {
+				categoryResult.result.forEach((res) => {
+					const id = typeof res === "object" ? res.id : res;
+					if (!seenUrls.has(id)) {
+						const item = rawData.find((d) => d.url === id);
+						if (item) matchedItems.push(item);
+						seenUrls.add(id);
+					}
+				});
+			});
+		}
+		searchResults = matchedItems;
+		if (searchResults.length === 0) {
+			noResultsTimeout = setTimeout(() => {
+				showNoResults = true;
+			}, 500);
+		}
+	} finally {
+		isSearching = false;
+	}
 };
 
 const closeSearch = (e?: MouseEvent) => {
-    if (e) e.stopPropagation();
-    isMobileInputVisible = false;
-    isDesktopPanelVisible = false;
-    keyword = "";
-    searchResults = [];
-    showNoResults = false;
-    clearTimeout(timer); // 닫을 때 타이머 취소 추가
-    document.body.style.overflow = "";
-    if (mobileInput) mobileInput.blur();
+	if (e) e.stopPropagation();
+	isMobileInputVisible = false;
+	isDesktopPanelVisible = false;
+	keyword = "";
+	searchResults = [];
+	showNoResults = false;
+	clearTimeout(timer); // 닫을 때 타이머 취소 추가
+	document.body.style.overflow = "";
+	if (mobileInput) mobileInput.blur();
 };
 
 const handleNavigate = (e: MouseEvent, targetUrl: string) => {
-    e.preventDefault();
-    e.stopPropagation();
-    closeSearch();
-    if ((window as any).swup) {
-        (window as any).swup.navigate(targetUrl);
-    } else {
-        window.location.href = targetUrl;
-    }
+	e.preventDefault();
+	e.stopPropagation();
+	closeSearch();
+	const win = window as Window & { swup?: { navigate: (url: string) => void } };
+	if (win.swup) {
+		win.swup.navigate(targetUrl);
+	} else {
+		window.location.href = targetUrl;
+	}
 };
 
 onMount(() => {
-    initSearch();
-    const handleGlobalClick = (e: MouseEvent) => {
-        const target = e.target as HTMLElement;
-        const wrapper = document.getElementById("search-wrapper");
-        if (wrapper && !wrapper.contains(target)) {
-            // 외부 클릭 시 지연된 검색 실행이 있다면 즉시 취소
-            clearTimeout(timer);
-            
-            if (showNoResults) {
-                // 결과가 없는 상태(No results)에서 외부 클릭 시 필드 초기화
-                closeSearch();
-            } else if (isMobileInputVisible) {
-                // 결과가 있는 상태에서 모바일 백드롭 클릭 시 텍스트 유지하고 창만 닫음
-                isMobileInputVisible = false;
-                document.body.style.overflow = "";
-            } else {
-                // 결과가 있는 상태에서 데스크톱 외부 클릭 시 텍스트 유지하고 패널만 닫음
-                isDesktopPanelVisible = false;
-            }
-        }
-    };
+	initSearch();
+	const handleGlobalClick = (e: MouseEvent) => {
+		const target = e.target as HTMLElement;
+		const wrapper = document.getElementById("search-wrapper");
+		if (wrapper && !wrapper.contains(target)) {
+			// 외부 클릭 시 지연된 검색 실행이 있다면 즉시 취소
+			clearTimeout(timer);
 
-    // 페이지 이동 시 검색 상태 초기화
-    const handleNavigateAway = () => {
-        closeSearch();
-    };
+			if (showNoResults) {
+				// 결과가 없는 상태(No results)에서 외부 클릭 시 필드 초기화
+				closeSearch();
+			} else if (isMobileInputVisible) {
+				// 결과가 있는 상태에서 모바일 백드롭 클릭 시 텍스트 유지하고 창만 닫음
+				isMobileInputVisible = false;
+				document.body.style.overflow = "";
+			} else {
+				// 결과가 있는 상태에서 데스크톱 외부 클릭 시 텍스트 유지하고 패널만 닫음
+				isDesktopPanelVisible = false;
+			}
+		}
+	};
 
-    document.addEventListener("click", handleGlobalClick);
-    document.addEventListener("swup:content:replace", handleNavigateAway);
-    document.addEventListener("astro:after-swap", handleNavigateAway);
+	// 페이지 이동 시 검색 상태 초기화
+	const handleNavigateAway = () => {
+		closeSearch();
+	};
 
-    return () => {
-        document.removeEventListener("click", handleGlobalClick);
-        document.removeEventListener("swup:content:replace", handleNavigateAway);
-        document.removeEventListener("astro:after-swap", handleNavigateAway);
-        clearTimeout(timer);
-    };
+	document.addEventListener("click", handleGlobalClick);
+	document.addEventListener("swup:content:replace", handleNavigateAway);
+	document.addEventListener("astro:after-swap", handleNavigateAway);
+
+	return () => {
+		document.removeEventListener("click", handleGlobalClick);
+		document.removeEventListener("swup:content:replace", handleNavigateAway);
+		document.removeEventListener("astro:after-swap", handleNavigateAway);
+		clearTimeout(timer);
+	};
 });
 
 $effect(() => {
-    const kw = keyword;
-    if (!isInitialized) return;
-    clearTimeout(timer);
-    timer = setTimeout(() => {
-        untrack(() => performSearch(kw));
-    }, 200);
+	const kw = keyword;
+	if (!isInitialized) return;
+	clearTimeout(timer);
+	timer = setTimeout(() => {
+		untrack(() => performSearch(kw));
+	}, 200);
 });
 
 $effect(() => {
-    if (isMobileInputVisible) {
-        document.body.style.overflow = "hidden";
-        setTimeout(() => mobileInput?.focus(), 100);
-    }
+	if (isMobileInputVisible) {
+		document.body.style.overflow = "hidden";
+		setTimeout(() => mobileInput?.focus(), 100);
+	}
 });
 </script>
 

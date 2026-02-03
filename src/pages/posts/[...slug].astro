@@ -5,18 +5,17 @@ import Markdown from "@components/misc/Markdown.astro";
 import I18nKey from "@i18n/i18nKey";
 import { i18n } from "@i18n/translation";
 import MainGridLayout from "@layouts/MainGridLayout.astro";
-import { getAllPosts, getSortedPosts } from "@utils/content-utils";
-import { getDir, getPostUrlBySlug } from "@utils/url-utils";
+import { getAllPosts } from "@utils/content-utils";
+import { getDir } from "@utils/url-utils";
 import { Icon } from "astro-icon/components";
 import { licenseConfig } from "src/config";
 import ImageWrapper from "../../components/misc/ImageWrapper.astro";
 import PostMetadata from "../../components/PostMeta.astro";
-import Categories from "../../components/widget/Categories.astro";
 import Comment from "../../components/widget/Comment.astro";
-import RelatedPosts from "../../components/widget/RelatedPosts.astro";
-import TOC from "../../components/widget/TOC.astro";
 import DietChart from "../../components/widget/DietChart.astro";
 import DietStats from "../../components/widget/DietStats.astro";
+import RelatedPosts from "../../components/widget/RelatedPosts.astro";
+import TOC from "../../components/widget/TOC.astro";
 import { profileConfig, siteConfig } from "../../config";
 import { formatDateToYYYYMMDD } from "../../utils/date-utils";
 
@@ -31,7 +30,7 @@ export async function getStaticPaths() {
 }
 
 const { entry } = Astro.props;
-const hasDietTag = entry.data.tags.includes('diet');
+const hasDietTag = entry.data.tags.includes("diet");
 
 const { Content, headings } = await entry.render();
 
@@ -135,7 +134,7 @@ const jsonLd = {
 
             {hasDietTag && <div class="onload-animation"><DietChart /></div>}
 
-            {licenseConfig.enable && <License title={entry.data.title} slug={entry.slug} pubDate={entry.data.published} class:list={["mb-6 rounded-xl license-container onload-animation", {"mb-0": !entry.data.image}]} ></License>}
+            {licenseConfig.enable && <License title={entry.data.title} pubDate={entry.data.published} class={`mb-6 rounded-xl license-container onload-animation ${!entry.data.image ? "mb-0" : ""}`} ></License>}
 
         </div>
     </div>
