@@ -73,15 +73,15 @@ const { remarkPluginFrontmatter } = await entry.render();
 
                     <!-- Date and Read Time (Moved Above Title) -->
                     {!isProject && (
-                        <div class:list={["hidden md:flex text-[11px] md:text-[12px] text-black/50 dark:text-white/50 flex-wrap items-center gap-x-4 transition relative z-10 pointer-events-none whitespace-nowrap mb-2"]}>
+                        <div class:list={["hidden md:flex text-[11px] md:text-[12px] text-black/75 dark:text-white/75 flex-wrap items-center gap-x-4 transition relative z-10 pointer-events-none whitespace-nowrap"]}>
                             <div class="flex items-center pl-2 -ml-2 shrink-0">
-                                <div class="meta-icon !bg-black/5 dark:!bg-white/10 !text-black/50 dark:!text-white/50 !w-6 !h-6 !mr-2 shrink-0">
+                                <div class="meta-icon !bg-black/5 dark:!bg-white/10 !text-black/75 dark:!text-white/75 !w-6 !h-6 !mr-2 shrink-0">
                                     <Icon name="material-symbols:edit-calendar-rounded" class="text-base"></Icon>
                                 </div>
                                 {formatDateToYYYYMMDD(published)}
                             </div>
                             <div class="flex items-center shrink-0">
-                                <div class="meta-icon !bg-black/5 dark:!bg-white/10 !text-black/50 dark:!text-white/50 !w-6 !h-6 !mr-2 shrink-0">
+                                <div class="meta-icon !bg-black/5 dark:!bg-white/10 !text-black/75 dark:!text-white/75 !w-6 !h-6 !mr-2 shrink-0">
                                     <Icon name="material-symbols:pace-rounded" class="text-base"></Icon>
                                 </div>
                                 {remarkPluginFrontmatter.minutes} {i18n(remarkPluginFrontmatter.minutes === 1 ? I18nKey.minuteCount : I18nKey.minutesCount)}

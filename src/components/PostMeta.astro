@@ -26,7 +26,7 @@ const className = Astro.props.class;
 <div class:list={["flex flex-col gap-2 items-start", className]}>
     <!-- First row: Dates (Non-clickable) -->
     {published && !hideDate && (
-        <div class="flex flex-wrap items-center justify-start gap-4 text-black/50 dark:text-white/50">
+        <div class="flex flex-wrap items-center justify-start gap-4 text-black/75 dark:text-white/75">
             <div class="flex items-center">
                 <div class="meta-icon">
                     <Icon name="material-symbols:edit-calendar-rounded"></Icon>
@@ -91,6 +91,6 @@ const className = Astro.props.class;
 
 <style>
 .meta-icon {
-    @apply transition h-6 w-6 rounded-md bg-black/5 dark:bg-white/10 text-black/50 dark:text-white/50 flex items-center justify-center mr-2 shrink-0;
+    @apply transition h-6 w-6 rounded-md bg-black/5 dark:bg-white/10 text-black/75 dark:text-white/75 flex items-center justify-center mr-2 shrink-0;
 }
 </style>
