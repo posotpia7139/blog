@@ -311,15 +311,6 @@ class TableOfContents extends HTMLElement {
         document.removeEventListener('astro:after-swap', this.refresh);
         document.removeEventListener('astro:page-load', this.refresh);
     };
-
-    disconnectedCallback() {
-        this.observer.disconnect();
-        this.tocEl?.removeEventListener("click", this.handleAnchorClick);
-        window.removeEventListener('scroll', this.handleScroll);
-        document.removeEventListener('swup:visit:start', this.clearTOC);
-        document.removeEventListener('swup:content:replace', this.refresh);
-        document.removeEventListener('astro:after-swap', this.refresh);
-    };
 }
 
 if (!customElements.get("table-of-contents")) {
