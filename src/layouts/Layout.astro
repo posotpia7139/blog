@@ -362,16 +362,9 @@ const setup = () => {
 		} else {
 			bodyElement!.classList.remove('lg:is-home');
 		}
-		
-		// Hide the TOC while scrolling back to top
-		let toc = document.getElementById('toc-wrapper');
-		if (toc) toc.classList.add('toc-not-ready')
 	});
 	window.swup.hooks.on('visit:end', (_visit: {to: {url: string}}) => {
-		setTimeout(() => {
-            const toc = document.getElementById('toc-wrapper');
-            if (toc) toc.classList.remove('toc-not-ready')
-        }, 300)
+		// 지연 로직 제거
 	});
 }
 if (window?.swup?.hooks) {

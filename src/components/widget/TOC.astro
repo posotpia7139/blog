@@ -111,18 +111,20 @@ class TableOfContents extends HTMLElement {
     };
 
     refresh = () => {
-        // [수정] 스크롤 애니메이션과 페이지 로딩이 완전히 끝날 때까지 1초간 대기
+        // 지연 시간을 대폭 줄여서 즉시 반응하도록 수정 (1000ms -> 100ms)
         setTimeout(() => {
             this.observer.disconnect();
             this.rebuildTOC();
             this.init();
-        }, 1000); 
+        }, 100); 
     };
 
     rebuildTOC = () => {
         const tocContainer = this.querySelector(".toc");
         if (!tocContainer) return;
 
+        // 기존 내용 유지하며 필요한 경우에만 재구축하도록 변경 고려 가능하나, 
+        // 현재는 안정성을 위해 초기화 후 재구축 유지
         tocContainer.innerHTML = '';
 
         const contentArea = document.querySelector('.prose') || document.querySelector('.markdown-content') || document.querySelector('#post-container');
@@ -131,7 +133,7 @@ class TableOfContents extends HTMLElement {
             return;
         }
 
-        const rawHeadings = Array.from(contentArea.querySelectorAll('h1, h2, h3, h4'));
+        const rawHeadings = Array.from(contentArea.querySelectorAll('h1, h2, h3, h4')); 
         const validHeadings = rawHeadings.filter(h => {
             const id = h.id.toLowerCase();
             const text = h.textContent?.toLowerCase() || '';
@@ -177,6 +179,8 @@ class TableOfContents extends HTMLElement {
     };
 
     toggleActiveHeading = () => {
+        if (this.dataset.isFloating !== 'true') return; // 플로팅일 때만 액티브 표시
+
         let activeIdx = -1;
         for (let i = 0; i < this.active.length; i++) {
             if (this.active[i]) activeIdx = i;
@@ -205,7 +209,7 @@ class TableOfContents extends HTMLElement {
     };
 
     scrollToActiveHeading = () => {
-        if (this.anchorNavTarget || !this.tocEl) return;
+        if (this.anchorNavTarget || !this.tocEl || this.dataset.isFloating !== 'true') return;
         const activeHeading = this.querySelector<HTMLDivElement>(`.${this.visibleClass}`);
         if (!activeHeading) return;
         this.tocEl.scrollTo({ top: activeHeading.offsetTop - 32, left: 0, behavior: "smooth" });
@@ -216,12 +220,11 @@ class TableOfContents extends HTMLElement {
     fallback = () => {
         if (!this.headings.length) return;
         this.active.fill(false);
-        if (window.scrollY < 100) { this.active[0] = true; return; }
 
         const thresholdLine = this.isScrollingDown ? window.innerHeight * 0.2 : window.innerHeight * 0.15;
         let currentIdx = -1;
         for (let i = 0; i < this.headings.length; i++) {
-            if (this.headings[i].getBoundingClientRect().top <= thresholdLine) currentIdx = i;
+            if (this.headings[i] && this.headings[i].getBoundingClientRect().top <= thresholdLine) currentIdx = i;
             else break;
         }
         if (currentIdx !== -1) this.active[currentIdx] = true;
@@ -245,20 +248,23 @@ class TableOfContents extends HTMLElement {
     };
 
     connectedCallback() {
-        if (this.dataset.isFloating !== 'true') return;
         this.init();
         window.addEventListener('scroll', this.handleScroll, { passive: true });
         
-        // [수정] 전환 시작 시 목차 즉시 제거
+        // [수정] 모든 페이지 전환 이벤트 대응
         document.addEventListener('swup:visit:start', this.clearTOC);
         document.addEventListener('swup:content:replace', this.refresh);
         document.addEventListener('astro:after-swap', this.refresh);
+        document.addEventListener('astro:page-load', this.refresh);
     };
 
     clearTOC = () => {
-        const tocContainer = this.querySelector(".toc");
-        if (tocContainer) tocContainer.innerHTML = '';
-        this.style.display = 'none';
+        // 플로팅 TOC만 전환 시 숨김 (본문 내 TOC는 페이지와 함께 교체됨)
+        if (this.dataset.isFloating === 'true') {
+            const tocContainer = this.querySelector(".toc");
+            if (tocContainer) tocContainer.innerHTML = '';
+            this.style.display = 'none';
+        }
     };
 
     init() {
@@ -266,11 +272,20 @@ class TableOfContents extends HTMLElement {
         this.headings = [];
         this.active = [];
         this.tocEl = this.querySelector(".toc-inner-wrapper");
-        if (!this.tocEl) return;
-        this.tocEl.addEventListener("click", this.handleAnchorClick, { capture: true });
+        
+        // 클릭 이벤트 리스너 중복 방지를 위해 제거 후 등록
+        this.tocEl?.removeEventListener("click", this.handleAnchorClick);
+        this.tocEl?.addEventListener("click", this.handleAnchorClick, { capture: true });
+        
         this.activeIndicator = this.querySelector(".active-indicator");
         this.tocEntries = Array.from(this.querySelectorAll<HTMLAnchorElement>(".toc a[href^='#']"));
-        if (this.tocEntries.length === 0) return;
+        
+        if (this.tocEntries.length === 0) {
+            // 항목이 없으면 본문에서 다시 찾아보기 (클라이언트 사이드 네비게이션 대응)
+            this.rebuildTOC();
+            this.tocEntries = Array.from(this.querySelectorAll<HTMLAnchorElement>(".toc a[href^='#']"));
+            if (this.tocEntries.length === 0) return;
+        }
 
         this.headings = new Array(this.tocEntries.length);
         for (let i = 0; i < this.tocEntries.length; i++) {
@@ -285,6 +300,16 @@ class TableOfContents extends HTMLElement {
         this.active = new Array(this.tocEntries.length).fill(false);
         this.fallback();
         this.update();
+    };
+
+    disconnectedCallback() {
+        this.observer.disconnect();
+        this.tocEl?.removeEventListener("click", this.handleAnchorClick);
+        window.removeEventListener('scroll', this.handleScroll);
+        document.removeEventListener('swup:visit:start', this.clearTOC);
+        document.removeEventListener('swup:content:replace', this.refresh);
+        document.removeEventListener('astro:after-swap', this.refresh);
+        document.removeEventListener('astro:page-load', this.refresh);
     };
 
     disconnectedCallback() {
