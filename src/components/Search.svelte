@@ -8,9 +8,6 @@ import { onMount, untrack } from "svelte";
 
 /**
  * [FlexSearch 검색 시스템 - 경로 집중형 버전]
- * 1. 경로 표시: 날짜를 제거하고 '생각의 위치(Path)'에만 집중.
- * 2. 32px 정렬: 모든 요소의 시작점을 일치시켜 시각적 신뢰도 향상.
- * 3. 클린 UX: 불필요한 메타데이터를 걷어낸 미니멀리즘 디자인.
  */
 
 interface SearchData {
@@ -27,54 +24,37 @@ interface IndexResult {
 	result: (string | { id: string })[];
 }
 
+// 모듈 스코프 변수 (페이지 이동 간 공유됨)
+let indexInstance: any = null;
+let rawDataCache: SearchData[] = [];
+let globalInitialized = false;
+
 let keyword = $state("");
 let searchResults = $state<SearchData[]>([]);
 let isSearching = $state(false);
 let isMobileInputVisible = $state(false);
 let isDesktopPanelVisible = $state(false);
 let showNoResults = $state(false);
-// biome-ignore lint/suspicious/noExplicitAny: FlexSearch Document instance is hard to type
-let index: any = null;
-let rawData: SearchData[] = [];
+
 let isInitialized = $state(false);
-let isFocused = $state(false); // 데스크톱 입력창 포커스 상태 추적
-let desktopInput: HTMLInputElement | undefined = $state(); // 데스크톱 입력창 바인딩
+let isFocused = $state(false);
+let desktopInput: HTMLInputElement | undefined = $state();
 let mobileInput: HTMLInputElement | undefined = $state();
 let noResultsTimeout: ReturnType<typeof setTimeout> | undefined;
-let timer: ReturnType<typeof setTimeout> | undefined; // 타이머 변수를 상위 스코프로 이동
+let timer: ReturnType<typeof setTimeout> | undefined;
 
 const highlight = (text: string, query: string) => {
+    // ... (기존 highlight 로직 유지)
 	if (!text || !query) return text;
 	const q = query.trim();
 	if (!q) return text;
 
 	try {
 		const cleanText = text.split(/\s+/).join(" ").trim();
-		const specialChars = [
-			".",
-			"*",
-			"+",
-			"?",
-			"^",
-			"$",
-			"{",
-			"}",
-			"(",
-			")",
-			"|",
-			"[",
-			"]",
-			"\\",
-		];
-		const escaped = q
-			.split("")
-			.map((c) => (specialChars.includes(c) ? `\\${c}` : c))
-			.join("");
+		const specialChars = [".", "*", "+", "?", "^", "$", "{", "}", "(", ")", "|", "[", "]", "\\"];
+		const escaped = q.split("").map((c) => (specialChars.includes(c) ? `\\${c}` : c)).join("");
 		const regex = new RegExp(`(${escaped})`, "gi");
-		return cleanText.replace(
-			regex,
-			'<span class="text-[var(--primary)] font-bold">$1</span>',
-		);
+		return cleanText.replace(regex, '<span class="text-[var(--primary)] font-bold">$1</span>');
 	} catch (e) {
 		return text;
 	}
@@ -86,10 +66,9 @@ const formatPath = (category: string) => {
 };
 
 const getDisplaySnippet = (item: SearchData, query: string) => {
+    // ... (기존 snippet 로직 유지)
 	if (!query.trim()) return "";
 	const q = query.trim().toLowerCase();
-
-	// 오직 본문(Content)에 키워드가 포함되어 있을 때만 스니펫 추출
 	const contentLower = item.content.toLowerCase();
 	const matchIndex = contentLower.indexOf(q);
 
@@ -97,19 +76,20 @@ const getDisplaySnippet = (item: SearchData, query: string) => {
 		const start = Math.max(0, matchIndex - 40);
 		const end = Math.min(item.content.length, matchIndex + 70);
 		let snippet = item.content.substring(start, end);
-
 		if (start > 0) snippet = `...${snippet}`;
 		if (end < item.content.length) snippet += "...";
-
 		return highlight(snippet, query);
 	}
-
-	// 제목 매칭 등 기본 상황에서는 아무것도 표시하지 않음 (설명 숨김)
 	return "";
 };
 
 const initSearch = async () => {
-	if (isInitialized) return;
+    // 이미 전역 초기화가 되었다면 상태만 업데이트하고 종료
+	if (globalInitialized) {
+        isInitialized = true;
+        return;
+    }
+    
 	try {
 		let dataPath = url("/search.json");
 		if (dataPath.includes("//")) {
@@ -117,11 +97,10 @@ const initSearch = async () => {
 			if (url("/").startsWith("/")) dataPath = `/${dataPath}`;
 		}
 		const response = await fetch(dataPath);
-		rawData = await response.json();
-		const FlexSearchLib =
-			(FlexSearch as unknown as { default: typeof FlexSearch }).default ||
-			FlexSearch;
-		index = new FlexSearchLib.Document({
+		rawDataCache = await response.json();
+		const FlexSearchLib = (FlexSearch as any).default || FlexSearch;
+		
+        indexInstance = new FlexSearchLib.Document({
 			tokenize: "full",
 			document: {
 				id: "url",
@@ -129,10 +108,13 @@ const initSearch = async () => {
 				index: ["title", "description", "category", "tags", "content"],
 			},
 		});
-		rawData.forEach((item) => {
-			index.add(item);
+		
+        rawDataCache.forEach((item) => {
+			indexInstance.add(item);
 		});
-		isInitialized = true;
+        
+		globalInitialized = true;
+        isInitialized = true;
 	} catch (e) {
 		console.error("[Search] Init failed:", e);
 	}
@@ -141,7 +123,7 @@ const initSearch = async () => {
 const performSearch = (kw: string) => {
 	const trimmed = kw.trim();
 	clearTimeout(noResultsTimeout);
-	if (!trimmed || !index) {
+	if (!trimmed || !indexInstance) {
 		searchResults = [];
 		showNoResults = false;
 		isDesktopPanelVisible = false;
@@ -150,21 +132,20 @@ const performSearch = (kw: string) => {
 	isSearching = true;
 	showNoResults = false;
 
-	// 포커스가 있거나 모바일인 경우에만 패널 노출
 	if (isFocused || isMobileInputVisible) {
 		isDesktopPanelVisible = true;
 	}
 
 	try {
-		const results = index.search(trimmed, { limit: 10, enrich: true });
+		const results = indexInstance.search(trimmed, { limit: 10, enrich: true });
 		const matchedItems: SearchData[] = [];
 		const seenUrls = new Set();
 		if (results) {
 			results.forEach((categoryResult: IndexResult) => {
 				categoryResult.result.forEach((res) => {
-					const id = typeof res === "object" ? res.id : res;
+					const id = typeof res === "object" ? (res as any).id : res;
 					if (!seenUrls.has(id)) {
-						const item = rawData.find((d) => d.url === id);
+						const item = rawDataCache.find((d) => d.url === id);
 						if (item) matchedItems.push(item);
 						seenUrls.add(id);
 					}

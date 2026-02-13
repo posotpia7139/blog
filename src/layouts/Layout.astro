@@ -1,4 +1,5 @@
 ---
+// biome-ignore lint/style/noNonNullAssertion: safe here
 import "@fontsource/roboto/400.css";
 import "@fontsource/roboto/500.css";
 import "@fontsource/roboto/600.css";
@@ -6,6 +7,8 @@ import "@fontsource/roboto/600.css";
 import ConfigCarrier from "@components/ConfigCarrier.astro";
 import ScrollProgress from "@components/control/ScrollProgress.astro";
 import { profileConfig, siteConfig } from "@/config";
+import { SEO } from "astro-seo";
+import "overlayscrollbars/overlayscrollbars.css";
 import {
 	AUTO_MODE,
 	BANNER_HEIGHT,
@@ -17,11 +20,9 @@ import {
 	PAGE_WIDTH,
 } from "../constants/constants";
 import { defaultFavicons } from "../constants/icon";
+import "../styles/main.css";
 import type { Favicon } from "../types/config";
 import { pathsEqual, url } from "../utils/url-utils";
-import "../styles/main.css";
-import "overlayscrollbars/overlayscrollbars.css";
-import { SEO } from "astro-seo";
 
 interface Props {
 	title?: string;
@@ -225,75 +226,36 @@ import { siteConfig } from '../config';
 
 const bannerEnabled = !!document.getElementById('banner-wrapper')
 
-function setClickOutsideToClose(panel: string, ignores: string[]) {
-	document.addEventListener("click", event => {
-		let panelDom = document.getElementById(panel);
-		if (!panelDom) return;
+// 전역 초기화 함수
+function init() {
+    setTheme(getStoredTheme());
+    setHue(getHue());
 
-		let tDom = event.target;
-		if (!(tDom instanceof Node)) return;
-		for (let ig of ignores) {
-			let ie = document.getElementById(ig)
-			if (ie == tDom || (ie?.contains(tDom))) {
-				return;
-			}
-		}
-		panelDom.classList.add("float-panel-closed");
-	});
-}
-setClickOutsideToClose("display-setting", ["display-setting", "display-settings-switch"])
-setClickOutsideToClose("nav-menu-panel", ["nav-menu-panel", "nav-menu-switch", "scheme-switch"])
-setClickOutsideToClose("search-panel", ["search-panel", "search-bar", "search-switch"])
+    const bodyElement = document.querySelector('body');
+    if (bodyElement) {
+        if (pathsEqual(window.location.pathname, url('/'))) {
+            bodyElement.classList.add('lg:is-home');
+        } else {
+            bodyElement.classList.remove('lg:is-home');
+        }
+    }
 
+    if (bodyElement && !(window as any).osInstance) {
+        (window as any).osInstance = OverlayScrollbars(bodyElement, {
+            scrollbars: {
+                theme: 'scrollbar-base scrollbar-auto py-1',
+                autoHide: 'never',
+            },
+            overflow: { x: 'hidden', y: 'scroll' }
+        });
+    } else if ((window as any).osInstance) {
+        (window as any).osInstance.update(true);
+    }
 
-function loadTheme() {
-	const theme = getStoredTheme()
-	setTheme(theme)
-}
-
-function loadHue() {
-	setHue(getHue())
-}
-
-function initCustomScrollbar() {
-	const bodyElement = document.querySelector('body');
-	if (!bodyElement || window.osInstance) return;
-
-	window.osInstance = OverlayScrollbars(bodyElement, {
-		scrollbars: {
-			theme: 'scrollbar-base scrollbar-auto py-1',
-			autoHide: 'never',
-			autoHideDelay: 500,
-			autoHideSuspend: false,
-		},
-		overflow: {
-			x: 'hidden',
-			y: 'scroll' // 항상 공간 확보 (레이아웃 시프트 방지)
-		}
-	});
-}
-
-function updateScrollbarHeight() {
-	if (window.osInstance) {
-		requestAnimationFrame(() => {
-			window.osInstance.update(true);
-		});
-	}
-}
-
-function processKaTeX() {
-	const katexElements = document.querySelectorAll('.katex-display') as NodeListOf<HTMLElement>;
-	katexElements.forEach(element => {
-		if (!element.parentNode || element.hasAttribute('data-scrollbar-initialized')) return;
-		const container = document.createElement('div');
-		container.className = 'katex-display-container';
-		element.parentNode.insertBefore(container, element);
-		container.appendChild(element);
-		OverlayScrollbars(container, {
-			scrollbars: { theme: 'scrollbar-base scrollbar-auto', autoHide: 'never', autoHideDelay: 500, autoHideSuspend: false }
-		});
-		element.setAttribute('data-scrollbar-initialized', 'true');
-	});
+    initFootnotes();
+    setupAnchorLinks();
+    processKaTeX();
+    showBanner();
 }
 
 function showBanner() {
@@ -347,150 +309,49 @@ function setupAnchorLinks() {
 	});
 }
 
-function init() {
-	if (window.isInitializing) return;
-	window.isInitializing = true;
-
-	if (!window.isInitialized) {
-		loadTheme();
-		loadHue();
-		window.isInitialized = true;
-	}
-
-	initCustomScrollbar();
-	showBanner();
-	initFootnotes();
-	setupAnchorLinks();
-	processKaTeX();
-
-	requestAnimationFrame(() => {
-		setTimeout(() => { window.isInitializing = false; }, 150);
-	});
-}
-
-document.addEventListener('astro:page-load', init);
-
-const setup = () => {
-	window.swup.hooks.on('visit:start', (visit: {to: {url: string}}) => {
-		const bodyElement = document.querySelector('body')
-		if (pathsEqual(visit.to.url, url('/'))) {
-			bodyElement!.classList.add('lg:is-home');
-		} else {
-			bodyElement!.classList.remove('lg:is-home');
-		}
-
-		// [추가 조언 반영] 공사 시작 시 스크롤바 잠시 숨김/고정
-		if (window.osInstance) {
-			window.osInstance.options({ overflow: { y: 'hidden' } }, true);
-		}
-	});
-
-	window.swup.hooks.on('page:view', () => {
-		// [추가 조언 반영] 공사 완료 시 스크롤바 복구 및 업데이트
-		if (window.osInstance) {
-			requestAnimationFrame(() => {
-				window.osInstance.options({ overflow: { y: 'scroll' } }, true);
-				window.osInstance.update(true);
-				initFootnotes();
-				setupAnchorLinks();
-				processKaTeX();
-			});
-		}
-	});
-
-	window.swup.hooks.on('visit:end', (_visit: {to: {url: string}}) => {
-		// 지연 로직 제거
-	});
-}
-
-if (window?.swup?.hooks) {
-	setup()
-} else {
-	document.addEventListener('swup:enable', setup)
-}
-
-let navbar = document.getElementById('navbar-wrapper')
-function scrollFunction() {
-	if (!bannerEnabled || !navbar) return
-	const NAVBAR_HEIGHT = 72
-	const MAIN_PANEL_EXCESS_HEIGHT = MAIN_PANEL_OVERLAPS_BANNER_HEIGHT * 16
-	let bannerHeight = BANNER_HEIGHT
-	if (document.body.classList.contains('lg:is-home') && window.innerWidth >= 1024) {
-		bannerHeight = BANNER_HEIGHT_HOME
-	}
-	let threshold = window.innerHeight * (bannerHeight / 100) - NAVBAR_HEIGHT - MAIN_PANEL_EXCESS_HEIGHT - 16
-	if (document.body.scrollTop >= threshold || document.documentElement.scrollTop >= threshold) {
-		navbar.classList.add('navbar-hidden')
-	} else {
-		navbar.classList.remove('navbar-hidden')
-	}
-}
-
-let isScrolling = false;
-window.onscroll = () => {
-	if (!isScrolling) {
-		window.requestAnimationFrame(() => {
-			scrollFunction();
-			isScrolling = false;
+function processKaTeX() {
+	const katexElements = document.querySelectorAll('.katex-display') as NodeListOf<HTMLElement>;
+	katexElements.forEach(element => {
+		if (!element.parentNode || element.hasAttribute('data-scrollbar-initialized')) return;
+		const container = document.createElement('div');
+		container.className = 'katex-display-container';
+		element.parentNode.insertBefore(container, element);
+		container.appendChild(element);
+		OverlayScrollbars(container, {
+			scrollbars: { theme: 'scrollbar-base scrollbar-auto', autoHide: 'never' }
 		});
-		isScrolling = true;
-	}
+		element.setAttribute('data-scrollbar-initialized', 'true');
+	});
 }
 
-function updateBannerHeightExtend() {
-	let offset = Math.floor(window.innerHeight * (BANNER_HEIGHT_EXTEND / 100));
-	offset = offset - offset % 4;
-	document.documentElement.style.setProperty('--banner-height-extend', `${offset}px`);
-}
-
-window.onresize = () => {
-	window.requestAnimationFrame(updateBannerHeightExtend);
-}
-</script>
-
-<script>
-let PhotoSwipeLightbox: any
-let lightbox: any
-let pswp = import("photoswipe")
-
-async function createPhotoSwipe() {
-	if (!PhotoSwipeLightbox) {
-		PhotoSwipeLightbox = (await import("photoswipe/lightbox")).default
-	}
-	lightbox = new PhotoSwipeLightbox({
-		gallery: ".custom-md img, #post-cover img",
-		pswpModule: () => pswp,
-		closeSVG: '<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#ffffff"><path d="M480-424 284-228q-11 11-28 11t-28-11q-11-11-11-28t11-28l196-196-196-196q-11-11-11-28t11-28q11-11 28-11t28 11l196 196 196-196q11-11 28-11t28 11q11 11 11 28t-11 28L536-480l196 196q11 11 11 28t-11 28q-11 11-28 11t-28-11L480-424Z"/></svg>',
-		zoomSVG: '<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#ffffff"><path d="M340-540h-40q-17 0-28.5-11.5T260-580q0-17 11.5-28.5T300-620h40v-40q0-17 11.5-28.5T380-700q17 0 28.5 11.5T420-660v40h40q17 0 28.5 11.5T500-580q0 17-11.5 28.5T460-540h-40v40q0 17-11.5 28.5T380-460q-17 0-28.5-11.5T340-500v-40Zm40 220q-109 0-184.5-75.5T120-580q0-109 75.5-184.5T380-840q109 0 184.5 75.5T640-580q0 44-14 83t-38 69l224 224q11 11 11 28t-11 28q-11 11-28 11t-28-11L532-372q-30 24-69 38t-83 14Zm0-80q75 0 127.5-52.5T560-580q0-75-52.5-127.5T380-760q-75 0-127.5 52.5T200-580q0 75 52.5 127.5T380-400Z"/></svg>',
-		padding: { top: 20, bottom: 20, left: 20, right: 20 },
-		wheelToZoom: true,
-		arrowPrev: false,
-		arrowNext: false,
-		imageClickAction: 'close',
-		tapAction: 'close',
-		doubleTapAction: 'zoom',
-	})
-	lightbox.addFilter("domItemData", (itemData: any, element: HTMLElement) => {
-		if (element instanceof HTMLImageElement) {
-			itemData.src = element.src
-			itemData.w = Number(element.naturalWidth || window.innerWidth)
-			itemData.h = Number(element.naturalHeight || window.innerHeight)
-			itemData.msrc = element.src
-		}
-		return itemData
-	})
-	lightbox.init()
-}
-
-const setup = () => {
-	if (!lightbox) createPhotoSwipe()
-	window.swup.hooks.on("page:view", () => createPhotoSwipe())
-	window.swup.hooks.on("content:replace", () => lightbox?.destroy?.(), { before: true })
-}
-
-if (window.swup) {
-	setup()
+// 초기 로드
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
 } else {
-	document.addEventListener("swup:enable", setup)
+    init();
 }
+
+// Swup 이벤트 연결
+document.addEventListener('swup:enable', () => {
+    const swup = (window as any).swup;
+    if (!swup) return;
+
+    swup.hooks.on('page:view', () => {
+        init();
+    });
+});
+
+// 스크롤 제어
+let navbar = document.getElementById('navbar-persistent-wrapper');
+function scrollFunction() {
+	if (!bannerEnabled || !navbar) return;
+	const NAVBAR_HEIGHT = 72;
+	const threshold = window.innerHeight * (BANNER_HEIGHT / 100) - NAVBAR_HEIGHT - (3.5 * 16) - 16;
+	if (document.body.scrollTop >= threshold || document.documentElement.scrollTop >= threshold) {
+		navbar.classList.add('navbar-hidden');
+	} else {
+		navbar.classList.remove('navbar-hidden');
+	}
+}
+window.onscroll = () => window.requestAnimationFrame(scrollFunction);
 </script>

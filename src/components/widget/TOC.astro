@@ -54,7 +54,8 @@ const filteredHeadings = headings.filter((heading) => {
 		text === "footnotes" ||
 		heading.depth === 100;
 
-	const isExcludedTitle = text.includes("related posts") || text.includes("관련 글");
+	const isExcludedTitle =
+		text.includes("related posts") || text.includes("관련 글");
 
 	return !isTooDeep && !isFootnote && !isExcludedTitle;
 });
@@ -79,7 +80,7 @@ const filteredHeadings = headings.filter((heading) => {
                         {heading.depth == minDepth + 1 && <div class="transition w-2 h-2 rounded-[0.1875rem] bg-[var(--toc-badge-bg)]"></div>}
                         {heading.depth == minDepth + 2 && <div class="transition w-1.5 h-1.5 rounded-sm bg-black/5 dark:bg-white/10"></div>}
                     </div>
-                    <div class:list={["transition text-sm text-left truncate leading-snug py-0.5 group-hover:text-[oklch(0.20_0.14_var(--hue))] dark:group-hover:text-[var(--primary)] flex-1 min-w-0",
+                    <div class:list={["transition text-[14px] text-left truncate leading-snug py-0.5 group-hover:text-[oklch(0.20_0.14_var(--hue))] dark:group-hover:text-[var(--primary)] flex-1 min-w-0",
                         {"text-black/100 dark:text-white/90": !isFloating},
                         {"text-black/80 dark:text-white/90 [.visible_&]:text-black/100 [.visible_&]:dark:text-white/90": isFloating}
                     ]}>{cleanHeadingText(heading.text)}</div>
@@ -179,7 +180,7 @@ class TableOfContents extends HTMLElement {
             }
 
             // 서버 사이드와 100% 동일한 클래스와 구조 유지
-            a.innerHTML = `${badgeHTML}<div class="transition text-sm text-left truncate leading-snug py-0.5 text-black/80 dark:text-white/90 group-hover:text-[oklch(0.20_0.14_var(--hue))] dark:group-hover:text-[var(--primary)] flex-1 min-w-0">${text.replace(/^(\d+\.)+\s*/, "")}</div>`;
+            a.innerHTML = `${badgeHTML}<div class="transition text-[14px] text-left truncate leading-snug py-0.5 text-black/80 dark:text-white/90 group-hover:text-[oklch(0.20_0.14_var(--hue))] dark:group-hover:text-[var(--primary)] flex-1 min-w-0">${text.replace(/^(\d+\.)+\s*/, "")}</div>`;
             tocContainer.appendChild(a);
         });
 
@@ -261,18 +262,13 @@ class TableOfContents extends HTMLElement {
     };
 
     connectedCallback() {
-        // [수정] 즉시 init()을 호출하지 않고 이벤트 리스너에 위임하여 중복 실행 방지
+        this.init();
         window.addEventListener('scroll', this.handleScroll, { passive: true });
-        
-        // [수정] 모든 페이지 전환 이벤트 대응
-        document.addEventListener('swup:visit:start', this.clearTOC);
-        document.addEventListener('swup:content:replace', this.refresh);
         document.addEventListener('astro:after-swap', this.refresh);
         document.addEventListener('astro:page-load', this.refresh);
     };
 
     clearTOC = () => {
-        // 플로팅 TOC만 전환 시 숨김 (본문 내 TOC는 페이지와 함께 교체됨)
         if (this.dataset.isFloating === 'true') {
             const tocContainer = this.querySelector(".toc");
             if (tocContainer) tocContainer.innerHTML = '';
@@ -281,6 +277,7 @@ class TableOfContents extends HTMLElement {
     };
 
     init() {
+        this.observer.disconnect();
         this.headingIdxMap.clear();
         this.headings = [];
         this.active = [];
@@ -319,8 +316,6 @@ class TableOfContents extends HTMLElement {
         this.observer.disconnect();
         this.tocEl?.removeEventListener("click", this.handleAnchorClick);
         window.removeEventListener('scroll', this.handleScroll);
-        document.removeEventListener('swup:visit:start', this.clearTOC);
-        document.removeEventListener('swup:content:replace', this.refresh);
         document.removeEventListener('astro:after-swap', this.refresh);
         document.removeEventListener('astro:page-load', this.refresh);
     };
