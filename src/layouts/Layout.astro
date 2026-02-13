@@ -257,30 +257,33 @@ function loadHue() {
 
 function initCustomScrollbar() {
 	const bodyElement = document.querySelector('body');
-	if (!bodyElement) return;
+	if (!bodyElement || window.osInstance) return;
 
-	let instance = window.osInstance;
+	window.osInstance = OverlayScrollbars(bodyElement, {
+		scrollbars: {
+			theme: 'scrollbar-base scrollbar-auto py-1',
+			autoHide: 'never',
+			autoHideDelay: 500,
+			autoHideSuspend: false,
+		},
+		overflow: {
+			x: 'hidden',
+			y: 'scroll' // 항상 공간 확보 (레이아웃 시프트 방지)
+		}
+	});
+}
 
-	if (!instance) {
-		// 최초 1회 생성
-		instance = window.osInstance = OverlayScrollbars(bodyElement, {
-			scrollbars: {
-				theme: 'scrollbar-base scrollbar-auto py-1',
-				autoHide: 'never',
-				autoHideDelay: 500,
-				autoHideSuspend: false,
-			},
-		});
-	} else {
-		// 이미 있으면 높이 즉시 갱신 (다음 프레임에서 실행하여 Svelte 렌더링 대응)
+function updateScrollbarHeight() {
+	if (window.osInstance) {
 		requestAnimationFrame(() => {
-			instance.update(true);
+			window.osInstance.update(true);
 		});
 	}
+}
 
-	// KaTeX 처리는 가드 밖으로 빼서 매번 실행 (새 콘텐츠 대응)
+function processKaTeX() {
 	const katexElements = document.querySelectorAll('.katex-display') as NodeListOf<HTMLElement>;
-	const processKatexElement = (element: HTMLElement) => {
+	katexElements.forEach(element => {
 		if (!element.parentNode || element.hasAttribute('data-scrollbar-initialized')) return;
 		const container = document.createElement('div');
 		container.className = 'katex-display-container';
@@ -290,8 +293,7 @@ function initCustomScrollbar() {
 			scrollbars: { theme: 'scrollbar-base scrollbar-auto', autoHide: 'never', autoHideDelay: 500, autoHideSuspend: false }
 		});
 		element.setAttribute('data-scrollbar-initialized', 'true');
-	};
-	katexElements.forEach(processKatexElement);
+	});
 }
 
 function showBanner() {
@@ -346,11 +348,9 @@ function setupAnchorLinks() {
 }
 
 function init() {
-	// [중복 방지 가드] 짧은 시간 내 여러 이벤트가 겹칠 때 단 한 번만 실행
 	if (window.isInitializing) return;
 	window.isInitializing = true;
 
-	// 테마와 색상은 최초 1회만 고정 로드
 	if (!window.isInitialized) {
 		loadTheme();
 		loadHue();
@@ -361,8 +361,8 @@ function init() {
 	showBanner();
 	initFootnotes();
 	setupAnchorLinks();
+	processKaTeX();
 
-	// 로직 완료 후 가드 해제 (시차를 두어 안정성 확보)
 	requestAnimationFrame(() => {
 		setTimeout(() => { window.isInitializing = false; }, 150);
 	});
@@ -378,15 +378,31 @@ const setup = () => {
 		} else {
 			bodyElement!.classList.remove('lg:is-home');
 		}
+
+		// [추가 조언 반영] 공사 시작 시 스크롤바 잠시 숨김/고정
+		if (window.osInstance) {
+			window.osInstance.options({ overflow: { y: 'hidden' } }, true);
+		}
 	});
-	window.swup.hooks.on('content:replace', () => {
-		// astro:page-load와 중복되지 않도록 가드 확인 후 실행
-		if (!window.isInitializing) init();
+
+	window.swup.hooks.on('page:view', () => {
+		// [추가 조언 반영] 공사 완료 시 스크롤바 복구 및 업데이트
+		if (window.osInstance) {
+			requestAnimationFrame(() => {
+				window.osInstance.options({ overflow: { y: 'scroll' } }, true);
+				window.osInstance.update(true);
+				initFootnotes();
+				setupAnchorLinks();
+				processKaTeX();
+			});
+		}
 	});
+
 	window.swup.hooks.on('visit:end', (_visit: {to: {url: string}}) => {
 		// 지연 로직 제거
 	});
 }
+
 if (window?.swup?.hooks) {
 	setup()
 } else {
