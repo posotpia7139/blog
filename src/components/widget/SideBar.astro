@@ -15,7 +15,7 @@ const { class: className, onlyAd, onlyCategories } = Astro.props;
     {/* 카테고리 영역 */}
     {!onlyAd && (
         <div class="flex flex-col w-full gap-4">
-            <Categories class="onload-animation" style="animation-delay: 100ms"></Categories>
+            <Categories id="sidebar-categories" class="sidebar-onload-animation sidebar-widget" style="animation-delay: 100ms"></Categories>
         </div>
     )}
     
@@ -23,11 +23,11 @@ const { class: className, onlyAd, onlyCategories } = Astro.props;
     {!onlyCategories && (
         <div class="sticky top-4 flex flex-col w-full gap-4">
             {/* 300x600 Ad */}
-            <div class="flex onload-animation w-full h-[600px] bg-gray-200 dark:bg-gray-800 items-center justify-center text-sm text-gray-500 rounded-lg overflow-hidden" style="animation-delay: 100ms">
+            <div id="sidebar-ad-1" class="flex sidebar-onload-animation sidebar-widget w-full h-[600px] bg-gray-200 dark:bg-gray-800 items-center justify-center text-sm text-gray-500 rounded-lg overflow-hidden" style="animation-delay: 100ms">
                 SideBar Ad (300x600)
             </div>
             {/* 300x250 Ad */}
-            <div class="flex onload-animation w-full h-[250px] bg-gray-200 dark:bg-gray-800 items-center justify-center text-sm text-gray-500 rounded-lg overflow-hidden" style="animation-delay: 150ms">
+            <div id="sidebar-ad-2" class="flex sidebar-onload-animation sidebar-widget w-full h-[250px] bg-gray-200 dark:bg-gray-800 items-center justify-center text-sm text-gray-500 rounded-lg overflow-hidden" style="animation-delay: 150ms">
                 SideBar Ad (300x250)
             </div>
         </div>

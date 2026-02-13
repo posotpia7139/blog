@@ -225,12 +225,18 @@ function cleanupTooltips() {
     }
 }
 
-setupFootnoteTooltips();
-setupImageTooltips();
-
+// [수정] 즉시 실행 제거 및 중복 실행 방지 가드 추가
 document.addEventListener('astro:page-load', () => {
+    if (window.markdownInitialized) return;
+    window.markdownInitialized = true;
+
     setupFootnoteTooltips();
     setupImageTooltips();
+});
+
+// 페이지 전환 시 가드 해제
+document.addEventListener('swup:content:replace', () => {
+    window.markdownInitialized = false;
 });
 
 // Swup 전환 시 모든 상태에서 툴팁 숨김 강제

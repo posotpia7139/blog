@@ -70,7 +70,6 @@ const bannerOffset =
 
 <!DOCTYPE html>
 <html lang={siteLang} class="bg-[var(--page-bg)] transition text-[16px] md:text-[18px] overflow-x-hidden"
-	  data-overlayscrollbars-initialize
 >
 	<head>
 		<SEO
@@ -107,7 +106,7 @@ const bannerOffset =
 		/>
 
 		<meta charset="UTF-8" />
-		<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-subset.css" />
+		<link rel="stylesheet" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-subset.css" />
 		{favicons.map(favicon => (
 			<link rel="icon"
 				  href={favicon.src.startsWith('/') ? url(favicon.src) : favicon.src}
@@ -178,7 +177,6 @@ const bannerOffset =
 
 	</head>
 	<body class=" min-h-screen " class:list={[{"lg:is-home": isHomePage, "enable-banner": enableBanner}]}
-		  data-overlayscrollbars-initialize
 	>
 		<ScrollProgress />
 		<ConfigCarrier></ConfigCarrier>
@@ -194,6 +192,19 @@ const bannerOffset =
 	'banner-height-home': `${BANNER_HEIGHT_HOME}vh`,
 	'banner-height': `${BANNER_HEIGHT}vh`,
 }}>
+	/* 레이아웃 시프트 방지 핵심 */
+	html {
+		scrollbar-gutter: stable;
+	}
+	/* 브라우저 기본 스크롤바 숨기기 */
+	html, body {
+		scrollbar-width: none !important;
+		-ms-overflow-style: none !important;
+	}
+	html::-webkit-scrollbar, body::-webkit-scrollbar {
+		display: none !important;
+	}
+
     /* PhotoSwipe 돋보기 커서를 손가락 커서로 변경 */
     .custom-md img, #post-cover img {
         cursor: pointer !important;
@@ -247,21 +258,27 @@ function loadHue() {
 function initCustomScrollbar() {
 	const bodyElement = document.querySelector('body');
 	if (!bodyElement) return;
-	OverlayScrollbars(
-		{
-			target: bodyElement,
-			cancel: {
-				nativeScrollbarsOverlaid: true,
-			}
-		}, {
-		scrollbars: {
-			theme: 'scrollbar-base scrollbar-auto py-1',
-			autoHide: 'never',
-			autoHideDelay: 500,
-			autoHideSuspend: false,
-		},
-	});
 
+	let instance = window.osInstance;
+
+	if (!instance) {
+		// 최초 1회 생성
+		instance = window.osInstance = OverlayScrollbars(bodyElement, {
+			scrollbars: {
+				theme: 'scrollbar-base scrollbar-auto py-1',
+				autoHide: 'never',
+				autoHideDelay: 500,
+				autoHideSuspend: false,
+			},
+		});
+	} else {
+		// 이미 있으면 높이 즉시 갱신 (다음 프레임에서 실행하여 Svelte 렌더링 대응)
+		requestAnimationFrame(() => {
+			instance.update(true);
+		});
+	}
+
+	// KaTeX 처리는 가드 밖으로 빼서 매번 실행 (새 콘텐츠 대응)
 	const katexElements = document.querySelectorAll('.katex-display') as NodeListOf<HTMLElement>;
 	const processKatexElement = (element: HTMLElement) => {
 		if (!element.parentNode || element.hasAttribute('data-scrollbar-initialized')) return;
@@ -329,32 +346,31 @@ function setupAnchorLinks() {
 }
 
 function init() {
-	loadTheme();
-	loadHue();
+	// [중복 방지 가드] 짧은 시간 내 여러 이벤트가 겹칠 때 단 한 번만 실행
+	if (window.isInitializing) return;
+	window.isInitializing = true;
+
+	// 테마와 색상은 최초 1회만 고정 로드
+	if (!window.isInitialized) {
+		loadTheme();
+		loadHue();
+		window.isInitialized = true;
+	}
+
 	initCustomScrollbar();
 	showBanner();
 	initFootnotes();
 	setupAnchorLinks();
+
+	// 로직 완료 후 가드 해제 (시차를 두어 안정성 확보)
+	requestAnimationFrame(() => {
+		setTimeout(() => { window.isInitializing = false; }, 150);
+	});
 }
 
-init();
+document.addEventListener('astro:page-load', init);
 
 const setup = () => {
-	window.swup.hooks.on('link:click', () => {
-		document.documentElement.style.setProperty('--content-delay', '0ms')
-		if (!bannerEnabled) return
-		let threshold = window.innerHeight * (BANNER_HEIGHT / 100) - 72 - 16
-		let navbar = document.getElementById('navbar-wrapper')
-		if (!navbar || !document.body.classList.contains('lg:is-home')) return
-		if (document.body.scrollTop >= threshold || document.documentElement.scrollTop >= threshold) {
-			navbar.classList.add('navbar-hidden')
-		}
-	})
-	window.swup.hooks.on('content:replace', () => {
-		initCustomScrollbar();
-		initFootnotes();
-		setupAnchorLinks();
-	})
 	window.swup.hooks.on('visit:start', (visit: {to: {url: string}}) => {
 		const bodyElement = document.querySelector('body')
 		if (pathsEqual(visit.to.url, url('/'))) {
@@ -362,6 +378,10 @@ const setup = () => {
 		} else {
 			bodyElement!.classList.remove('lg:is-home');
 		}
+	});
+	window.swup.hooks.on('content:replace', () => {
+		// astro:page-load와 중복되지 않도록 가드 확인 후 실행
+		if (!window.isInitializing) init();
 	});
 	window.swup.hooks.on('visit:end', (_visit: {to: {url: string}}) => {
 		// 지연 로직 제거

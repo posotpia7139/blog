@@ -69,24 +69,41 @@ const { class: className, style } = Astro.props;
     </div>
 </WidgetLayout>
 
+<script is:inline>
+    // [핵심] 사이드바 전체 애니메이션 즉시 제어 (카테고리 + 광고 포함)
+    (function() {
+        if (window.sidebarLoaded) {
+            const widgets = document.querySelectorAll('.sidebar-widget');
+            widgets.forEach(widget => {
+                widget.classList.remove('sidebar-onload-animation');
+                widget.style.opacity = '1';
+                widget.style.transform = 'none';
+            });
+        }
+    })();
+</script>
+
 <script>
+    // 전역 변수로 마지막으로 처리한 경로 저장 (중복 실행 방지)
+    window.lastProcessedPath = window.lastProcessedPath || '';
+
     function updateActiveStates() {
-        const tree = document.querySelector('.category-tree') as HTMLElement;
-        if (!tree) return;
-
-        const urlParams = new URLSearchParams(window.location.search);
         const pathname = window.location.pathname;
-        const isPostPage = pathname.includes('/posts/');
+        const search = window.location.search;
+        const currentFullHref = pathname + search;
 
-        // 초기화: 모든 활성 클래스 제거
-        tree.querySelectorAll('.category-item a').forEach(el => {
-            el.classList.remove('bg-[var(--primary)]/[0.08]', 'reading-active-star');
-            const label = el.querySelector('div');
-            if (label) {
-                label.classList.remove('text-[var(--primary)]');
-                label.classList.add('text-black/70', 'dark:text-white/70');
-            }
-        });
+        // [핵심 가드] 이미 처리된 URL이라면 로직 수행 안 함
+        if (window.lastProcessedPath === currentFullHref) return;
+        window.lastProcessedPath = currentFullHref;
+
+        const tree = document.querySelector('.category-tree') as HTMLElement;
+        if (!tree) {
+            window.lastProcessedPath = ''; 
+            return;
+        }
+
+        const urlParams = new URLSearchParams(search);
+        const isPostPage = pathname.includes('/posts/');
 
         // 현재 카테고리 결정
         let activeCategory = urlParams.get('category');
@@ -95,26 +112,54 @@ const { class: className, style } = Astro.props;
             activeCategory = postContainer?.dataset.category || null;
         }
 
-        if (activeCategory) {
-            const targetItem = tree.querySelector(`[data-path="${activeCategory}"] a`);
-            if (targetItem) {
-                targetItem.classList.add('bg-[var(--primary)]/[0.08]');
-                const label = targetItem.querySelector('div');
-                if (label) {
-                    label.classList.add('text-[var(--primary)]');
-                    label.classList.remove('text-black/70', 'dark:text-white/70');
+        // 1. DOM에서 현재 활성화된 항목과 새로 활성화될 항목 찾기
+        const currentActiveA = tree.querySelector('.category-item a.bg-\\[var\\(--primary\\)\\]\\/\\[0\\.08\\]');
+        const targetA = activeCategory ? tree.querySelector(`[data-path="${activeCategory}"] a`) : null;
+
+        // 2. 변경이 필요 없는 경우 즉시 종료
+        if (currentActiveA === targetA) {
+            if (targetA) {
+                const hasStar = targetA.classList.contains('reading-active-star');
+                if (hasStar !== isPostPage) {
+                    targetA.classList.toggle('reading-active-star', isPostPage);
                 }
-                if (isPostPage) {
-                    targetItem.classList.add('reading-active-star');
-                }
+            }
+            return;
+        }
+
+        // 3. 수술적 업데이트 (Surgical Update)
+        if (currentActiveA) {
+            currentActiveA.classList.remove('bg-[var(--primary)]/[0.08]', 'reading-active-star');
+            const labelDiv = currentActiveA.querySelector('div');
+            if (labelDiv) {
+                labelDiv.classList.remove('text-[var(--primary)]');
+                labelDiv.classList.add('text-black/70', 'dark:text-white/70');
+            }
+        }
+
+        if (targetA) {
+            targetA.classList.add('bg-[var(--primary)]/[0.08]');
+            if (isPostPage) targetA.classList.add('reading-active-star');
+            const labelDiv = targetA.querySelector('div');
+            if (labelDiv) {
+                labelDiv.classList.add('text-[var(--primary)]');
+                labelDiv.classList.remove('text-black/70', 'dark:text-white/70');
             }
         }
     }
 
+    // 초기 로드 및 전환 완료 시 실행 (astro:page-load 하나로 통합)
+    document.addEventListener('astro:page-load', () => {
+        updateActiveStates();
+        
+        // 사이드바 로드 상태 기록 (첫 애니메이션이 끝난 후)
+        if (!window.sidebarLoaded) {
+            setTimeout(() => { window.sidebarLoaded = true; }, 1000);
+        }
+    });
+    
+    // 초기 실행
     updateActiveStates();
-    document.addEventListener('astro:page-load', updateActiveStates);
-    document.addEventListener('astro:after-swap', updateActiveStates);
-    document.addEventListener('swup:content:replace', updateActiveStates);
 </script>
 
 <style>

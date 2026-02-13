@@ -3,6 +3,7 @@ title: "Present Flame (Blog)"
 published: 2025-12-25
 description: "Astro 5와 Svelte 5를 기반으로 구축한 독립적인 디지털 사유의 공간. 플랫폼 종속성에서 벗어나, 내면의 불꽃을 기록하고 공유하는 개인화된 미디어 허브입니다."
 image: "static-blog.png"
+category: "Projects"
 tags: ["Web Dev", "Astro", "Svelte", "Tailwind"]
 github_url: "https://github.com/posotpia7139/blog"
 demo_url: "https://presentflame.com/"
@@ -45,16 +46,16 @@ draft: false
 
 ## 주요 구현 기능 (Key Features)
 
-### 1. 계층형 카테고리 시스템 (Hierarchical Categories)
+### 계층형 카테고리 시스템
 기존 정적 블로그 템플릿들이 가지는 단조로운 1차원적 카테고리 구조를 탈피했습니다. 
 파일 시스템 기반의 라우팅을 분석하여 **3단계(Depth)까지 확장 가능한 중첩 카테고리**를 구현했으며, 현재 읽고 있는 글의 위치를 자동으로 펼쳐주는(Auto-expand) 아코디언 UI를 Svelte로 직접 제작하여 탐색 편의성을 극대화했습니다.
 
-### 2. 몰입형 독서 경험 (Immersive Reading)
+### 몰입형 독서 경험
 *   **TOC (목차) 연동:** 긴 글을 읽을 때 현재 위치를 파악할 수 있도록, 스크롤 위치에 따라 목차가 하이라이팅되는 인터랙션을 구현했습니다.
 *   **독서 시간 예측:** 글의 길이를 분석하여 예상 독서 시간을 제공, 독자가 호흡을 조절할 수 있도록 돕습니다.
 *   **다크 모드 최적화:** 시스템 설정 자동 감지 및 부드러운 전환 효과를 통해 눈의 피로를 최소화했습니다.
 
-### 3. 프로젝트 쇼케이스 (Project Showcase)
+### 프로젝트 쇼케이스
 블로그 포스트와는 성격이 다른 '프로젝트'를 위한 별도의 컬렉션(Collection) 타입을 정의했습니다. 
 GitHub 리포지토리 링크와 라이브 데모 버튼을 눈에 띄게 배치하고, 프로젝트의 성격을 직관적으로 보여주는 썸네일 중심의 레이아웃을 적용하여 포트폴리오로서의 기능을 강화했습니다.
 

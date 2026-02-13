@@ -40,7 +40,7 @@ let heading1Count = 1;
 
 const maxLevel = siteConfig.toc.depth;
 
-// [수정] Footnotes 제목 제외 (가장 강력한 필터링)
+// [수정] Footnotes 및 관련 글 제목 제외 (필터링 강화)
 const filteredHeadings = headings.filter((heading) => {
 	const text = heading.text.toLowerCase().trim();
 	const slug = heading.slug.toLowerCase();
@@ -54,7 +54,9 @@ const filteredHeadings = headings.filter((heading) => {
 		text === "footnotes" ||
 		heading.depth === 100;
 
-	return !isTooDeep && !isFootnote;
+	const isExcludedTitle = text.includes("related posts") || text.includes("관련 글");
+
+	return !isTooDeep && !isFootnote && !isExcludedTitle;
 });
 ---
 {shouldShowTOC &&
@@ -77,7 +79,7 @@ const filteredHeadings = headings.filter((heading) => {
                         {heading.depth == minDepth + 1 && <div class="transition w-2 h-2 rounded-[0.1875rem] bg-[var(--toc-badge-bg)]"></div>}
                         {heading.depth == minDepth + 2 && <div class="transition w-1.5 h-1.5 rounded-sm bg-black/5 dark:bg-white/10"></div>}
                     </div>
-                    <div class:list={["transition text-sm text-left break-words leading-snug py-0.5 group-hover:text-[oklch(0.20_0.14_var(--hue))] dark:group-hover:text-[var(--primary)]",
+                    <div class:list={["transition text-sm text-left truncate leading-snug py-0.5 group-hover:text-[oklch(0.20_0.14_var(--hue))] dark:group-hover:text-[var(--primary)] flex-1 min-w-0",
                         {"text-black/100 dark:text-white/90": !isFloating},
                         {"text-black/80 dark:text-white/90 [.visible_&]:text-black/100 [.visible_&]:dark:text-white/90": isFloating}
                     ]}>{cleanHeadingText(heading.text)}</div>
@@ -111,23 +113,30 @@ class TableOfContents extends HTMLElement {
     };
 
     refresh = () => {
-        // 지연 시간을 대폭 줄여서 즉시 반응하도록 수정 (1000ms -> 100ms)
-        setTimeout(() => {
+        // [수정] setTimeout 대신 requestAnimationFrame을 사용하여 렌더링 타이밍 최적화
+        requestAnimationFrame(() => {
+            const pathname = window.location.pathname;
+            const search = window.location.search;
+            const currentHref = pathname + search;
+
+            // 이미 처리된 URL이고 항목이 존재한다면 스킵 (깜빡임 방지)
+            if (this.dataset.processedHref === currentHref && this.querySelector('.toc a')) return;
+            this.dataset.processedHref = currentHref;
+
             this.observer.disconnect();
             this.rebuildTOC();
             this.init();
-        }, 100); 
+        });
     };
 
     rebuildTOC = () => {
         const tocContainer = this.querySelector(".toc");
         if (!tocContainer) return;
 
-        // 기존 내용 유지하며 필요한 경우에만 재구축하도록 변경 고려 가능하나, 
-        // 현재는 안정성을 위해 초기화 후 재구축 유지
         tocContainer.innerHTML = '';
 
-        const contentArea = document.querySelector('.prose') || document.querySelector('.markdown-content') || document.querySelector('#post-container');
+        // 본문 영역만 정확히 타겟팅
+        const contentArea = document.querySelector('.markdown-content') || document.querySelector('#post-container');
         if (!contentArea) {
             this.style.display = 'none';
             return;
@@ -136,8 +145,10 @@ class TableOfContents extends HTMLElement {
         const rawHeadings = Array.from(contentArea.querySelectorAll('h1, h2, h3, h4')); 
         const validHeadings = rawHeadings.filter(h => {
             const id = h.id.toLowerCase();
-            const text = h.textContent?.toLowerCase() || '';
-            return id && !id.includes('footnote') && !text.includes('각주') && !text.includes('footnote');
+            const text = h.textContent?.toLowerCase().trim() || '';
+            const isFootnote = id.includes('footnote') || text.includes('각주') || text.includes('footnote');
+            const isExcluded = text === 'related posts' || text === '관련 글';
+            return id && !isFootnote && !isExcluded;
         });
 
         if (validHeadings.length === 0) {
@@ -153,6 +164,7 @@ class TableOfContents extends HTMLElement {
             const depth = parseInt(h.tagName.substring(1));
             const text = h.textContent || '';
             const slug = h.id;
+            
             const a = document.createElement('a');
             a.href = `#${slug}`;
             a.className = "group pr-3.5 pl-3.5 flex items-start gap-2 relative transition-all duration-100 ease-out w-full min-h-[26px] rounded-xl hover:bg-[var(--toc-btn-active)] active:bg-[var(--toc-btn-active)] py-0.5";
@@ -166,7 +178,8 @@ class TableOfContents extends HTMLElement {
                 badgeHTML = `<div class="transition w-5 h-5 shrink-0 flex items-center justify-center mt-0.5 ml-8"><div class="transition w-1.5 h-1.5 rounded-sm bg-black/5 dark:bg-white/10"></div></div>`;
             }
 
-            a.innerHTML = `${badgeHTML}<div class="transition text-sm text-left break-words leading-snug py-0.5 text-black/80 dark:text-white/90 group-hover:text-[oklch(0.20_0.14_var(--hue))] dark:group-hover:text-[var(--primary)]">${text.replace(/^(\d+\.)+\s*/, "")}</div>`;
+            // 서버 사이드와 100% 동일한 클래스와 구조 유지
+            a.innerHTML = `${badgeHTML}<div class="transition text-sm text-left truncate leading-snug py-0.5 text-black/80 dark:text-white/90 group-hover:text-[oklch(0.20_0.14_var(--hue))] dark:group-hover:text-[var(--primary)] flex-1 min-w-0">${text.replace(/^(\d+\.)+\s*/, "")}</div>`;
             tocContainer.appendChild(a);
         });
 
@@ -256,11 +269,6 @@ class TableOfContents extends HTMLElement {
         document.addEventListener('swup:content:replace', this.refresh);
         document.addEventListener('astro:after-swap', this.refresh);
         document.addEventListener('astro:page-load', this.refresh);
-
-        // 첫 로드 대응 (이벤트가 이미 지나갔을 경우를 대비해 필요한 경우에만 실행)
-        if (document.readyState === 'complete') {
-            this.init();
-        }
     };
 
     clearTOC = () => {

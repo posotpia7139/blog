@@ -132,6 +132,27 @@ const jsonLd = {
                 <Content />
             </Markdown>
 
+            <!-- Project Links (Bottom) -->
+            {entry.data.category === 'Projects' && (entry.data.github_url || entry.data.demo_url) && (
+                <div class="flex flex-row items-center justify-center text-lg mb-8 mt-10 onload-animation text-90">
+                    {entry.data.github_url && (
+                        <a href={entry.data.github_url} target="_blank" rel="noopener" class="flex items-center hover:text-[var(--primary)] transition-colors group/link px-4 py-4 -mx-4 -my-4 gap-2">
+                            <Icon name="fa6-brands:github" class="text-xl"></Icon>
+                            <span class="font-bold">GitHub</span>
+                        </a>
+                    )}
+                    {entry.data.github_url && entry.data.demo_url && (
+                        <span class="mx-4 text-black/20 dark:text-white/20">|</span>
+                    )}
+                    {entry.data.demo_url && (
+                        <a href={entry.data.demo_url} target="_blank" rel="noopener" class="flex items-center hover:text-[var(--primary)] transition-colors group/link px-4 py-4 -mx-4 -my-4 gap-2">
+                            <Icon name="material-symbols:open-in-new-rounded" class="text-xl"></Icon>
+                            <span class="font-bold">Live Demo</span>
+                        </a>
+                    )}
+                </div>
+            )}
+
             {hasDietTag && <div class="onload-animation"><DietChart /></div>}
 
             {licenseConfig.enable && <License title={entry.data.title} pubDate={entry.data.published} class={`mb-6 rounded-xl license-container onload-animation ${!entry.data.image ? "mb-0" : ""}`} ></License>}

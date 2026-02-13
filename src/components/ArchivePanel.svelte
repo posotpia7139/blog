@@ -242,8 +242,13 @@ function formatTag(tagList: string[]) {
                             <div class="w-[13%] md:w-[10%] relative dash-line flex items-center shrink-0">
                                 <div class="transition-all mx-auto w-1.5 h-1.5 rounded-full group-hover:h-5 bg-[oklch(0.5_0.05_var(--hue))] group-hover:bg-[var(--primary)] z-50"></div>
                             </div>
-                            <div class="flex-1 min-w-0 text-left font-medium group-hover:translate-x-1 transition-all group-hover:text-[var(--primary)] text-75 pr-4 line-clamp-2 [text-wrap:balance] break-keep leading-tight">
-                                {post.data.title}
+                            <div class:list={["flex-1 min-w-0 text-left font-medium group-hover:translate-x-1 transition-all group-hover:text-[var(--primary)] text-75 pr-4 line-clamp-3 break-keep text-balance leading-tight"]}>
+                                <span>{post.data.title}</span>
+                                {#if post.data.category}
+                                    <span class="text-[11px] opacity-80 font-semibold capitalize text-black/60 dark:text-white/60 ml-2 inline-block translate-y-[-1px]">
+                                        {post.data.category.split('/').pop()}
+                                    </span>
+                                {/if}
                             </div>
                         </div>
                     </a>
