@@ -1,13 +1,11 @@
 <script lang="ts">
-import I18nKey from "@i18n/i18nKey";
-import { i18n } from "@i18n/translation";
 import Icon from "@iconify/svelte";
 import { url } from "@utils/url-utils.ts";
 import FlexSearch from "flexsearch";
 import { onMount, untrack } from "svelte";
 
 /**
- * [FlexSearch 검색 시스템 - 경로 집중형 버전]
+ * [FlexSearch 검색 결과 패널 - UI 전용]
  */
 
 interface SearchData {
@@ -24,40 +22,40 @@ interface IndexResult {
 	result: (string | { id: string })[];
 }
 
-// 모듈 스코프 변수 (페이지 이동 간 공유됨)
+// 모듈 스코프 캐시
 let indexInstance: any = null;
 let rawDataCache: SearchData[] = [];
 let globalInitialized = false;
 
+// 상태 관리
 let keyword = $state("");
 let searchResults = $state<SearchData[]>([]);
 let isSearching = $state(false);
-let isMobileInputVisible = $state(false);
-let isDesktopPanelVisible = $state(false);
 let showNoResults = $state(false);
-
-let isInitialized = $state(false);
-let isFocused = $state(false);
-let desktopInput: HTMLInputElement | undefined = $state();
-let mobileInput: HTMLInputElement | undefined = $state();
-let noResultsTimeout: ReturnType<typeof setTimeout> | undefined;
+let isVisible = $state(false); // 패널 노출 여부
+let inputEl: HTMLInputElement | undefined = $state();
 let timer: ReturnType<typeof setTimeout> | undefined;
 
+// 외부에서 패널을 열 수 있도록 함수 노출 (window 객체 활용)
+export const openSearch = () => {
+    isVisible = true;
+    setTimeout(() => inputEl?.focus(), 100);
+};
+
+if (typeof window !== 'undefined') {
+    (window as any).openSearch = openSearch;
+}
+
 const highlight = (text: string, query: string) => {
-    // ... (기존 highlight 로직 유지)
 	if (!text || !query) return text;
 	const q = query.trim();
 	if (!q) return text;
-
 	try {
 		const cleanText = text.split(/\s+/).join(" ").trim();
-		const specialChars = [".", "*", "+", "?", "^", "$", "{", "}", "(", ")", "|", "[", "]", "\\"];
-		const escaped = q.split("").map((c) => (specialChars.includes(c) ? `\\${c}` : c)).join("");
+		const escaped = q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 		const regex = new RegExp(`(${escaped})`, "gi");
 		return cleanText.replace(regex, '<span class="text-[var(--primary)] font-bold">$1</span>');
-	} catch (e) {
-		return text;
-	}
+	} catch (e) { return text; }
 };
 
 const formatPath = (category: string) => {
@@ -66,12 +64,10 @@ const formatPath = (category: string) => {
 };
 
 const getDisplaySnippet = (item: SearchData, query: string) => {
-    // ... (기존 snippet 로직 유지)
 	if (!query.trim()) return "";
 	const q = query.trim().toLowerCase();
 	const contentLower = item.content.toLowerCase();
 	const matchIndex = contentLower.indexOf(q);
-
 	if (matchIndex !== -1) {
 		const start = Math.max(0, matchIndex - 40);
 		const end = Math.min(item.content.length, matchIndex + 70);
@@ -84,23 +80,12 @@ const getDisplaySnippet = (item: SearchData, query: string) => {
 };
 
 const initSearch = async () => {
-    // 이미 전역 초기화가 되었다면 상태만 업데이트하고 종료
-	if (globalInitialized) {
-        isInitialized = true;
-        return;
-    }
-    
+	if (globalInitialized) return;
 	try {
-		let dataPath = url("/search.json");
-		if (dataPath.includes("//")) {
-			dataPath = dataPath.split("/").filter(Boolean).join("/");
-			if (url("/").startsWith("/")) dataPath = `/${dataPath}`;
-		}
-		const response = await fetch(dataPath);
+		const response = await fetch(url("/search.json"));
 		rawDataCache = await response.json();
 		const FlexSearchLib = (FlexSearch as any).default || FlexSearch;
-		
-        indexInstance = new FlexSearchLib.Document({
+		indexInstance = new FlexSearchLib.Document({
 			tokenize: "full",
 			document: {
 				id: "url",
@@ -108,34 +93,20 @@ const initSearch = async () => {
 				index: ["title", "description", "category", "tags", "content"],
 			},
 		});
-		
-        rawDataCache.forEach((item) => {
-			indexInstance.add(item);
-		});
-        
+		rawDataCache.forEach((item) => indexInstance.add(item));
 		globalInitialized = true;
-        isInitialized = true;
-	} catch (e) {
-		console.error("[Search] Init failed:", e);
-	}
+	} catch (e) { console.error("[Search] Init failed:", e); }
 };
 
 const performSearch = (kw: string) => {
 	const trimmed = kw.trim();
-	clearTimeout(noResultsTimeout);
 	if (!trimmed || !indexInstance) {
 		searchResults = [];
 		showNoResults = false;
-		isDesktopPanelVisible = false;
 		return;
 	}
 	isSearching = true;
 	showNoResults = false;
-
-	if (isFocused || isMobileInputVisible) {
-		isDesktopPanelVisible = true;
-	}
-
 	try {
 		const results = indexInstance.search(trimmed, { limit: 10, enrich: true });
 		const matchedItems: SearchData[] = [];
@@ -154,205 +125,108 @@ const performSearch = (kw: string) => {
 		}
 		searchResults = matchedItems;
 		if (searchResults.length === 0) {
-			noResultsTimeout = setTimeout(() => {
-				showNoResults = true;
-			}, 500);
-		}
-	} finally {
-		isSearching = false;
-	}
+            setTimeout(() => { if (keyword.trim()) showNoResults = true; }, 500);
+        }
+	} finally { isSearching = false; }
 };
 
-const closeSearch = (e?: MouseEvent) => {
-	if (e) e.stopPropagation();
-	isMobileInputVisible = false;
-	isDesktopPanelVisible = false;
+const closeSearch = () => {
+	isVisible = false;
 	keyword = "";
 	searchResults = [];
 	showNoResults = false;
-	clearTimeout(timer); // 닫을 때 타이머 취소 추가
 	document.body.style.overflow = "";
-	if (mobileInput) mobileInput.blur();
 };
 
 const handleNavigate = (e: MouseEvent, targetUrl: string) => {
 	e.preventDefault();
-	e.stopPropagation();
+    e.stopPropagation(); // 이벤트 전파 차단
 	closeSearch();
-	const win = window as Window & { swup?: { navigate: (url: string) => void } };
-	if (win.swup) {
-		win.swup.navigate(targetUrl);
-	} else {
-		window.location.href = targetUrl;
-	}
+    
+    // Swup을 통한 부드러운 이동 (존재할 경우)
+    const swup = (window as any).swup;
+    if (swup && typeof swup.navigate === 'function') {
+        swup.navigate(targetUrl);
+    } else {
+        window.location.href = targetUrl;
+    }
 };
 
 onMount(() => {
 	initSearch();
-	const handleGlobalClick = (e: MouseEvent) => {
-		const target = e.target as HTMLElement;
-		const wrapper = document.getElementById("search-wrapper");
-		if (wrapper && !wrapper.contains(target)) {
-			// 외부 클릭 시 지연된 검색 실행이 있다면 즉시 취소
-			clearTimeout(timer);
-
-			if (showNoResults) {
-				// 결과가 없는 상태(No results)에서 외부 클릭 시 필드 초기화
-				closeSearch();
-			} else if (isMobileInputVisible) {
-				// 결과가 있는 상태에서 모바일 백드롭 클릭 시 텍스트 유지하고 창만 닫음
-				isMobileInputVisible = false;
-				document.body.style.overflow = "";
-			} else {
-				// 결과가 있는 상태에서 데스크톱 외부 클릭 시 텍스트 유지하고 패널만 닫음
-				isDesktopPanelVisible = false;
-			}
-		}
-	};
-
-	// 페이지 이동 시 검색 상태 초기화
-	const handleNavigateAway = () => {
-		closeSearch();
-	};
-
-	document.addEventListener("click", handleGlobalClick);
-	document.addEventListener("swup:content:replace", handleNavigateAway);
-	document.addEventListener("astro:after-swap", handleNavigateAway);
-
+    const handleGlobalClick = (e: MouseEvent) => {
+        const target = e.target as HTMLElement;
+        if (isVisible && !target.closest('.search-panel-content')) {
+            closeSearch();
+        }
+    };
+    const handleEscape = (e: KeyboardEvent) => { if (e.key === 'Escape') closeSearch(); };
+    
+    document.addEventListener("click", handleGlobalClick);
+    document.addEventListener("keydown", handleEscape);
 	return () => {
-		document.removeEventListener("click", handleGlobalClick);
-		document.removeEventListener("swup:content:replace", handleNavigateAway);
-		document.removeEventListener("astro:after-swap", handleNavigateAway);
-		clearTimeout(timer);
-	};
+        document.removeEventListener("click", handleGlobalClick);
+        document.removeEventListener("keydown", handleEscape);
+    };
 });
 
 $effect(() => {
 	const kw = keyword;
-	if (!isInitialized) return;
 	clearTimeout(timer);
-	timer = setTimeout(() => {
-		untrack(() => performSearch(kw));
-	}, 200);
+	timer = setTimeout(() => untrack(() => performSearch(kw)), 200);
 });
 
 $effect(() => {
-	if (isMobileInputVisible) {
-		document.body.style.overflow = "hidden";
-		setTimeout(() => mobileInput?.focus(), 100);
-	}
+	if (isVisible) document.body.style.overflow = "hidden";
 });
 </script>
 
-<div id="search-wrapper" class="flex items-center">
-    <!-- 1. 데스크탑 검색바 -->
-    <div 
-        onclick={() => desktopInput?.focus()}
-        role="presentation"
-        class="hidden lg:flex relative items-center h-10 px-3 rounded-lg bg-black/[0.04] dark:bg-white/[0.06] w-[265px] cursor-text"
-    >
-        <Icon icon="material-symbols:search" class="text-[1.2rem] text-black/60 dark:text-white/60" />
-        <input 
-            bind:this={desktopInput}
-            type="text"
-            placeholder="{i18n(I18nKey.search)}" 
-            bind:value={keyword}
-            onfocus={() => { isFocused = true; if (keyword.trim()) isDesktopPanelVisible = true; }}
-            onblur={() => { isFocused = false; }}
-            onclick={(e) => { e.stopPropagation(); if (keyword.trim()) isDesktopPanelVisible = true; }}
-            class="ml-2 w-full bg-transparent outline-none text-sm font-medium text-black/90 dark:text-white/90 placeholder:text-black/50 dark:placeholder:text-white/50"
-        />
-    </div>
-
-    <!-- 2. 모바일 토글 버튼 -->
-    <button onclick={(e) => { e.stopPropagation(); isMobileInputVisible = true; }}
-        class="lg:hidden flex items-center justify-center w-12 h-12 rounded-lg active:bg-black/5 dark:active:bg-white/5 transition-all active:scale-90"
-        aria-label="Open Search">
-        <Icon icon="material-symbols:search" class="text-[1.5rem] text-black/60 dark:text-white/60" />
-    </button>
-
-    <!-- 3. 모바일 패널 -->
-    {#if isMobileInputVisible}
-        <div id="search-backdrop" 
-             class="lg:hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-[1000] animate-fade-in" 
-             onclick={closeSearch}
-             onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') closeSearch(); }}
-             role="button"
-             tabindex="0"
-             aria-label="Close Search"></div>
-        <div class="lg:hidden fixed top-[80px] left-4 right-4 bg-[var(--card-bg)] border border-[var(--line-color)] z-[1001] shadow-2xl animate-slide-down rounded-xl overflow-hidden"
-             onclick={(e) => e.stopPropagation()}
-             role="presentation">
-            <div class="flex items-center p-4">
-                <div class="w-full flex items-center h-12 px-4 rounded-xl bg-black/[0.05] dark:bg-white/[0.08]">
-                    <Icon icon="material-symbols:search" class="text-[1.2rem] text-black/60 dark:text-white/60" />
-                    <input bind:this={mobileInput} type="text" placeholder="무엇을 찾으시나요?" bind:value={keyword}
-                        class="ml-3 w-full bg-transparent outline-none text-base font-bold text-black/90 dark:text-white/90" />
-                </div>
+{#if isVisible}
+    <div id="search-backdrop" 
+         class="fixed inset-0 bg-black/40 backdrop-blur-sm z-[2000] animate-fade-in" 
+         onclick={closeSearch}
+         role="presentation"></div>
+    <div class="search-panel-content fixed top-[20px] md:top-[12vh] left-1/2 -translate-x-1/2 w-[92%] md:w-[600px] max-w-[calc(100vw-2rem)] bg-[var(--card-bg)] border border-[var(--line-color)] z-[2001] shadow-2xl animate-slide-down rounded-2xl overflow-hidden"
+         onclick={(e) => e.stopPropagation()}
+         role="presentation">
+        <div class="flex items-center p-3 md:p-4">
+            <div class="w-full flex items-center h-12 px-4 rounded-xl bg-black/[0.05] dark:bg-white/[0.08]">
+                <Icon icon="material-symbols:search" class="text-[1.2rem] text-black/60 dark:text-white/60" />
+                <input bind:this={inputEl} type="text" placeholder="검색어를 입력하세요..." bind:value={keyword}
+                    class="ml-3 w-full bg-transparent outline-none text-base font-bold text-black/90 dark:text-white/90" />
+                {#if keyword}
+                    <button onclick={() => { keyword = ""; inputEl?.focus(); }} class="p-1 hover:bg-black/5 dark:hover:bg-white/10 rounded-full transition-colors">
+                        <Icon icon="material-symbols:close-rounded" class="text-xl text-black/40" />
+                    </button>
+                {/if}
             </div>
-
-            {#if keyword.trim()}
-                <div class="max-h-[55vh] overflow-y-auto pb-4 scrollbar-hide">
-                    <div class="mx-8 border-t border-[var(--line-color)] mb-3 opacity-50"></div>
-                    <div class="flex flex-col gap-1.5 px-4">
-                        {#if isSearching}
-                            <div class="py-12 text-center text-50 italic flex items-center justify-center gap-2 text-xs"><Icon icon="svg-spinners:ring-resize" class="text-xl" /> 검색 중...</div>
-                        {:else if searchResults.length > 0}
-                            {#each searchResults as item}
-                                <a href={item.url} onclick={(e) => handleNavigate(e, item.url)}
-                                   class="block p-4 px-4 rounded-xl bg-black/[0.03] dark:bg-white/[0.03] active:bg-[var(--btn-plain-bg-hover)] transition-colors">
-                                    <div class="text-[10px] text-50 font-semibold uppercase tracking-wider mb-1">
-                                        {formatPath(item.category)}
-                                    </div>
-                                    <div class="text-90 font-bold text-sm leading-tight">{@html highlight(item.title, keyword)}</div>
-                                    {#if getDisplaySnippet(item, keyword)}
-                                        <div class="text-[11px] text-50 line-clamp-2 mt-2 leading-relaxed">
-                                            {@html getDisplaySnippet(item, keyword)}
-                                        </div>
-                                    {/if}
-                                </a>
-                            {/each}
-                        {:else if showNoResults}
-                            <div class="py-16 text-center flex flex-col items-center justify-center gap-3">
-                                <Icon icon="material-symbols:search-off-rounded" class="text-4xl text-black/20 dark:text-white/20" />
-                                <div class="text-50 text-sm italic font-medium px-4">"{keyword}"에 대한 결과를 찾을 수 없습니다.</div>
-                            </div>
-                        {/if}
-                    </div>
-                </div>
-            {/if}
         </div>
-    {/if}
 
-    <!-- 4. 데스크톱 패널 -->
-    <div class="hidden lg:block">
-        {#if keyword.trim() && !isMobileInputVisible && isDesktopPanelVisible}
-            <div class="absolute top-14 right-0 w-[32rem] bg-[var(--card-bg)] shadow-2xl rounded-2xl p-2 border border-[var(--line-color)] z-[100]">
-                <div class="max-h-[60vh] overflow-y-auto flex flex-col scrollbar-hide p-1 gap-1">
+        {#if keyword.trim()}
+            <div class="max-h-[60vh] overflow-y-auto pb-4 scrollbar-hide">
+                <div class="mx-8 border-t border-[var(--line-color)] mb-3 opacity-50"></div>
+                <div class="flex flex-col gap-1.5 px-3 md:px-4">
                     {#if isSearching}
                         <div class="py-12 text-center text-50 italic flex items-center justify-center gap-2 text-xs"><Icon icon="svg-spinners:ring-resize" class="text-xl" /> 검색 중...</div>
                     {:else if searchResults.length > 0}
                         {#each searchResults as item}
                             <a href={item.url} onclick={(e) => handleNavigate(e, item.url)}
-                               class="group block p-3 px-4 rounded-xl hover:bg-[var(--btn-plain-bg-hover)] transition-all">
-                                <div class="text-[9px] text-50 font-semibold uppercase tracking-tight mb-1 opacity-70">
+                               class="group block p-4 rounded-xl hover:bg-black/[0.03] dark:hover:bg-white/[0.03] active:bg-[var(--btn-plain-bg-hover)] transition-all border border-transparent hover:border-[var(--line-color)]">
+                                <div class="text-[10px] text-50 font-semibold uppercase tracking-wider mb-1 opacity-70">
                                     {formatPath(item.category)}
                                 </div>
-                                <div class="flex justify-between items-center">
-                                    <div class="text-90 font-bold flex items-center transition-colors">
-                                        <span class="group-hover:text-[var(--primary)] transition-colors">{@html highlight(item.title, keyword)}</span>
-                                        <Icon icon="fa6-solid:chevron-right" class="text-[0.6rem] text-[var(--primary)] opacity-0 group-hover:opacity-100 transition-all ml-2" />
-                                    </div>
+                                <div class="text-90 font-bold text-sm md:text-base leading-tight group-hover:text-[var(--primary)] transition-colors">
+                                    {@html highlight(item.title, keyword)}
                                 </div>
                                 {#if getDisplaySnippet(item, keyword)}
-                                    <div class="text-[11px] text-50 line-clamp-1 mt-1 font-medium">
+                                    <div class="text-[11px] md:text-xs text-50 line-clamp-2 mt-2 leading-relaxed opacity-80 font-medium">
                                         {@html getDisplaySnippet(item, keyword)}
                                     </div>
                                 {/if}
                             </a>
                         {/each}
                     {:else if showNoResults}
-                        <div class="py-12 text-center flex flex-col items-center justify-center gap-3">
+                        <div class="py-16 text-center flex flex-col items-center justify-center gap-3">
                             <Icon icon="material-symbols:search-off-rounded" class="text-4xl text-black/20 dark:text-white/20" />
                             <div class="text-50 text-sm italic font-medium px-4">"{keyword}"에 대한 결과를 찾을 수 없습니다.</div>
                         </div>
@@ -361,13 +235,13 @@ $effect(() => {
             </div>
         {/if}
     </div>
-</div>
+{/if}
 
 <style>
     .scrollbar-hide::-webkit-scrollbar { display: none; }
     .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
-    @keyframes slide-down { from { transform: translateY(-20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    @keyframes slide-down { from { transform: translate(-50%, -20px); opacity: 0; } to { transform: translate(-50%, 0); opacity: 1; } }
     @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
-    .animate-slide-down { animation: slide-down 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+    .animate-slide-down { animation: slide-down 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
     .animate-fade-in { animation: fade-in 0.3s ease-out; }
 </style>

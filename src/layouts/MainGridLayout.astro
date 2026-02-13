@@ -1,6 +1,7 @@
 ---
 import Footer from "@components/Footer.astro";
 import Navbar from "@components/Navbar.astro";
+import Search from "@components/Search.svelte";
 import SideBar from "@components/widget/SideBar.astro";
 import type { MarkdownHeading } from "astro";
 import { Icon } from "astro-icon/components";
@@ -45,6 +46,9 @@ const mainPanelTopMobile = siteConfig.banner.enable
 ---
 
 <Layout title={title} banner={banner} description={description} lang={lang} setOGTypeArticle={setOGTypeArticle}>
+
+{/* 글로벌 검색 패널 (전체 화면 오버레이 지원) */}
+<Search client:load transition:persist />
 
 <!-- Navbar -->
 <slot slot="head" name="head"></slot>

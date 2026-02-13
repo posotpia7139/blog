@@ -244,7 +244,7 @@ function formatTag(tagList: string[]) {
                             </div>
                             <div class:list={["flex-1 min-w-0 text-left font-medium group-hover:translate-x-1 transition-all group-hover:text-[var(--primary)] text-75 pr-4 line-clamp-3 break-keep text-balance leading-tight"]}>
                                 {#if post.data.category}
-                                    <span class="text-[11px] font-bold capitalize text-black/70 dark:text-white/80 mr-2 inline-block translate-y-[-1px] border border-black/15 dark:border-white/20 bg-black/[0.08] dark:bg-white/[0.08] px-1.5 py-0.5 rounded-md leading-none">
+                                    <span class="text-[11px] font-bold capitalize text-black/70 dark:text-white/80 mr-1 inline-block translate-y-[-1px] border border-black/15 dark:border-white/20 bg-black/[0.08] dark:bg-white/[0.08] px-1.5 py-0.5 rounded-md leading-none">
                                         {post.data.category.split('/').pop()}
                                     </span>
                                 {/if}
