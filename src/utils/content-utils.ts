@@ -68,9 +68,10 @@ export async function getSortedPosts() {
 }
 
 export async function getSortedProjects() {
-	const allProjects = await getCollection("projects", ({ data }) => {
-		return import.meta.env.PROD ? data.draft !== true : true;
-	});
+	const allPosts = await getPosts();
+	const allProjects = allPosts.filter(
+		(post) => post.data.category === "Projects",
+	);
 
 	const sorted = allProjects.sort((a, b) => {
 		const dateA = new Date(a.data.published);
