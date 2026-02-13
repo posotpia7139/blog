@@ -138,8 +138,7 @@ const mainPanelTopMobile = siteConfig.banner.enable
                     floatingToc.classList.add('opacity-100', 'pointer-events-auto');
                 }
 
-                // 초기 로드 및 전환 시 실행
-                initTOCVisibility();
+                // 초기 로드 및 전환 시 실행 (astro:page-load가 첫 로드도 담당함)
                 document.addEventListener('swup:content:replace', initTOCVisibility);
                 document.addEventListener('astro:after-swap', initTOCVisibility);
                 document.addEventListener('astro:page-load', initTOCVisibility);

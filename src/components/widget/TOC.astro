@@ -248,7 +248,7 @@ class TableOfContents extends HTMLElement {
     };
 
     connectedCallback() {
-        this.init();
+        // [수정] 즉시 init()을 호출하지 않고 이벤트 리스너에 위임하여 중복 실행 방지
         window.addEventListener('scroll', this.handleScroll, { passive: true });
         
         // [수정] 모든 페이지 전환 이벤트 대응
@@ -256,6 +256,11 @@ class TableOfContents extends HTMLElement {
         document.addEventListener('swup:content:replace', this.refresh);
         document.addEventListener('astro:after-swap', this.refresh);
         document.addEventListener('astro:page-load', this.refresh);
+
+        // 첫 로드 대응 (이벤트가 이미 지나갔을 경우를 대비해 필요한 경우에만 실행)
+        if (document.readyState === 'complete') {
+            this.init();
+        }
     };
 
     clearTOC = () => {

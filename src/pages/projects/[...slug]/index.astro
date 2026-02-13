@@ -114,7 +114,7 @@ const jsonLd = {
                 <ImageWrapper id="post-cover" src={entry.data.image} basePath={path.join("content/projects/", getDir(entry.id))} class="mb-8 rounded-xl banner-container" loading="eager" fetchPriority="high"/>
             }
 
-            {siteConfig.toc.enable && <div id="top-toc-container" class="mb-7 w-fit max-w-full md:max-w-[50%] onload-animation pb-0">
+            {siteConfig.toc.enable && <div id="top-toc-container" class="mb-7 w-fit max-w-full md:max-w-[50%] onload-animation pb-0 2xl:hidden">
                 <TOC headings={headings} class="!pl-0" isFloating={false}></TOC>
             </div>}
 
