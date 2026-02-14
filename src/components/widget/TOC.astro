@@ -72,13 +72,11 @@ const filteredHeadings = headings.filter((heading) => {
                         {
                             "bg-[var(--toc-badge-bg)] text-[var(--btn-content)]": heading.depth == minDepth,
                             "ml-4": heading.depth == minDepth + 1,
-                            "ml-8": heading.depth == minDepth + 2,
                         }
                     ]}
                     >
                         {heading.depth == minDepth && heading1Count++}
                         {heading.depth == minDepth + 1 && <div class="transition w-2 h-2 rounded-[0.1875rem] bg-[var(--toc-badge-bg)]"></div>}
-                        {heading.depth == minDepth + 2 && <div class="transition w-1.5 h-1.5 rounded-sm bg-black/5 dark:bg-white/10"></div>}
                     </div>
                     <div class:list={["transition text-[14px] text-left truncate leading-snug py-0.5 group-hover:text-[oklch(0.20_0.14_var(--hue))] dark:group-hover:text-[var(--primary)] flex-1 min-w-0",
                         {"text-black/100 dark:text-white/90": !isFloating},
@@ -143,7 +141,7 @@ class TableOfContents extends HTMLElement {
             return;
         }
 
-        const rawHeadings = Array.from(contentArea.querySelectorAll('h1, h2, h3, h4')); 
+        const rawHeadings = Array.from(contentArea.querySelectorAll('h1, h2, h3')); 
         const validHeadings = rawHeadings.filter(h => {
             const id = h.id.toLowerCase();
             const text = h.textContent?.toLowerCase().trim() || '';
@@ -173,10 +171,9 @@ class TableOfContents extends HTMLElement {
             let badgeHTML = '';
             if (depth === minDepth) {
                 badgeHTML = `<div class="transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold mt-0.5 bg-[var(--toc-badge-bg)] text-[var(--btn-content)]">${h1Count++}</div>`;
-            } else if (depth === minDepth + 1) {
-                badgeHTML = `<div class="transition w-5 h-5 shrink-0 flex items-center justify-center mt-0.5 ml-4"><div class="transition w-2 h-2 rounded-[0.1875rem] bg-[var(--toc-badge-bg)]"></div></div>`;
             } else {
-                badgeHTML = `<div class="transition w-5 h-5 shrink-0 flex items-center justify-center mt-0.5 ml-8"><div class="transition w-1.5 h-1.5 rounded-sm bg-black/5 dark:bg-white/10"></div></div>`;
+                // depth === minDepth + 1 이상은 모두 점 형태의 배지로 표시 (현재는 H3만 해당)
+                badgeHTML = `<div class="transition w-5 h-5 shrink-0 flex items-center justify-center mt-0.5 ml-4"><div class="transition w-2 h-2 rounded-[0.1875rem] bg-[var(--toc-badge-bg)]"></div></div>`;
             }
 
             // 서버 사이드와 100% 동일한 클래스와 구조 유지
