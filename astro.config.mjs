@@ -39,6 +39,7 @@ export default defineConfig({
 	site: "https://presentflame.com/",
 	base: "/",
 	trailingSlash: "always",
+    prefetch: false, // Swup과 충돌 방지를 위해 비활성화
 	build: {
 		inlineStylesheets: "auto",
 	},

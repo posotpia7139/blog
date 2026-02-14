@@ -8,7 +8,10 @@ import ConfigCarrier from "@components/ConfigCarrier.astro";
 import ScrollProgress from "@components/control/ScrollProgress.astro";
 import { profileConfig, siteConfig } from "@/config";
 import { SEO } from "astro-seo";
+<<<<<<< HEAD
 import { ClientRouter } from 'astro:transitions';
+=======
+>>>>>>> bc67bcfad42705cc0ac51b4c8f828a47049db6f9
 import "overlayscrollbars/overlayscrollbars.css";
 import {
 	AUTO_MODE,
@@ -260,11 +263,17 @@ const bannerEnabled = !!document.getElementById('banner-wrapper')
 
 // 전역 초기화 함수
 function init() {
+<<<<<<< HEAD
     // 1. 테마 및 색상 로드
     setTheme(getStoredTheme());
     setHue(getHue());
 
     // 2. 홈 페이지 클래스 제어
+=======
+    setTheme(getStoredTheme());
+    setHue(getHue());
+
+>>>>>>> bc67bcfad42705cc0ac51b4c8f828a47049db6f9
     const bodyElement = document.querySelector('body');
     if (bodyElement) {
         if (pathsEqual(window.location.pathname, url('/'))) {
@@ -274,6 +283,7 @@ function init() {
         }
     }
 
+<<<<<<< HEAD
     // 3. 스크롤바 초기화 (데스크톱 전용: 1024px 이상)
     if (bodyElement && window.innerWidth >= 1024) {
         requestAnimationFrame(() => {
@@ -296,6 +306,20 @@ function init() {
     }
 
     // 4. 기타 UI 요소 (각주, 앵커, 수식 등)
+=======
+    if (bodyElement && !(window as any).osInstance) {
+        (window as any).osInstance = OverlayScrollbars(bodyElement, {
+            scrollbars: {
+                theme: 'scrollbar-base scrollbar-auto py-1',
+                autoHide: 'never',
+            },
+            overflow: { x: 'hidden', y: 'scroll' }
+        });
+    } else if ((window as any).osInstance) {
+        (window as any).osInstance.update(true);
+    }
+
+>>>>>>> bc67bcfad42705cc0ac51b4c8f828a47049db6f9
     initFootnotes();
     setupAnchorLinks();
     processKaTeX();
@@ -367,6 +391,7 @@ function processKaTeX() {
 		element.setAttribute('data-scrollbar-initialized', 'true');
 	});
 }
+<<<<<<< HEAD
 
 // 클릭 외부 닫기 처리 (전역)
 document.addEventListener("click", event => {
@@ -452,4 +477,37 @@ async function initPhotoSwipe() {
 document.addEventListener('astro:page-load', () => {
     initPhotoSwipe();
 });
+=======
+
+// 초기 로드
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+} else {
+    init();
+}
+
+// Swup 이벤트 연결
+document.addEventListener('swup:enable', () => {
+    const swup = (window as any).swup;
+    if (!swup) return;
+
+    swup.hooks.on('page:view', () => {
+        init();
+    });
+});
+
+// 스크롤 제어
+let navbar = document.getElementById('navbar-persistent-wrapper');
+function scrollFunction() {
+	if (!bannerEnabled || !navbar) return;
+	const NAVBAR_HEIGHT = 72;
+	const threshold = window.innerHeight * (BANNER_HEIGHT / 100) - NAVBAR_HEIGHT - (3.5 * 16) - 16;
+	if (document.body.scrollTop >= threshold || document.documentElement.scrollTop >= threshold) {
+		navbar.classList.add('navbar-hidden');
+	} else {
+		navbar.classList.remove('navbar-hidden');
+	}
+}
+window.onscroll = () => window.requestAnimationFrame(scrollFunction);
+>>>>>>> bc67bcfad42705cc0ac51b4c8f828a47049db6f9
 </script>

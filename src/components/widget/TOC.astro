@@ -54,7 +54,8 @@ const filteredHeadings = headings.filter((heading) => {
 		text === "footnotes" ||
 		heading.depth === 100;
 
-	const isExcludedTitle = text.includes("related posts") || text.includes("관련 글");
+	const isExcludedTitle =
+		text.includes("related posts") || text.includes("관련 글");
 
 	return !isTooDeep && !isFootnote && !isExcludedTitle;
 });
@@ -261,18 +262,13 @@ class TableOfContents extends HTMLElement {
     };
 
     connectedCallback() {
-        // [수정] 즉시 init()을 호출하지 않고 이벤트 리스너에 위임하여 중복 실행 방지
+        this.init();
         window.addEventListener('scroll', this.handleScroll, { passive: true });
-        
-        // [수정] 모든 페이지 전환 이벤트 대응
-        document.addEventListener('swup:visit:start', this.clearTOC);
-        document.addEventListener('swup:content:replace', this.refresh);
         document.addEventListener('astro:after-swap', this.refresh);
         document.addEventListener('astro:page-load', this.refresh);
     };
 
     clearTOC = () => {
-        // 플로팅 TOC만 전환 시 숨김 (본문 내 TOC는 페이지와 함께 교체됨)
         if (this.dataset.isFloating === 'true') {
             const tocContainer = this.querySelector(".toc");
             if (tocContainer) tocContainer.innerHTML = '';
@@ -281,6 +277,7 @@ class TableOfContents extends HTMLElement {
     };
 
     init() {
+        this.observer.disconnect();
         this.headingIdxMap.clear();
         this.headings = [];
         this.active = [];
@@ -319,8 +316,6 @@ class TableOfContents extends HTMLElement {
         this.observer.disconnect();
         this.tocEl?.removeEventListener("click", this.handleAnchorClick);
         window.removeEventListener('scroll', this.handleScroll);
-        document.removeEventListener('swup:visit:start', this.clearTOC);
-        document.removeEventListener('swup:content:replace', this.refresh);
         document.removeEventListener('astro:after-swap', this.refresh);
         document.removeEventListener('astro:page-load', this.refresh);
     };
