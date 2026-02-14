@@ -214,7 +214,7 @@ function formatTag(tagList: string[]) {
                     <span class="inline-block font-medium text-[56px] leading-[0.9] tabular-nums tracking-[-0.05em] text-[var(--primary)] {isPopping ? 'anim-pop' : ''}">
                         {Math.round(displayCount)}
                     </span>
-                    <span class="mt-2 text-[14px] font-bold text-black/40 dark:text-white/40 uppercase">
+                    <span class="mt-2 text-[14px] font-bold text-black/60 dark:text-white/60 uppercase tracking-widest">
                         게시물
                     </span>
                 </div>
@@ -242,13 +242,14 @@ function formatTag(tagList: string[]) {
                             <div class="w-[13%] md:w-[10%] relative dash-line flex items-center shrink-0">
                                 <div class="transition-all mx-auto w-1.5 h-1.5 rounded-full group-hover:h-5 bg-[oklch(0.5_0.05_var(--hue))] group-hover:bg-[var(--primary)] z-50"></div>
                             </div>
-                            <div class:list={["flex-1 min-w-0 text-left font-medium group-hover:translate-x-1 transition-all group-hover:text-[var(--primary)] text-75 pr-4 line-clamp-3 break-keep text-balance leading-tight"]}>
-                                <span>{post.data.title}</span>
+                            <div class:list={["flex-1 min-w-0 text-left font-medium group-hover:translate-x-1 transition-all group-hover:text-[var(--primary)] text-75 pr-4 line-clamp-3 leading-tight"]}
+                                 style="text-wrap: balance; word-break: keep-all;">
                                 {#if post.data.category}
-                                    <span class="text-[11px] opacity-80 font-semibold capitalize text-black/60 dark:text-white/60 ml-2 inline-block translate-y-[-1px]">
+                                    <span class="text-[11px] font-bold capitalize text-black/70 dark:text-white/80 mr-1 inline-flex items-center border border-black/30 dark:border-white/30 bg-black/[0.08] dark:bg-white/[0.08] px-1.5 py-0.5 rounded-md leading-none align-middle tracking-wide">
                                         {post.data.category.split('/').pop()}
                                     </span>
                                 {/if}
+                                <span class="align-middle">{post.data.title}</span>
                             </div>
                         </div>
                     </a>

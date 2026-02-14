@@ -79,7 +79,7 @@ const filteredHeadings = headings.filter((heading) => {
                         {heading.depth == minDepth + 1 && <div class="transition w-2 h-2 rounded-[0.1875rem] bg-[var(--toc-badge-bg)]"></div>}
                         {heading.depth == minDepth + 2 && <div class="transition w-1.5 h-1.5 rounded-sm bg-black/5 dark:bg-white/10"></div>}
                     </div>
-                    <div class:list={["transition text-sm text-left truncate leading-snug py-0.5 group-hover:text-[oklch(0.20_0.14_var(--hue))] dark:group-hover:text-[var(--primary)] flex-1 min-w-0",
+                    <div class:list={["transition text-[14px] text-left truncate leading-snug py-0.5 group-hover:text-[oklch(0.20_0.14_var(--hue))] dark:group-hover:text-[var(--primary)] flex-1 min-w-0",
                         {"text-black/100 dark:text-white/90": !isFloating},
                         {"text-black/80 dark:text-white/90 [.visible_&]:text-black/100 [.visible_&]:dark:text-white/90": isFloating}
                     ]}>{cleanHeadingText(heading.text)}</div>
@@ -179,7 +179,7 @@ class TableOfContents extends HTMLElement {
             }
 
             // 서버 사이드와 100% 동일한 클래스와 구조 유지
-            a.innerHTML = `${badgeHTML}<div class="transition text-sm text-left truncate leading-snug py-0.5 text-black/80 dark:text-white/90 group-hover:text-[oklch(0.20_0.14_var(--hue))] dark:group-hover:text-[var(--primary)] flex-1 min-w-0">${text.replace(/^(\d+\.)+\s*/, "")}</div>`;
+            a.innerHTML = `${badgeHTML}<div class="transition text-[14px] text-left truncate leading-snug py-0.5 text-black/80 dark:text-white/90 group-hover:text-[oklch(0.20_0.14_var(--hue))] dark:group-hover:text-[var(--primary)] flex-1 min-w-0">${text.replace(/^(\d+\.)+\s*/, "")}</div>`;
             tocContainer.appendChild(a);
         });
 

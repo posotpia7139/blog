@@ -55,11 +55,15 @@ const { class: className, style } = Astro.props;
                            ]}
                         >
                             <div class:list={[
-                                "text-sm transition-colors duration-300 flex items-center",
+                                "text-sm transition-colors duration-300 flex items-center relative",
                                 (isActive || isReading) ? "text-[var(--primary)]" : "text-black/70 dark:text-white/70 group-hover:text-[var(--primary)]",
                                 depth === 1 ? "font-extrabold text-[15px]" : "font-normal text-[15px]"
                             ]}>
                                 <span class="category-label capitalize leading-none">{parts[parts.length - 1]}</span>
+                                {/* 독서 중임을 나타내는 별표 (*) - 실제 요소로 변경하여 페이드 아웃 지원 */}
+                                <span class:list={["reading-star ml-1.5 font-black text-xl leading-none",
+                                    { "is-reading": isReading }
+                                ]}>*</span>
                             </div>
                         </a>
                     </li>
@@ -119,9 +123,9 @@ const { class: className, style } = Astro.props;
         // 2. 변경이 필요 없는 경우 즉시 종료
         if (currentActiveA === targetA) {
             if (targetA) {
-                const hasStar = targetA.classList.contains('reading-active-star');
-                if (hasStar !== isPostPage) {
-                    targetA.classList.toggle('reading-active-star', isPostPage);
+                const star = targetA.querySelector('.reading-star');
+                if (star) {
+                    star.classList.toggle('is-reading', isPostPage);
                 }
             }
             return;
@@ -129,7 +133,11 @@ const { class: className, style } = Astro.props;
 
         // 3. 수술적 업데이트 (Surgical Update)
         if (currentActiveA) {
-            currentActiveA.classList.remove('bg-[var(--primary)]/[0.08]', 'reading-active-star');
+            currentActiveA.classList.remove('bg-[var(--primary)]/[0.08]');
+            const star = currentActiveA.querySelector('.reading-star');
+            if (star) {
+                star.classList.remove('is-reading');
+            }
             const labelDiv = currentActiveA.querySelector('div');
             if (labelDiv) {
                 labelDiv.classList.remove('text-[var(--primary)]');
@@ -139,7 +147,10 @@ const { class: className, style } = Astro.props;
 
         if (targetA) {
             targetA.classList.add('bg-[var(--primary)]/[0.08]');
-            if (isPostPage) targetA.classList.add('reading-active-star');
+            const star = targetA.querySelector('.reading-star');
+            if (isPostPage && star) {
+                star.classList.add('is-reading');
+            }
             const labelDiv = targetA.querySelector('div');
             if (labelDiv) {
                 labelDiv.classList.add('text-[var(--primary)]');
@@ -169,27 +180,17 @@ const { class: className, style } = Astro.props;
     .category-tree ul { list-style: none; padding: 0; margin: 0; }
     
     /* 독서 모드 별표(*) 포인트 */
-    :global(.reading-active-star .category-label) {
-        position: relative;
-    }
-    :global(.reading-active-star .category-label::after) {
-        content: "*";
-        position: absolute;
-        right: -15px;
-        top: -4px;
+    .reading-star {
         color: var(--primary);
-        font-weight: 900;
-        font-size: 1.25rem;
-        line-height: 1;
-        opacity: 0; /* 초기 상태: 투명 */
-        animation: pulse-opacity 1.5s ease-in-out infinite;
-        animation-delay: 0.2s; /* 0.2초 대기 후 시작 */
+        transition: opacity 0.8s ease-in-out;
+        will-change: opacity;
+        opacity: 0;
+        pointer-events: none;
     }
 
-    @keyframes pulse-opacity {
-        0% { opacity: 0; }
-        50% { opacity: 1; }
-        100% { opacity: 0; }
+    /* 독서 중일 때 투명도만 조절 (애니메이션 제거) */
+    .reading-star.is-reading {
+        opacity: 1;
     }
 
     .category-label {
