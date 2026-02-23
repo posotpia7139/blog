@@ -40,3 +40,7 @@
 - **Stack**: MERN Stack 선호.
 - **OS**: Windows (PowerShell 환경).
 - **Framework**: Svelte 5 (experimental.async 활성화됨).
+
+## 6. 포스팅 기준
+
+- 맞춤법을 준수하여 작성하고 이에 따라 변경된 내용은 사용자에게 고지. (사용자가 글을 준 것을)
