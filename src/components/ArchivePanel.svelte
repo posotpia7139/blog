@@ -163,9 +163,9 @@ function formatTag(tagList: string[]) {
                         <Icon icon="material-symbols:folder-open-outline-rounded" class="text-[var(--primary)] text-[15px] md:text-[20px] mr-2 md:mr-3" />
                         {#each categorySegments as segment, i}
                             {#if i > 0}
-                                <span class="mx-2 opacity-30 text-[13px] md:text-[17px] translate-y-[0.5px] md:translate-y-[1px]">/</span>
+                                <span class="mx-2 opacity-65 text-[13px] md:text-[17px] translate-y-[-1px] font-bold inline-block">&gt;</span>
                             {/if}
-                            <span class="text-[13px] md:text-[17px] translate-y-[0.5px] md:translate-y-[1px] capitalize {i === categorySegments.length - 1 ? 'text-[var(--primary)] font-bold' : 'text-black/75 dark:text-white/75'}">
+                            <span class="text-[13px] md:text-[17px] translate-y-[0.5px] md:translate-y-[1px] capitalize {i === categorySegments.length - 1 ? 'text-[var(--primary)] font-bold' : 'text-black/50 dark:text-white/50'}">
                                 {segment}
                             </span>
                         {/each}
@@ -177,9 +177,9 @@ function formatTag(tagList: string[]) {
                     {/if}
                 </div>
                 <div class="flex items-center justify-start shrink-0 px-4">
-                    <span class="text-[13px] md:text-[17px] opacity-60">게시물&nbsp;</span>
+                    <span class="text-[13px] md:text-[17px] opacity-50">게시물&nbsp;</span>
                     <span class="text-[var(--primary)] font-bold text-[13px] md:text-[17px]">{targetCount}</span>
-                    <span class="text-[13px] md:text-[17px] opacity-60">개</span>
+                    <span class="text-[13px] md:text-[17px] opacity-50">개</span>
                 </div>
                 <div class="w-16 md:w-24 h-1 md:h-1.5 rounded-full bg-[var(--primary)]/10 mt-2 ml-4"></div>
             </div>
