@@ -4,6 +4,7 @@ declare global {
 	interface Window {
 		// type from '@swup/astro' is incorrect
 		swup: AstroIntegration;
+		lastProcessedPath?: string;
 		pagefind: {
 			search: (query: string) => Promise<{
 				results: Array<{
@@ -11,8 +12,11 @@ declare global {
 				}>;
 			}>;
 		};
+		sidebarLoaded?: boolean;
 	}
 }
+
+declare module "*.css" {}
 
 interface SearchResult {
 	url: string;
