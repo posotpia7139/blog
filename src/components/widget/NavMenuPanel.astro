@@ -19,7 +19,7 @@ const isPostPage = !!Astro.params.slug;
 let postCategory = "";
 
 if (isPostPage) {
-	const currentPost = allPosts.find((p) => p.slug === Astro.params.slug);
+	const currentPost = allPosts.find((p) => p.id === Astro.params.slug);
 	postCategory = currentPost?.data.category || "";
 }
 ---

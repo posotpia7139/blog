@@ -7,7 +7,7 @@ import { i18n } from "../i18n/translation";
 import { getPostUrlBySlug } from "../utils/url-utils";
 
 interface Post {
-	slug: string;
+	id: string;
 	data: {
 		title: string;
 		tags: string[];
@@ -236,7 +236,7 @@ function formatTag(tagList: string[]) {
             </div>
             <div class="mt-2 space-y-1">
                 {#each group.posts as post}
-                    <a href={getPostUrlBySlug(post.slug)} class="group btn-plain !block h-auto w-full rounded-lg overflow-hidden py-2.5">
+                    <a href={getPostUrlBySlug(post.id)} class="group btn-plain !block h-auto w-full rounded-lg overflow-hidden py-2.5">
                         <div class="flex flex-row justify-start items-center px-2 gap-2">
                             <div class="w-[17%] md:w-[10%] transition text-sm text-right text-50 shrink-0 leading-none">{formatDate(post.data.published)}</div>
                             <div class="w-[13%] md:w-[10%] relative dash-line flex items-center shrink-0">

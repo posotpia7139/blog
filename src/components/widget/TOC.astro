@@ -61,7 +61,7 @@ const filteredHeadings = headings.filter((heading) => {
 });
 ---
 {shouldShowTOC &&
-<table-of-contents class:list={[className, "block relative text-left"]} data-is-floating={isFloating}>
+<table-of-contents class:list={[className, "block relative text-left max-w-full"]} data-is-floating={isFloating}>
     <div class:list={["w-full", {"toc-inner-wrapper hide-scrollbar flex flex-col pb-24": isFloating}]}>
         <div class="toc w-full h-full">
             {/* 초기 렌더링 (서버 사이드) */}
@@ -78,7 +78,7 @@ const filteredHeadings = headings.filter((heading) => {
                         {heading.depth == minDepth && heading1Count++}
                         {heading.depth == minDepth + 1 && <div class="transition w-2 h-2 rounded-[0.1875rem] bg-[var(--toc-badge-bg)]"></div>}
                     </div>
-                    <div class:list={["transition text-[14px] text-left truncate leading-snug py-0.5 group-hover:text-[oklch(0.20_0.14_var(--hue))] dark:group-hover:text-[var(--primary)] flex-1 min-w-0",
+                    <div class:list={["transition text-[14px] text-left leading-snug py-0.5 group-hover:text-[oklch(0.20_0.14_var(--hue))] dark:group-hover:text-[var(--primary)] flex-1 min-w-0 whitespace-normal break-words [overflow-wrap:anywhere]",
                         {"text-black/100 dark:text-white/90": !isFloating},
                         {"text-black/80 dark:text-white/90 [.visible_&]:text-black/100 [.visible_&]:dark:text-white/90": isFloating}
                     ]}>{cleanHeadingText(heading.text)}</div>
@@ -177,7 +177,7 @@ class TableOfContents extends HTMLElement {
             }
 
             // 서버 사이드와 100% 동일한 클래스와 구조 유지
-            a.innerHTML = `${badgeHTML}<div class="transition text-[14px] text-left truncate leading-snug py-0.5 text-black/80 dark:text-white/90 group-hover:text-[oklch(0.20_0.14_var(--hue))] dark:group-hover:text-[var(--primary)] flex-1 min-w-0">${text.replace(/^(\d+\.)+\s*/, "")}</div>`;
+            a.innerHTML = `${badgeHTML}<div class="transition text-[14px] text-left leading-snug py-0.5 text-black/80 dark:text-white/90 group-hover:text-[oklch(0.20_0.14_var(--hue))] dark:group-hover:text-[var(--primary)] flex-1 min-w-0 whitespace-normal break-words [overflow-wrap:anywhere]">${text.replace(/^(\d+\.)+\s*/, "")}</div>`;
             tocContainer.appendChild(a);
         });
 

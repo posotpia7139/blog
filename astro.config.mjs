@@ -115,12 +115,14 @@ export default defineConfig({
 			},
 		}),
 		svelte(),
-		sitemap(),
+		sitemap({
+			filter: (page) => !page.endsWith("/posts/privacy/"),
+		}),
 		robotsTxt({
 			policy: [
 				{
 					userAgent: "*",
-					disallow: ["/_astro/"],
+					disallow: ["/_astro/", "/posts/privacy/"],
 				},
 			],
 		}),

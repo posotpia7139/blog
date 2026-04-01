@@ -13,7 +13,7 @@ let activeCategory = url.searchParams.get("category");
 const isPostPage = !!Astro.params.slug;
 
 if (!activeCategory && Astro.params.slug) {
-	const currentPost = allPosts.find((p) => p.slug === Astro.params.slug);
+	const currentPost = allPosts.find((p) => p.id === Astro.params.slug);
 	if (currentPost?.data.category) {
 		activeCategory = currentPost.data.category;
 	}

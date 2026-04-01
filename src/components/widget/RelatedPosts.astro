@@ -1,7 +1,7 @@
 ---
 import type { CollectionEntry } from "astro:content";
 import path from "node:path";
-import { getSortedPosts } from "@utils/content-utils";
+import { getEntryAssetBasePath, getSortedPosts } from "@utils/content-utils";
 import { formatDateToYYYYMMDD } from "@utils/date-utils";
 import { getPostUrlBySlug } from "@utils/url-utils";
 import { Icon } from "astro-icon/components";
@@ -16,7 +16,7 @@ const allPosts = await getSortedPosts();
 
 // 점수 계산 알고리즘 2.0
 const relatedPosts = allPosts
-	.filter((post) => post.slug !== entry.slug)
+	.filter((post) => post.id !== entry.id)
 	.map((post) => {
 		let score = 0;
 		const currentTags = entry.data.tags || [];
@@ -72,7 +72,7 @@ const relatedPosts = allPosts
         <div class="grid grid-cols-2 gap-3 md:gap-6">
             {relatedPosts.map(({ post }) => (
                 <a 
-                    href={getPostUrlBySlug(post.slug)} 
+                    href={getPostUrlBySlug(post.id)} 
                     class="group flex flex-col transition-all duration-300 active:scale-[0.98]"
                 >
                     {/* Thumbnail & Description Overlay */}
@@ -82,7 +82,7 @@ const relatedPosts = allPosts
                             {post.data.image ? (
                                 <ImageWrapper 
                                     src={post.data.image} 
-                                    basePath={path.join("content", post.collection, post.id.substring(0, post.id.lastIndexOf("/")))} 
+                                    basePath={path.normalize(getEntryAssetBasePath(post))} 
                                     alt={post.data.title}
                                     widths={[400, 800]}
                                     sizes="(max-width: 768px) 50vw, 400px"

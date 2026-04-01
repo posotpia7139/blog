@@ -3,6 +3,10 @@ import I18nKey from "@i18n/i18nKey";
 import { i18n } from "@i18n/translation";
 import { getCategoryUrl } from "@utils/url-utils.ts";
 
+export function isPrivacyPostId(id: string): boolean {
+	return id === "privacy" || id.startsWith("privacy/");
+}
+
 // // Retrieve posts and sort them by publication date
 export function extractCategoryFromId(id: string): string | null {
 	const parts = id.split("/");
@@ -39,7 +43,7 @@ async function getRawSortedPosts() {
 	const allBlogPosts = await getPosts();
 
 	const sorted = allBlogPosts
-		.filter((post) => !post.id.startsWith("privacy/"))
+		.filter((post) => !isPrivacyPostId(post.id))
 		.sort((a, b) => {
 			const dateA = new Date(a.data.published);
 			const dateB = new Date(b.data.published);
@@ -56,11 +60,11 @@ export async function getSortedPosts() {
 	const sorted = await getRawSortedPosts();
 
 	for (let i = 1; i < sorted.length; i++) {
-		sorted[i].data.nextSlug = sorted[i - 1].slug;
+		sorted[i].data.nextSlug = sorted[i - 1].id;
 		sorted[i].data.nextTitle = sorted[i - 1].data.title;
 	}
 	for (let i = 0; i < sorted.length - 1; i++) {
-		sorted[i].data.prevSlug = sorted[i + 1].slug;
+		sorted[i].data.prevSlug = sorted[i + 1].id;
 		sorted[i].data.prevTitle = sorted[i + 1].data.title;
 	}
 
@@ -80,11 +84,11 @@ export async function getSortedProjects() {
 	});
 
 	for (let i = 1; i < sorted.length; i++) {
-		sorted[i].data.nextSlug = sorted[i - 1].slug;
+		sorted[i].data.nextSlug = sorted[i - 1].id;
 		sorted[i].data.nextTitle = sorted[i - 1].data.title;
 	}
 	for (let i = 0; i < sorted.length - 1; i++) {
-		sorted[i].data.prevSlug = sorted[i + 1].slug;
+		sorted[i].data.prevSlug = sorted[i + 1].id;
 		sorted[i].data.prevTitle = sorted[i + 1].data.title;
 	}
 
@@ -92,6 +96,7 @@ export async function getSortedProjects() {
 }
 
 export type PostForList = {
+	id: string;
 	slug: string;
 	data: CollectionEntry<"posts">["data"];
 };
@@ -100,7 +105,8 @@ export async function getSortedPostsList(): Promise<PostForList[]> {
 
 	// delete post.body
 	const sortedPostsList = sortedFullPosts.map((post) => ({
-		slug: post.slug,
+		slug: post.id,
+		id: post.id,
 		data: post.data,
 	}));
 
@@ -114,7 +120,7 @@ export type Tag = {
 export async function getTagList(): Promise<Tag[]> {
 	const allPosts = await getPosts();
 	const allBlogPosts = allPosts.filter(
-		(post) => !post.id.startsWith("privacy/"),
+		(post) => !isPrivacyPostId(post.id),
 	);
 
 	const countMap: { [key: string]: number } = {};
@@ -142,7 +148,7 @@ export type Category = {
 export async function getCategoryList(): Promise<Category[]> {
 	const allPosts = await getPosts();
 	const allBlogPosts = allPosts.filter(
-		(post) => !post.id.startsWith("privacy/"),
+		(post) => !isPrivacyPostId(post.id),
 	);
 	const count: { [key: string]: number } = {};
 	allBlogPosts.forEach((post) => {
@@ -205,6 +211,20 @@ export async function getCategoryList(): Promise<Category[]> {
 		});
 	}
 	return ret;
+}
+
+export function getEntryAssetBasePath(
+	entry: Pick<CollectionEntry<"posts">, "collection" | "id" | "filePath">,
+): string {
+	if (entry.filePath) {
+		return entry.filePath
+			.replace(/\\/g, "/")
+			.replace(/^src\//, "")
+			.replace(/\/index\.(md|mdx)$/, "")
+			.replace(/\/[^/]+\.(md|mdx)$/, "");
+	}
+
+	return `content/${entry.collection}/${entry.id}`;
 }
 
 /**

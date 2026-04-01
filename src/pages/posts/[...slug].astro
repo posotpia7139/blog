@@ -1,12 +1,16 @@
 ---
 import path from "node:path";
+import { render } from "astro:content";
 import License from "@components/misc/License.astro";
 import Markdown from "@components/misc/Markdown.astro";
 import I18nKey from "@i18n/i18nKey";
 import { i18n } from "@i18n/translation";
 import MainGridLayout from "@layouts/MainGridLayout.astro";
-import { getAllPosts } from "@utils/content-utils";
-import { getDir } from "@utils/url-utils";
+import {
+	getAllPosts,
+	getEntryAssetBasePath,
+	isPrivacyPostId,
+} from "@utils/content-utils";
 import { Icon } from "astro-icon/components";
 import { licenseConfig } from "src/config";
 import ImageWrapper from "../../components/misc/ImageWrapper.astro";
@@ -24,17 +28,16 @@ import "katex/dist/katex.css";
 export async function getStaticPaths() {
 	const blogEntries = await getAllPosts();
 	return blogEntries.map((entry) => ({
-		params: { slug: entry.slug },
+		params: { slug: entry.id },
 		props: { entry },
 	}));
 }
 
 const { entry } = Astro.props;
 const hasDietTag = entry.data.tags.includes("diet");
+const isPrivacyPage = entry.id === "privacy";
 
-const { Content, headings } = await entry.render();
-
-const { remarkPluginFrontmatter } = await entry.render();
+const { Content, headings, remarkPluginFrontmatter } = await render(entry);
 
 const jsonLd = {
 	"@context": "https://schema.org",
@@ -56,10 +59,11 @@ const jsonLd = {
 ---
 <MainGridLayout banner={entry.data.image} title={entry.data.title} description={entry.data.description} lang={entry.data.lang} setOGTypeArticle={true} headings={headings}>
     <script is:inline slot="head" type="application/ld+json" set:html={JSON.stringify(jsonLd)}></script>
+    {isPrivacyPage && <meta slot="head" name="robots" content="noindex, nofollow" />}
     <div class="flex w-full rounded-[var(--radius-large)] overflow-hidden relative mb-2 md:mb-4">
         <div id="post-container" 
              data-category={entry.data.category}
-             data-pagefind-ignore={entry.id.startsWith("privacy/") ? true : null}
+             data-pagefind-ignore={isPrivacyPostId(entry.id) ? true : null}
              class:list={["card-base z-10 px-7 md:px-9 pt-6 pb-4 relative w-full ",
             {}
         ]}>
@@ -119,7 +123,7 @@ const jsonLd = {
             <!-- always show cover as long as it has one -->
 
             {entry.data.image &&
-                <ImageWrapper id="post-cover" src={entry.data.image} basePath={path.join("content/posts/", getDir(entry.id))} alt={entry.data.image_alt || `${entry.data.title} Cover`} class="mb-8 rounded-xl banner-container" loading="eager" fetchPriority="high"/>
+                <ImageWrapper id="post-cover" src={entry.data.image} basePath={path.normalize(getEntryAssetBasePath(entry))} alt={entry.data.image_alt || `${entry.data.title} Cover`} class="mb-8 rounded-xl banner-container" loading="eager" fetchPriority="high"/>
             }
 
             {siteConfig.toc.enable && <div id="top-toc-container" class="mb-7 w-fit max-w-full md:max-w-[50%] onload-animation pb-0 2xl:hidden">

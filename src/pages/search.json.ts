@@ -1,8 +1,9 @@
 import { getCollection } from "astro:content";
+import { isPrivacyPostId } from "../utils/content-utils";
 
 export async function GET() {
 	const allPosts = await getCollection("posts");
-	const posts = allPosts.filter((post) => !post.id.startsWith("privacy/"));
+	const posts = allPosts.filter((post) => !isPrivacyPostId(post.id));
 
 	const searchData = posts.map((post) => {
 		// 1. 명시적인 category가 있으면 사용
@@ -51,7 +52,7 @@ export async function GET() {
 			description: post.data.description || "",
 			category: category || "Uncategorized",
 			tags: post.data.tags || [],
-			url: `/posts/${post.slug}/`,
+			url: `/posts/${post.id}/`,
 			content: cleanContent.substring(0, 1500),
 		};
 	});
