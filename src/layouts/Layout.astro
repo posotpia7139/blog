@@ -107,6 +107,7 @@ const bannerOffset =
 		/>
 
 		<meta charset="UTF-8" />
+		<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
 		<link rel="stylesheet" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-subset.css" />
 		{favicons.map(favicon => (
 			<link rel="icon"
@@ -144,6 +145,31 @@ const bannerOffset =
 			let offset = Math.floor(window.innerHeight * (BANNER_HEIGHT_EXTEND / 100));
 			offset = offset - offset % 4;
 			document.documentElement.style.setProperty('--banner-height-extend', `${offset}px`);
+		</script>
+		<script is:inline define:vars={{isHomePage}}>
+			if (isHomePage) {
+				const isFirstHomePaint = !sessionStorage.getItem('home-first-paint-done');
+				if (isFirstHomePaint) {
+					document.documentElement.classList.add('home-first-paint');
+
+					const finishFirstHomePaint = () => {
+						document.documentElement.classList.remove('home-font-pending');
+						requestAnimationFrame(() => {
+							document.documentElement.classList.remove('home-first-paint');
+							sessionStorage.setItem('home-first-paint-done', '1');
+						});
+					};
+
+					if ('fonts' in document) {
+						document.documentElement.classList.add('home-font-pending');
+						document.fonts.ready.then(finishFirstHomePaint).catch(finishFirstHomePaint);
+						setTimeout(finishFirstHomePaint, 1500);
+					} else {
+						window.addEventListener('load', finishFirstHomePaint, { once: true });
+						setTimeout(finishFirstHomePaint, 300);
+					}
+				}
+			}
 		</script>
 		<style define:vars={{
 			configHue,
@@ -206,6 +232,21 @@ const bannerOffset =
 		display: none !important;
 	}
 
+	#post-list-container {
+		transition: opacity 120ms ease;
+	}
+
+	html.home-first-paint #content-wrapper,
+	html.home-first-paint #post-list-container,
+	html.home-first-paint #post-list-container .onload-animation {
+		animation: none !important;
+		opacity: 1 !important;
+	}
+
+	html.home-font-pending #post-list-container {
+		opacity: 0 !important;
+	}
+
     /* PhotoSwipe 돋보기 커서를 손가락 커서로 변경 */
     .custom-md img, #post-cover img {
         cursor: pointer !important;
@@ -225,6 +266,9 @@ import {
 import { siteConfig } from '../config';
 
 const bannerEnabled = !!document.getElementById('banner-wrapper')
+const isFirstHomePaint =
+    pathsEqual(window.location.pathname, url('/')) &&
+    !sessionStorage.getItem('home-first-paint-done');
 
 // 전역 초기화 함수
 function init() {
@@ -242,6 +286,7 @@ function init() {
 
     // 스크롤바 초기화 (데스크톱 전용)
     if (bodyElement && window.innerWidth >= 1024) {
+        if (isFirstHomePaint) return;
         requestAnimationFrame(() => {
             if (!(window as any).osInstance) {
                 (window as any).osInstance = OverlayScrollbars(bodyElement, {
@@ -359,6 +404,27 @@ if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
 } else {
     init();
+}
+
+if (isFirstHomePaint) {
+    window.addEventListener('load', () => {
+        const bodyElement = document.querySelector('body');
+        if (!bodyElement || window.innerWidth < 1024) return;
+
+        requestAnimationFrame(() => {
+            if (!(window as any).osInstance) {
+                (window as any).osInstance = OverlayScrollbars(bodyElement, {
+                    scrollbars: {
+                        theme: 'scrollbar-base scrollbar-auto py-1',
+                        autoHide: 'never',
+                    },
+                    overflow: { x: 'hidden', y: 'scroll' }
+                });
+            } else {
+                (window as any).osInstance.update(true);
+            }
+        });
+    }, { once: true });
 }
 
 // Swup 이벤트 연결

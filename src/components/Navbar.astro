@@ -4,7 +4,7 @@ import { navBarConfig, siteConfig } from "../config";
 import { LinkPresets } from "../constants/link-presets";
 import { LinkPreset, type NavBarLink } from "../types/config";
 import { url } from "../utils/url-utils";
-import LightDarkSwitch from "./LightDarkSwitch.svelte";
+import LightDarkSwitch from "./LightDarkSwitch.astro";
 import Search from "./Search.svelte";
 import NavMenuPanel from "./widget/NavMenuPanel.astro";
 
@@ -51,7 +51,7 @@ let links: NavBarLink[] = navBarConfig.links.map(
             <button id="search-switch" aria-label="Search" class="btn-plain rounded-lg w-11 h-11 flex items-center justify-center active:scale-90 transition-all shrink-0">
                 <Icon name="material-symbols:search" class="text-[1.5rem] text-black/60 dark:text-white/60"></Icon>
             </button>
-            <LightDarkSwitch client:load />
+            <LightDarkSwitch />
             <button aria-label="Menu" name="Nav Menu" class="btn-plain rounded-lg w-[48px] h-[48px] active:scale-90 lg:!hidden shrink-0" id="nav-menu-switch">
                 <Icon name="material-symbols:menu-rounded" class="text-[24px]"></Icon>
             </button>

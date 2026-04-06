@@ -1,0 +1,102 @@
+---
+import { Icon } from "astro-icon/components";
+import { AUTO_MODE, DARK_MODE, LIGHT_MODE } from "@constants/constants";
+---
+
+<div class="relative z-50 shrink-0" role="menu" tabindex="-1">
+    <button
+        aria-label="Light/Dark Mode"
+        role="menuitem"
+        class="relative btn-plain rounded-lg h-11 w-11 active:scale-90 flex items-center justify-center transition-all shrink-0"
+        id="scheme-switch"
+        data-theme-switch
+    >
+        <div class="theme-icon absolute inset-0 flex items-center justify-center transition-opacity duration-300" data-mode={LIGHT_MODE}>
+            <Icon name="material-symbols:wb-sunny-outline-rounded" class="text-[1.5rem]"></Icon>
+        </div>
+        <div class="theme-icon absolute inset-0 flex items-center justify-center transition-opacity duration-300" data-mode={DARK_MODE}>
+            <Icon name="material-symbols:dark-mode-outline-rounded" class="text-[1.5rem]"></Icon>
+        </div>
+        <div class="theme-icon absolute inset-0 flex items-center justify-center transition-opacity duration-300" data-mode={AUTO_MODE}>
+            <Icon name="material-symbols:radio-button-partial-outline" class="text-[1.5rem]"></Icon>
+        </div>
+    </button>
+</div>
+
+<script is:inline define:vars={{ AUTO_MODE, DARK_MODE, LIGHT_MODE }}>
+    function getStoredThemeMode() {
+        return localStorage.getItem('theme') || AUTO_MODE;
+    }
+
+    function applyThemeMode(theme) {
+        switch (theme) {
+            case LIGHT_MODE:
+                document.documentElement.classList.remove('dark');
+                break;
+            case DARK_MODE:
+                document.documentElement.classList.add('dark');
+                break;
+            default:
+                if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                    document.documentElement.classList.add('dark');
+                } else {
+                    document.documentElement.classList.remove('dark');
+                }
+        }
+    }
+
+    function renderThemeSwitch(mode) {
+        const switchButton = document.querySelector('[data-theme-switch]');
+        if (!(switchButton instanceof HTMLElement)) return;
+
+        switchButton.querySelectorAll('.theme-icon').forEach((icon) => {
+            if (!(icon instanceof HTMLElement)) return;
+            const active = icon.dataset.mode === mode;
+            icon.classList.toggle('opacity-100', active);
+            icon.classList.toggle('opacity-0', !active);
+            icon.setAttribute('aria-hidden', active ? 'false' : 'true');
+        });
+    }
+
+    function cycleTheme(mode) {
+        if (mode === AUTO_MODE) {
+            return window.matchMedia('(prefers-color-scheme: dark)').matches
+                ? LIGHT_MODE
+                : DARK_MODE;
+        }
+        if (mode === LIGHT_MODE) return DARK_MODE;
+        return LIGHT_MODE;
+    }
+
+    function initThemeSwitch() {
+        const switchButton = document.querySelector('[data-theme-switch]');
+        if (!(switchButton instanceof HTMLElement)) return;
+
+        const mode = getStoredThemeMode();
+        applyThemeMode(mode);
+        renderThemeSwitch(mode);
+
+        if (switchButton.dataset.bound === 'true') return;
+        switchButton.dataset.bound = 'true';
+
+        switchButton.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const nextMode = cycleTheme(getStoredThemeMode());
+            localStorage.setItem('theme', nextMode);
+            applyThemeMode(nextMode);
+            renderThemeSwitch(nextMode);
+        });
+
+        const media = window.matchMedia('(prefers-color-scheme: dark)');
+        media.addEventListener('change', () => {
+            const currentMode = getStoredThemeMode();
+            if (currentMode === AUTO_MODE) {
+                applyThemeMode(AUTO_MODE);
+                renderThemeSwitch(AUTO_MODE);
+            }
+        });
+    }
+
+    initThemeSwitch();
+    document.addEventListener('astro:page-load', initThemeSwitch);
+</script>

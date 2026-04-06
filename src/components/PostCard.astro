@@ -307,10 +307,23 @@ const { remarkPluginFrontmatter } = await render(entry);
         });
     }
 
+    let tagTruncationScheduled = false;
+    function scheduleTagTruncation() {
+        if (tagTruncationScheduled) return;
+        tagTruncationScheduled = true;
+
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                setupTagTruncation();
+                tagTruncationScheduled = false;
+            });
+        });
+    }
+
     // 초기 로드, 리사이즈, Astro 페이지 이동 시 실행
-    setupTagTruncation();
-    window.addEventListener('resize', setupTagTruncation);
-    document.addEventListener('astro:page-load', setupTagTruncation);
+    scheduleTagTruncation();
+    window.addEventListener('resize', scheduleTagTruncation);
+    document.addEventListener('astro:page-load', scheduleTagTruncation);
 </script>
 
 <style define:vars={{coverWidth}}>
