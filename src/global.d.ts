@@ -13,6 +13,7 @@ declare global {
 			}>;
 		};
 		sidebarLoaded?: boolean;
+		markdownInitialized?: boolean;
 	}
 }
 
