@@ -65,8 +65,8 @@ const filteredHeadings = headings.filter((heading) => {
     <div class:list={["w-full", {"toc-inner-wrapper hide-scrollbar flex flex-col pb-24": isFloating}]}>
         <div class="toc w-full h-full">
             {/* 초기 렌더링 (서버 사이드) */}
-            {filteredHeadings.map((heading) =>
-                <a href={`#${heading.slug}`} class:list={["group pr-3.5 pl-3.5 flex items-start gap-2 relative transition-all duration-100 ease-out w-full min-h-[26px] rounded-xl hover:bg-[var(--toc-btn-active)] active:bg-[var(--toc-btn-active)] py-0.5"
+            {filteredHeadings.map((heading, index) =>
+                <a href={`#${heading.slug}`} style={`--toc-item-index: ${index};`} class:list={["toc-item-anim group pr-3.5 pl-3.5 flex items-start gap-2 relative transition-all duration-100 ease-out w-full min-h-[26px] rounded-xl hover:bg-[var(--toc-btn-active)] active:bg-[var(--toc-btn-active)] py-0.5"
                 ]}>
                     <div class:list={["transition w-5 h-5 shrink-0 rounded-lg text-xs flex items-center justify-center font-bold mt-0.5",
                         {
@@ -159,14 +159,15 @@ class TableOfContents extends HTMLElement {
         let minDepth = Math.min(...validHeadings.map(h => parseInt(h.tagName.substring(1))));
         let h1Count = 1;
 
-        validHeadings.forEach(h => {
+        validHeadings.forEach((h, index) => {
             const depth = parseInt(h.tagName.substring(1));
             const text = h.textContent || '';
             const slug = h.id;
             
             const a = document.createElement('a');
             a.href = `#${slug}`;
-            a.className = "group pr-3.5 pl-3.5 flex items-start gap-2 relative transition-all duration-100 ease-out w-full min-h-[26px] rounded-xl hover:bg-[var(--toc-btn-active)] active:bg-[var(--toc-btn-active)] py-0.5";
+            a.className = "toc-item-anim group pr-3.5 pl-3.5 flex items-start gap-2 relative transition-all duration-100 ease-out w-full min-h-[26px] rounded-xl hover:bg-[var(--toc-btn-active)] active:bg-[var(--toc-btn-active)] py-0.5";
+            a.style.setProperty('--toc-item-index', `${index}`);
             
             let badgeHTML = '';
             if (depth === minDepth) {

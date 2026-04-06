@@ -132,7 +132,7 @@ const mainPanelTopMobile = siteConfig.banner.enable
 {siteConfig.toc.enable && (
     <div class="absolute w-full z-0 hidden 2xl:block h-0 overflow-visible">
         <div class="relative max-w-[var(--page-width)] mx-auto">
-            <div id="toc-wrapper" class:list={["hidden 2xl:block transition-all duration-500 absolute top-0 opacity-100 pointer-events-auto"]}>
+            <div id="toc-wrapper" class:list={["hidden 2xl:block onload-animation transition-swup-fade transition-opacity duration-500 ease-out absolute top-0 pointer-events-auto"]}>
                 <div class="fixed top-4 flex flex-col items-end w-fit"
                      style="right: calc(50vw + var(--page-width) / 2); max-width: calc(50vw - var(--page-width) / 2 - 16px);">
                     <div id="toc" class="w-full h-full flex flex-col items-end">
@@ -140,22 +140,6 @@ const mainPanelTopMobile = siteConfig.banner.enable
                     </div>
                 </div>
             </div>
-
-            <script is:inline>
-                function initTOCVisibility() {
-                    const floatingToc = document.getElementById('toc-wrapper');
-                    if (!floatingToc) return;
-
-                    // 항상 표시되도록 클래스 강제 고정
-                    floatingToc.classList.remove('opacity-0', 'pointer-events-none');
-                    floatingToc.classList.add('opacity-100', 'pointer-events-auto');
-                }
-
-                // 초기 로드 및 전환 시 실행 (astro:page-load가 첫 로드도 담당함)
-                document.addEventListener('swup:content:replace', initTOCVisibility);
-                document.addEventListener('astro:after-swap', initTOCVisibility);
-                document.addEventListener('astro:page-load', initTOCVisibility);
-            </script>
         </div>
     </div>
 )}

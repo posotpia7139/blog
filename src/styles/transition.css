@@ -6,6 +6,17 @@ html.is-animating .transition-swup-fade {
     @apply opacity-0 translate-y-4
 }
 
+html.is-changing #toc-wrapper {
+    transition: opacity 200ms ease, transform 200ms ease;
+    will-change: opacity, transform;
+}
+
+html.is-animating #toc-wrapper {
+    opacity: 0;
+    transform: translateY(16px);
+    pointer-events: none;
+}
+
 /* 1. 순수 페이드 인 (절제의 미학) */
 @keyframes fade-in {
     0% {
@@ -40,6 +51,17 @@ html.is-animating .transition-swup-fade {
     }
 }
 
+@keyframes toc-stagger-in {
+    0% {
+        opacity: 0;
+        transform: translateY(-6px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
 /* --- 공용 애니메이션 클래스 --- */
 
 /* 사이트 전체 기본 로딩 애니메이션 (Pure Fade 적용) */
@@ -62,11 +84,19 @@ html.is-animating .transition-swup-fade {
     animation: char-in 0.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
+#toc-wrapper .toc-item-anim {
+    opacity: 0;
+    transform: translateY(-6px);
+    animation: toc-stagger-in 0.32s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    animation-delay: calc(var(--content-delay) + 110ms + (var(--toc-item-index, 0) * 36ms));
+}
+
 /* --- 컴포넌트별 딜레이 제어 --- */
 #navbar { animation-delay: 100ms }
 #sidebar { animation-delay: 200ms }
 #swup-container { outline: none; }
 #content-wrapper { animation-delay: calc(var(--content-delay) + 100ms); }
+#toc-wrapper { animation-delay: calc(var(--content-delay) + 100ms); }
 #footer-wrapper .onload-animation { animation-delay: calc(var(--content-delay) + 100ms); }
 #banner-credit { animation-delay: 500ms; }
 

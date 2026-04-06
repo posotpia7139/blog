@@ -73,6 +73,18 @@
         }
     }
 
+    h2 {
+        font-size: 1.5rem;
+    }
+
+    h3 {
+        font-size: 1.25rem;
+    }
+
+    h4 {
+        font-size: 1.125rem;
+    }
+
     /* 헤더 레벨별 # 아이콘 크기 및 간격 최적화 */
     h1 .anchor-link { padding-right: 1.2rem; }
     h1 .anchor-link::after { font-size: 1.5rem; }
@@ -228,7 +240,7 @@
         font-weight: inherit;
 
         &:before {
-            @apply content-[''] absolute -left-1 block transition bg-[var(--btn-regular-bg)] h-full w-1 rounded-full;
+            @apply content-[''] absolute -left-1.5 block transition h-full w-[0.28125rem] rounded-full bg-[var(--primary)] opacity-40;
         }
 
         /* Remove the double quotes from default styles */

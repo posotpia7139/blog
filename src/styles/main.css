@@ -17,7 +17,7 @@
     }
     
     .dark .prose {
-        --tw-prose-body: #f8f8f8; /* 투명도 없는 순백색 계열 */
+        --tw-prose-body: #f2f2f2; /* 다크 모드 본문을 약간 부드럽게 조정 */
         --tw-prose-headings: #ffffff;
         opacity: 1 !important;
     }
