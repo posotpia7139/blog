@@ -303,10 +303,16 @@ function init() {
         (window as any).osInstance = null;
     }
 
-    initFootnotes();
     setupAnchorLinks();
-    processKaTeX();
-    showBanner();
+    initContentEnhancements();
+}
+
+function initContentEnhancements() {
+	requestAnimationFrame(() => {
+		initFootnotes();
+		processKaTeX();
+		showBanner();
+	});
 }
 
 function showBanner() {
@@ -343,6 +349,9 @@ function initFootnotes() {
 function setupAnchorLinks() {
 	const anchors = document.querySelectorAll('.anchor-link');
 	anchors.forEach(anchor => {
+		if ((anchor as HTMLElement).dataset.copyLinkBound === 'true') return;
+		(anchor as HTMLElement).dataset.copyLinkBound = 'true';
+
 		anchor.addEventListener('click', async (e) => {
 			e.preventDefault();
 			const href = anchor.getAttribute('href');
@@ -403,6 +412,8 @@ if (document.readyState === 'loading') {
 } else {
     init();
 }
+
+document.addEventListener('astro:page-load', initContentEnhancements);
 
 if (isFirstHomePaint) {
     window.addEventListener('load', () => {
