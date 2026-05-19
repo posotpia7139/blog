@@ -7,6 +7,13 @@ export function isPrivacyPostId(id: string): boolean {
 	return id === "privacy" || id.startsWith("privacy/");
 }
 
+export function isProjectPost(
+	post: Pick<CollectionEntry<"posts">, "data">,
+): boolean {
+	const category = post.data.category?.trim().toLowerCase();
+	return category === "projects" || category?.startsWith("projects/");
+}
+
 // // Retrieve posts and sort them by publication date
 export function extractCategoryFromId(id: string): string | null {
 	const parts = id.split("/");
@@ -73,9 +80,7 @@ export async function getSortedPosts() {
 
 export async function getSortedProjects() {
 	const allPosts = await getPosts();
-	const allProjects = allPosts.filter(
-		(post) => post.data.category === "Projects",
-	);
+	const allProjects = allPosts.filter((post) => isProjectPost(post));
 
 	const sorted = allProjects.sort((a, b) => {
 		const dateA = new Date(a.data.published);
@@ -119,9 +124,7 @@ export type Tag = {
 
 export async function getTagList(): Promise<Tag[]> {
 	const allPosts = await getPosts();
-	const allBlogPosts = allPosts.filter(
-		(post) => !isPrivacyPostId(post.id),
-	);
+	const allBlogPosts = allPosts.filter((post) => !isPrivacyPostId(post.id));
 
 	const countMap: { [key: string]: number } = {};
 	allBlogPosts.forEach((post: { data: { tags: string[] } }) => {
@@ -147,9 +150,7 @@ export type Category = {
 
 export async function getCategoryList(): Promise<Category[]> {
 	const allPosts = await getPosts();
-	const allBlogPosts = allPosts.filter(
-		(post) => !isPrivacyPostId(post.id),
-	);
+	const allBlogPosts = allPosts.filter((post) => !isPrivacyPostId(post.id));
 	const count: { [key: string]: number } = {};
 	allBlogPosts.forEach((post) => {
 		if (!post.data.category) {

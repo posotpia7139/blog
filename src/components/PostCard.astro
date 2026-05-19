@@ -51,11 +51,11 @@ const { remarkPluginFrontmatter } = await render(entry);
     {/* 전체 카드 링크 - peer로 설정하여 호버 상태를 추적함. z-index는 메타 링크(z-30)보다 낮게 설정. */}
     <a href={url} aria-label={title} class="absolute inset-0 z-20 peer"></a>
 
-        <div class:list={["px-6 pt-6 md:px-9 md:pt-7 relative w-full", {"pb-6": !isProject, "pb-4 md:pb-5": isProject}]}>
+        <div class="p-7 relative w-full">
 
                     {/* 상단 영역: 제목, 설명글, 썸네일 */}
 
-                    <div class:list={["flex-row flex items-center mb-0 md:gap-9", hasCover ? "gap-4" : "gap-0"]}>
+                    <div class:list={["flex-row flex items-center mb-0 md:gap-9", isProject ? "min-h-[112px] md:min-h-[160px]" : "min-h-[112px] sm:min-h-[160px]", hasCover ? "gap-4" : "gap-0"]}>
 
                 {/* 썸네일을 왼쪽에 배치 (프로젝트 및 블로그 포스트 모두) */}
                 {hasCover && (
@@ -252,7 +252,7 @@ const { remarkPluginFrontmatter } = await render(entry);
 
         </div>
 </div>
-<div class="transition border-t-[1px] border-dashed mx-6 border-black/10 dark:border-white/[0.15] last:border-t-0 first:border-t-0 md:hidden"></div>
+<div class="transition border-t-2 border-dashed mx-7 border-black/20 dark:border-white/25 last:border-t-0 first:border-t-0 md:hidden"></div>
 
 <script>
     function setupTagTruncation() {

@@ -18,6 +18,17 @@
 <script>
     const container = document.getElementById('scroll-progress-container');
     const progressBar = document.getElementById('scroll-progress-bar');
+
+    function hideProgress() {
+        if (!progressBar || !container) return;
+
+        container.classList.add('opacity-0');
+        progressBar.classList.add('transition-none');
+        progressBar.style.width = "0%";
+        requestAnimationFrame(() => {
+            progressBar.classList.remove('transition-none');
+        });
+    }
     
     function updateProgress() {
         if (!progressBar || !container) return;
@@ -57,6 +68,8 @@
     window.addEventListener('resize', updateProgress);
     updateProgress();
 
+    document.addEventListener('swup:visit:start', hideProgress);
     document.addEventListener('swup:content:replace', updateProgress);
     document.addEventListener('astro:after-swap', updateProgress);
+    document.addEventListener('astro:page-load', updateProgress);
 </script>

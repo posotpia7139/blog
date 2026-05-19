@@ -1,0 +1,18 @@
+---
+import PostPage from "../components/PostPage.astro";
+import MainGridLayout from "../layouts/MainGridLayout.astro";
+import { getSortedProjects } from "../utils/content-utils";
+
+const projects = await getSortedProjects();
+const page = { data: projects };
+---
+
+<MainGridLayout title="Projects">
+    <div class="mb-2 md:mb-4">
+        {projects.length > 0 ? (
+            <PostPage page={page}></PostPage>
+        ) : (
+            <div class="card-base p-7 text-75">No projects yet.</div>
+        )}
+    </div>
+</MainGridLayout>

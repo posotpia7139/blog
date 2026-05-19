@@ -23,6 +23,7 @@ interface Props {
 	lang?: string;
 	setOGTypeArticle?: boolean;
 	headings?: MarkdownHeading[];
+	animateContent?: boolean;
 }
 
 const {
@@ -32,6 +33,7 @@ const {
 	lang,
 	setOGTypeArticle,
 	headings = [],
+	animateContent = true,
 } = Astro.props;
 const hasBannerCredit =
 	siteConfig.banner.enable && siteConfig.banner.credit.enable;
@@ -90,7 +92,7 @@ const mainPanelTopMobile = siteConfig.banner.enable
             {/* 1. 본문 영역 (Left Column) */}
             <div class="flex flex-col gap-2 md:gap-4">
                 <main id="main-content" class="transition-swup-fade overflow-hidden flex flex-col">
-                    <div id="content-wrapper" class="onload-animation grow">
+                    <div id="content-wrapper" class:list={["grow", { "onload-animation": animateContent }]}>
                         <slot></slot>
                     </div>
                 </main>
